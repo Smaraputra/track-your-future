@@ -1,12 +1,33 @@
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 import { RetroWindow } from '@/components/retro-window';
+import { LoginForm } from './login-form';
 
-export default function LoginPage() {
+const ERROR_MESSAGES: Record<string, string> = {
+  CredentialsSignin: 'Invalid email or password. If you recently registered, check your email for a verification link.',
+  OAuthAccountNotLinked: 'An account already exists with this email using a different sign-in method.',
+  Default: 'An authentication error occurred. Please try again.',
+};
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const session = await auth();
+  if (session?.user) redirect('/dashboard');
+
+  const params = await searchParams;
+  const errorCode = typeof params.error === 'string' ? params.error : undefined;
+  const callbackUrl = typeof params.callbackUrl === 'string' ? params.callbackUrl : undefined;
+  const initialError = errorCode
+    ? ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.Default
+    : undefined;
+
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4">
-      <RetroWindow title="sys://login">
-        <p className="font-body text-muted-foreground text-sm">
-          Login -- coming in Step 8
-        </p>
+      <RetroWindow title="sys://auth/login" className="w-full max-w-sm">
+        <LoginForm initialError={initialError} callbackUrl={callbackUrl} />
       </RetroWindow>
     </div>
   );
