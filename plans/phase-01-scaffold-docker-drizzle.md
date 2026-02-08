@@ -49,5 +49,5 @@
 ## Status
 
 - [x] 1.1 Next.js initialized (Next.js 16.1.6, Tailwind v4, pnpm, Prettier)
-- [ ] 1.2 Docker Compose
+- [x] 1.2 Docker Compose
 - [ ] 1.3 Drizzle ORM setup

@@ -18,3 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Playwright E2E testing framework with Chromium
 - Unit tests for project configuration (tsconfig, ESLint, Prettier, env vars)
 - E2E tests for homepage (title, logo, links, responsive viewports)
+- Docker Compose with PostgreSQL 16, MinIO, Redis 7, and minio-init bucket creation
+- Multi-stage Dockerfile (base, dependencies, development, builder, production)
+- Unit tests for docker-compose.yml structure and service configuration
+- Integration tests for PostgreSQL, MinIO health, and Redis connectivity
