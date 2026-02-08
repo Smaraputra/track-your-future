@@ -40,8 +40,9 @@ describe('auth config structure', () => {
     expect(authSource).toContain('session.user.id = token.id');
   });
 
-  it('protects /dashboard routes', () => {
-    expect(authSource).toContain("'/dashboard'");
+  it('uses public path allowlist for route protection', () => {
+    expect(authSource).toContain('publicPaths');
+    expect(authSource).toContain('!isPublic && !isLoggedIn');
   });
 
   it('uses loginSchema for validation', () => {
