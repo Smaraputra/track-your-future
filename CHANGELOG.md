@@ -22,3 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-stage Dockerfile (base, dependencies, development, builder, production)
 - Unit tests for docker-compose.yml structure and service configuration
 - Integration tests for PostgreSQL, MinIO health, and Redis connectivity
+- Drizzle ORM with postgres-js driver and connection singleton
+- Drizzle Kit configuration (generate, push, studio, migrate scripts)
+- Unit tests for Drizzle config and connection module
+- Integration tests for Drizzle query execution
