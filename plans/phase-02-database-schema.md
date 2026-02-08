@@ -81,7 +81,7 @@ src/db/schema/
 
 ## Status
 
-- [ ] Schema files created
-- [ ] Enums defined
-- [ ] Relations defined
-- [ ] Migration generated and tested
+- [x] Schema files created
+- [x] Enums defined
+- [x] Relations defined
+- [x] Migration generated and tested

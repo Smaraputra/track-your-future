@@ -1,2 +1,8 @@
-// Schema barrel file. Tables will be added in Phase 2.
-export {};
+export * from './enums';
+export * from './auth';
+export * from './core';
+export * from './applications';
+export * from './billing';
+export * from './ai';
+export * from './notifications';
+export * from './relations';

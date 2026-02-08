@@ -5,7 +5,7 @@ Ordered steps with phase references and effort estimates.
 | Step | Phase | Effort | Description | Status |
 |------|-------|--------|-------------|--------|
 | 1 | 1.1-1.3 | 1 day | Scaffold + Docker + Drizzle setup | Complete |
-| 2 | 2 | 1 day | Database schema (all tables) | Pending |
+| 2 | 2 | 1 day | Database schema (all tables) | Complete |
 | 3 | 3 | 2-3 days | Auth (NextAuth v5 + credentials + OAuth + email verification) | Pending |
 | 4 | 4 | 2 days | Design system + retro components | Pending |
 | 5 | 5 | 0.5 day | Route structure + layouts (stubs) | Pending |
