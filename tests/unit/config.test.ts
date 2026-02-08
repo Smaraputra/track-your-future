@@ -79,7 +79,7 @@ describe('.env.example', () => {
 
   it.each([
     'DATABASE_URL',
-    'NEXTAUTH_SECRET',
+    'AUTH_SECRET',
     'MINIO_ENDPOINT',
     'STRIPE_SECRET_KEY',
     'REDIS_URL',
