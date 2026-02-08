@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import { and, eq } from 'drizzle-orm';
 
-import { db } from '@/db';
-import { users, verificationTokens } from '@/db/schema/auth';
-import { hashToken } from '@/lib/auth/tokens';
+import { verifyEmail } from '@/lib/auth/verify-email';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { VERIFY_EMAIL_RATE_LIMIT } from '@/lib/auth/rate-limit-config';
 import { getClientIp } from '@/lib/auth/get-ip';
@@ -31,46 +28,11 @@ export async function GET(request: Request) {
     );
   }
 
-  const hashed = hashToken(rawToken);
+  const result = await verifyEmail(rawToken);
 
-  const record = await db.query.verificationTokens.findFirst({
-    where: and(
-      eq(verificationTokens.token, hashed),
-    ),
-  });
-
-  if (!record) {
-    return NextResponse.json(
-      { error: 'Invalid or expired token' },
-      { status: 400 },
-    );
+  if (!result.success) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
-
-  if (record.expires < new Date()) {
-    await db
-      .delete(verificationTokens)
-      .where(
-        and(
-          eq(verificationTokens.identifier, record.identifier),
-          eq(verificationTokens.token, hashed),
-        ),
-      );
-    return NextResponse.json({ error: 'Token has expired' }, { status: 400 });
-  }
-
-  await db
-    .update(users)
-    .set({ emailVerified: new Date() })
-    .where(eq(users.email, record.identifier));
-
-  await db
-    .delete(verificationTokens)
-    .where(
-      and(
-        eq(verificationTokens.identifier, record.identifier),
-        eq(verificationTokens.token, hashed),
-      ),
-    );
 
   return NextResponse.json({ message: 'Email verified successfully' });
 }
