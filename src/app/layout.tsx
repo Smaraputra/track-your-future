@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { VT323, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/hooks/use-theme";
+import { CookieConsent } from "@/components/cookie-consent";
 import { THEME_STORAGE_KEY, DEFAULT_THEME } from "@/lib/theme";
 import "./globals.css";
 
@@ -38,7 +39,10 @@ export default function RootLayout({
         className={`${vt323.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <SessionProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <CookieConsent />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
