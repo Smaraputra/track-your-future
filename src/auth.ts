@@ -77,8 +77,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     authorized({ auth: session, request: { nextUrl } }) {
       const isLoggedIn = !!session?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-      if (isOnDashboard && !isLoggedIn) {
+      const publicPaths = [
+        '/',
+        '/login',
+        '/register',
+        '/privacy',
+        '/terms',
+        '/verify-email',
+        '/reset-password',
+        '/pricing',
+      ];
+      const isPublic =
+        publicPaths.includes(nextUrl.pathname) ||
+        publicPaths.some(
+          (p) => p !== '/' && nextUrl.pathname.startsWith(p + '/'),
+        ) ||
+        nextUrl.pathname.startsWith('/api/auth/');
+      if (!isPublic && !isLoggedIn) {
         return false;
       }
       return true;
