@@ -43,17 +43,17 @@ Two selectable themes stored in `localStorage` + `data-theme` attribute on `<htm
 
 ## Status
 
-- [ ] CSS variables and theme system
-- [ ] Font loading (VT323, JetBrains Mono)
-- [ ] Tailwind extensions (colors, keyframes, utilities)
-- [ ] shadcn/ui installed and configured
-- [ ] RetroWindow component
-- [ ] RetroButton component
-- [ ] RetroInput component
-- [ ] RetroSelect component
-- [ ] RetroDialog component
-- [ ] RetroStatusBadge component
-- [ ] CRTOverlay component
-- [ ] Sidebar component
-- [ ] Header component
-- [ ] UpgradeGate component
+- [x] CSS variables and theme system
+- [x] Font loading (VT323, JetBrains Mono)
+- [x] Tailwind extensions (colors, keyframes, utilities)
+- [x] shadcn/ui installed and configured
+- [x] RetroWindow component
+- [x] RetroButton component
+- [x] RetroInput component
+- [x] RetroSelect component
+- [x] RetroDialog component
+- [x] RetroStatusBadge component
+- [x] CRTOverlay component
+- [x] Sidebar component
+- [x] Header component
+- [x] UpgradeGate component
