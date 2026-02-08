@@ -60,12 +60,12 @@
 
 ## Status
 
-- [ ] NextAuth v5 configured with Drizzle adapter
-- [ ] Credentials provider (email/password)
-- [ ] Google OAuth provider
-- [ ] GitHub OAuth provider
-- [ ] Email verification flow
-- [ ] Password reset flow
-- [ ] Rate limiting on auth endpoints
-- [ ] Middleware for route protection
-- [ ] Auth pages (login, register, verify, reset)
+- [x] NextAuth v5 configured with Drizzle adapter
+- [x] Credentials provider (email/password)
+- [x] Google OAuth provider
+- [x] GitHub OAuth provider
+- [x] Email verification flow
+- [x] Password reset flow
+- [x] Rate limiting on auth endpoints
+- [x] Proxy (middleware) for route protection
+- [ ] Auth pages (login, register, verify, reset) -- deferred to Phase 8 (design system first)
