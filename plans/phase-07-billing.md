@@ -56,12 +56,12 @@ Annual pricing: $79/year (27% discount).
 
 ## Status
 
-- [ ] Stripe client setup
-- [ ] Plan limits config
-- [ ] Feature gating functions
-- [ ] Checkout Session API route
-- [ ] Webhook handler (idempotent)
-- [ ] Customer Portal redirect
-- [ ] Pricing page
-- [ ] Upgrade prompts (UpgradeGate component)
-- [ ] Past-due banner
+- [x] Stripe client setup
+- [x] Plan limits config
+- [x] Feature gating functions
+- [x] Checkout Session API route
+- [x] Webhook handler (idempotent)
+- [x] Customer Portal redirect
+- [x] Pricing page
+- [x] Upgrade prompts (UpgradeGate component)
+- [x] Past-due banner

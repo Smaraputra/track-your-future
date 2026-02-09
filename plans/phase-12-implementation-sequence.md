@@ -12,8 +12,8 @@ Ordered steps with phase references and effort estimates.
 | 6 | 11 | 1 day | Legal pages + cookie consent + GDPR endpoints | Complete |
 | 7 | 5 | 1-2 days | Landing page (boot animation) | Complete |
 | 8 | 3 | 1-2 days | Login/register/verify/reset pages | Complete |
-| 9 | 7 | 2-3 days | Stripe billing (checkout, webhooks, portal, feature gating) | Pending |
-| 10 | 7 | 0.5 day | Pricing page | Pending |
+| 9 | 7 | 2-3 days | Stripe billing (checkout, webhooks, portal, feature gating) | Complete |
+| 10 | 7 | 0.5 day | Pricing page | Complete |
 | 11 | 9.1 | 1-2 days | Role Categories CRUD | Pending |
 | 12 | 9.2 | 1 day | Form Field Templates CRUD | Pending |
 | 13 | 9.3 | 2 days | Document upload/download (MinIO presigned URLs) | Pending |
