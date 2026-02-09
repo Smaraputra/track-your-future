@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { and, count, eq } from 'drizzle-orm';
+import { and, asc, count, eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { FileText, Briefcase, FileStack } from 'lucide-react';
 
@@ -11,6 +11,7 @@ import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
 import { RoleColorBadge } from '@/components/roles/role-color-badge';
 import { RoleDetailActions } from '@/components/roles/role-detail-actions';
+import { TemplateList } from '@/components/templates/template-list';
 
 export default async function RoleDetailPage({
   params,
@@ -31,7 +32,13 @@ export default async function RoleDetailPage({
     notFound();
   }
 
-  const [[docCount], [appCount], [templateCount]] = await Promise.all([
+  const [
+    [docCount],
+    [appCount],
+    [templateCount],
+    templates,
+    [globalTemplateCount],
+  ] = await Promise.all([
     db
       .select({ count: count() })
       .from(documents)
@@ -44,6 +51,28 @@ export default async function RoleDetailPage({
       .select({ count: count() })
       .from(formFieldTemplates)
       .where(eq(formFieldTemplates.roleCategoryId, roleId)),
+    db
+      .select({
+        id: formFieldTemplates.id,
+        fieldKey: formFieldTemplates.fieldKey,
+        fieldValue: formFieldTemplates.fieldValue,
+        position: formFieldTemplates.position,
+      })
+      .from(formFieldTemplates)
+      .where(
+        and(
+          eq(formFieldTemplates.roleCategoryId, roleId),
+          eq(formFieldTemplates.userId, session!.user!.id),
+        ),
+      )
+      .orderBy(
+        asc(formFieldTemplates.position),
+        asc(formFieldTemplates.createdAt),
+      ),
+    db
+      .select({ count: count() })
+      .from(formFieldTemplates)
+      .where(eq(formFieldTemplates.userId, session!.user!.id)),
   ]);
 
   return (
@@ -100,11 +129,11 @@ export default async function RoleDetailPage({
           </div>
         </div>
 
-        <div className="border-border rounded-md border p-6 text-center">
-          <p className="font-body text-muted-foreground text-sm">
-            Form field templates will appear here in Step 12.
-          </p>
-        </div>
+        <TemplateList
+          roleId={roleId}
+          initialTemplates={templates}
+          globalTemplateCount={globalTemplateCount.count}
+        />
 
         <div className="border-border rounded-md border p-6 text-center">
           <p className="font-body text-muted-foreground text-sm">
