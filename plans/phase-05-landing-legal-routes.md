@@ -70,12 +70,12 @@ src/app/
 
 ## Status
 
-- [ ] Route structure created (all page stubs)
-- [ ] (public) layout
-- [ ] (dashboard) layout with sidebar + header
-- [ ] Landing page with boot sequence animation
-- [ ] Privacy policy page
-- [ ] Terms of service page
-- [ ] Cookie consent banner
-- [ ] GDPR export endpoint
-- [ ] GDPR account deletion endpoint
+- [x] Route structure created (all page stubs)
+- [x] (public) layout
+- [x] (dashboard) layout with sidebar + header
+- [x] Landing page with boot sequence animation
+- [x] Privacy policy page
+- [x] Terms of service page
+- [x] Cookie consent banner
+- [x] GDPR export endpoint
+- [x] GDPR account deletion endpoint

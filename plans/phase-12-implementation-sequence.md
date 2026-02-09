@@ -14,7 +14,7 @@ Ordered steps with phase references and effort estimates.
 | 8 | 3 | 1-2 days | Login/register/verify/reset pages | Complete |
 | 9 | 7 | 2-3 days | Stripe billing (checkout, webhooks, portal, feature gating) | Complete |
 | 10 | 7 | 0.5 day | Pricing page | Complete |
-| 11 | 9.1 | 1-2 days | Role Categories CRUD | Pending |
+| 11 | 9.1 | 1-2 days | Role Categories CRUD | Complete |
 | 12 | 9.2 | 1 day | Form Field Templates CRUD | Pending |
 | 13 | 9.3 | 2 days | Document upload/download (MinIO presigned URLs) | Pending |
 | 14 | 8.1 | 2 days | AI: CV parsing (pdf-parse + mammoth + LLM extraction) | Pending |
