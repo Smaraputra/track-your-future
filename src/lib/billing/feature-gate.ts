@@ -75,7 +75,7 @@ async function countDocuments(userId: string): Promise<number> {
   const [result] = await db
     .select({ count: count() })
     .from(documents)
-    .where(eq(documents.userId, userId));
+    .where(and(eq(documents.userId, userId), eq(documents.isLatest, true)));
   return result.count;
 }
 
