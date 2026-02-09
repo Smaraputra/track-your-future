@@ -99,7 +99,8 @@ export async function POST(request: Request) {
       .returning();
   });
 
-  // TODO: trigger async CV parsing if documentType === 'cv' (Step 14)
-
-  return NextResponse.json(created, { status: 201 });
+  return NextResponse.json(
+    { ...created, canParse: created.documentType === 'cv' },
+    { status: 201 },
+  );
 }
