@@ -78,10 +78,10 @@ Multi-provider via Vercel AI SDK (`ai` package).
 
 ## Status
 
-- [ ] AI provider setup (Vercel AI SDK)
-- [ ] Model routing config
-- [ ] Usage tracking + limit enforcement
-- [ ] 8.1 CV parsing pipeline
+- [x] AI provider setup (Vercel AI SDK)
+- [x] Model routing config
+- [x] Usage tracking + limit enforcement
+- [x] 8.1 CV parsing pipeline
 - [ ] 8.2 JD extraction (URL + text)
 - [ ] 8.3 Match scoring + gap analysis
 - [ ] 8.4 Cover letter generation (streaming)
