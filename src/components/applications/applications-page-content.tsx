@@ -6,6 +6,7 @@ import { Plus, Briefcase, List, LayoutGrid } from 'lucide-react';
 
 import { RetroButton } from '@/components/retro-button';
 import { ApplicationListView } from '@/components/applications/application-list-view';
+import { ApplicationBoardView } from '@/components/applications/application-board-view';
 import { DeleteApplicationDialog } from '@/components/applications/delete-application-dialog';
 import {
   Select,
@@ -209,9 +210,10 @@ export function ApplicationsPageContent({
           onDelete={setDeleteTarget}
         />
       ) : (
-        <div className="font-body text-muted-foreground border-border rounded-md border p-8 text-center text-sm">
-          Board view placeholder -- wired in next commit
-        </div>
+        <ApplicationBoardView
+          applications={filteredApplications}
+          onStatusChange={handleStatusChange}
+        />
       )}
 
       {atLimit && tier === 'free' && (
