@@ -2,14 +2,17 @@
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Trash2, ExternalLink, Lock } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink, Lock, Sparkles } from 'lucide-react';
 
 import { RetroButton } from '@/components/retro-button';
 import { ApplicationStatusSelect } from './application-status-select';
 import { ApplicationStatusTimeline } from './application-status-timeline';
 import { ApplicationDocumentLinker } from './application-document-linker';
 import { DeleteApplicationDialog } from './delete-application-dialog';
+import { ExtractJdButton } from './extract-jd-button';
+import { JdAnalysisViewer } from './jd-analysis-viewer';
 import { type ApplicationItem } from './applications-page-content';
+import type { JdExtractedData } from '@/lib/ai/schemas';
 
 interface StatusHistoryEntry {
   id: string;
@@ -31,12 +34,19 @@ interface AvailableDocument {
   documentType: string;
 }
 
+interface JobAnalysisData {
+  id: string;
+  analysis: unknown;
+  createdAt: string;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
   linkedDocuments: LinkedDocument[];
   availableDocuments: AvailableDocument[];
   isPro: boolean;
+  jobAnalysis: JobAnalysisData | null;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -55,12 +65,14 @@ export function ApplicationDetail({
   linkedDocuments: initialLinkedDocs,
   availableDocuments: initialAvailableDocs,
   isPro,
+  jobAnalysis: initialJobAnalysis,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
   const [linkedDocuments, setLinkedDocuments] = useState(initialLinkedDocs);
   const [availableDocuments, setAvailableDocuments] =
     useState(initialAvailableDocs);
+  const [jobAnalysis, setJobAnalysis] = useState(initialJobAnalysis);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const refreshDetail = useCallback(async () => {
@@ -117,6 +129,18 @@ export function ApplicationDetail({
     if (docsRes.ok) {
       const docs = await docsRes.json();
       setAvailableDocuments(docs);
+    }
+  }, [application.id]);
+
+  const refreshJobAnalysis = useCallback(async () => {
+    const res = await fetch(`/api/ai/extract-jd/${application.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setJobAnalysis({
+        id: data.id,
+        analysis: data.analysis,
+        createdAt: data.createdAt,
+      });
     }
   }, [application.id]);
 
@@ -234,6 +258,37 @@ export function ApplicationDetail({
           availableDocuments={availableDocuments}
           onChanged={refreshDocuments}
         />
+      </div>
+
+      {/* Job Description Analysis */}
+      <div className="border-border rounded-md border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-foreground text-lg">
+            Job Description
+          </h2>
+          {application.jobUrl && (
+            <ExtractJdButton
+              applicationId={application.id}
+              jobUrl={application.jobUrl}
+              hasAnalysis={!!jobAnalysis}
+              onExtracted={refreshJobAnalysis}
+            />
+          )}
+        </div>
+        {jobAnalysis ? (
+          <JdAnalysisViewer
+            data={jobAnalysis.analysis as JdExtractedData}
+          />
+        ) : application.jobUrl ? (
+          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
+            <Sparkles className="size-4" />
+            Click &quot;Extract JD&quot; to analyze the job posting
+          </p>
+        ) : (
+          <p className="font-body text-muted-foreground text-sm">
+            Add a job URL to enable JD extraction
+          </p>
+        )}
       </div>
 
       {/* AI Placeholders */}
