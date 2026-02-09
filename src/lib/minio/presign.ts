@@ -57,6 +57,24 @@ export async function headObject(
   }
 }
 
+export async function getObjectBuffer(fileKey: string): Promise<Buffer> {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET,
+    Key: fileKey,
+  });
+  const response = await s3.send(command);
+
+  if (!response.Body) {
+    throw new Error(`Empty response body for key: ${fileKey}`);
+  }
+
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 export async function deleteObject(fileKey: string): Promise<void> {
   const command = new DeleteObjectCommand({
     Bucket: BUCKET,

@@ -3,6 +3,7 @@ export {
   createPresignedPutUrl,
   createPresignedGetUrl,
   headObject,
+  getObjectBuffer,
   deleteObject,
   deleteObjects,
 } from './presign';
