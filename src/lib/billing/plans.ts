@@ -86,6 +86,17 @@ export interface PriceConfig {
   trialDays: number;
 }
 
+const PRO_ONLY_FEATURES: AiFeatureKey[] = [
+  'cover_letter',
+  'interview_prep',
+  'resume_suggestions',
+];
+
+export function canAccess(tier: Tier, feature: AiFeatureKey): boolean {
+  if (tier === 'pro') return true;
+  return !PRO_ONLY_FEATURES.includes(feature);
+}
+
 export const PRICES: PriceConfig = {
   monthly: {
     amountCents: 900,
