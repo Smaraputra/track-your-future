@@ -68,4 +68,4 @@
 - [x] Password reset flow
 - [x] Rate limiting on auth endpoints
 - [x] Proxy (middleware) for route protection
-- [ ] Auth pages (login, register, verify, reset) -- deferred to Phase 8 (design system first)
+- [x] Auth pages (login, register, verify, reset) -- implemented in Step 8
