@@ -11,7 +11,7 @@ import {
 } from '@/lib/auth/schemas';
 import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
-import { RetroFormField } from '@/components/auth/retro-form-field';
+import { RetroFormField } from '@/components/retro-form-field';
 import { AuthMessage } from '@/components/auth/auth-message';
 
 export function ResetPasswordForm() {
