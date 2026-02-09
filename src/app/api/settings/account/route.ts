@@ -37,13 +37,21 @@ export async function DELETE(request: Request) {
 
   // TODO: Query documents.fileKey for this user and delete from MinIO/S3 when SDK is installed
 
-  // Check for active Stripe subscription
+  // Cancel active Stripe subscription if exists
   const userSubscription = await db.query.subscriptions.findFirst({
     where: eq(subscriptions.userId, userId),
     columns: { providerSubscriptionId: true, status: true },
   });
-  if (userSubscription?.providerSubscriptionId && userSubscription.status === 'active') {
-    // TODO: Cancel Stripe subscription when SDK is installed
+  if (
+    userSubscription?.providerSubscriptionId &&
+    ['active', 'trialing', 'past_due'].includes(userSubscription.status)
+  ) {
+    const { stripe } = await import('@/lib/billing/stripe');
+    if (stripe) {
+      await stripe.subscriptions.cancel(
+        userSubscription.providerSubscriptionId,
+      );
+    }
   }
 
   // Delete user -- cascades all related data

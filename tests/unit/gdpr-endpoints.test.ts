@@ -82,6 +82,19 @@ describe('GDPR account deletion endpoint', () => {
     expect(source).toContain('MinIO/S3');
   });
 
+  it('cancels active Stripe subscription on deletion', () => {
+    expect(source).toContain('stripe.subscriptions.cancel');
+    expect(source).not.toContain('// TODO: Cancel Stripe');
+  });
+
+  it('handles active, trialing, and past_due statuses', () => {
+    expect(source).toContain("'active', 'trialing', 'past_due'");
+  });
+
+  it('dynamically imports Stripe to avoid loading for free users', () => {
+    expect(source).toContain("await import('@/lib/billing/stripe')");
+  });
+
   it('checks for active Stripe subscription', () => {
     expect(source).toContain('providerSubscriptionId');
   });
