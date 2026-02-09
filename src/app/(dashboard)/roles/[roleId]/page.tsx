@@ -7,6 +7,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core';
 import { applications } from '@/db/schema/applications';
+import { parsedProfiles } from '@/db/schema/ai';
 import { checkResourceLimit, getUserSubscription } from '@/lib/billing/feature-gate';
 import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
@@ -96,9 +97,11 @@ export default async function RoleDetailPage({
         roleCategoryId: documents.roleCategoryId,
         roleCategoryName: roleCategories.name,
         roleCategoryColor: roleCategories.color,
+        parsedProfileId: parsedProfiles.id,
       })
       .from(documents)
       .leftJoin(roleCategories, eq(documents.roleCategoryId, roleCategories.id))
+      .leftJoin(parsedProfiles, eq(documents.id, parsedProfiles.documentId))
       .where(
         and(
           eq(documents.roleCategoryId, roleId),

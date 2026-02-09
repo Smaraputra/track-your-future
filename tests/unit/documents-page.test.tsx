@@ -47,6 +47,12 @@ vi.mock('lucide-react', () => ({
   XIcon: (props: Record<string, unknown>) => (
     <svg data-testid="icon-x" {...props} />
   ),
+  Sparkles: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-sparkles" {...props} />
+  ),
+  Loader2: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-loader" {...props} />
+  ),
 }));
 
 const mockDocs = [
@@ -62,6 +68,7 @@ const mockDocs = [
     roleCategoryId: 'role-1',
     roleCategoryName: 'Frontend',
     roleCategoryColor: '#22c55e',
+    parsedProfileId: null,
   },
   {
     id: 'doc-2',
@@ -76,6 +83,7 @@ const mockDocs = [
     roleCategoryId: null,
     roleCategoryName: null,
     roleCategoryColor: null,
+    parsedProfileId: null,
   },
 ];
 

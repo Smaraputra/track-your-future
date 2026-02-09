@@ -4,6 +4,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { documents, roleCategories } from '@/db/schema/core';
+import { parsedProfiles } from '@/db/schema/ai';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -44,9 +45,11 @@ export async function GET(request: Request) {
       createdAt: documents.createdAt,
       roleCategoryName: roleCategories.name,
       roleCategoryColor: roleCategories.color,
+      parsedProfileId: parsedProfiles.id,
     })
     .from(documents)
     .leftJoin(roleCategories, eq(documents.roleCategoryId, roleCategories.id))
+    .leftJoin(parsedProfiles, eq(documents.id, parsedProfiles.documentId))
     .where(and(...conditions))
     .orderBy(desc(documents.createdAt));
 
