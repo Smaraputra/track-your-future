@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { and, asc, count, eq } from 'drizzle-orm';
+import { and, asc, count, desc, eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { FileText, Briefcase, FileStack } from 'lucide-react';
 
@@ -7,11 +7,13 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core';
 import { applications } from '@/db/schema/applications';
+import { checkResourceLimit, getUserSubscription } from '@/lib/billing/feature-gate';
 import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
 import { RoleColorBadge } from '@/components/roles/role-color-badge';
 import { RoleDetailActions } from '@/components/roles/role-detail-actions';
 import { TemplateList } from '@/components/templates/template-list';
+import { RoleDocumentList } from '@/components/documents/role-document-list';
 
 export default async function RoleDetailPage({
   params,
@@ -32,17 +34,25 @@ export default async function RoleDetailPage({
     notFound();
   }
 
+  const userId = session!.user!.id;
+  const sub = await getUserSubscription(userId);
+
   const [
     [docCount],
     [appCount],
     [templateCount],
     templates,
     [globalTemplateCount],
+    roleDocs,
+    allRoles,
+    docLimit,
   ] = await Promise.all([
     db
       .select({ count: count() })
       .from(documents)
-      .where(eq(documents.roleCategoryId, roleId)),
+      .where(
+        and(eq(documents.roleCategoryId, roleId), eq(documents.isLatest, true)),
+      ),
     db
       .select({ count: count() })
       .from(applications)
@@ -62,7 +72,7 @@ export default async function RoleDetailPage({
       .where(
         and(
           eq(formFieldTemplates.roleCategoryId, roleId),
-          eq(formFieldTemplates.userId, session!.user!.id),
+          eq(formFieldTemplates.userId, userId),
         ),
       )
       .orderBy(
@@ -72,8 +82,47 @@ export default async function RoleDetailPage({
     db
       .select({ count: count() })
       .from(formFieldTemplates)
-      .where(eq(formFieldTemplates.userId, session!.user!.id)),
+      .where(eq(formFieldTemplates.userId, userId)),
+    db
+      .select({
+        id: documents.id,
+        fileName: documents.fileName,
+        documentType: documents.documentType,
+        customTypeName: documents.customTypeName,
+        mimeType: documents.mimeType,
+        fileSizeBytes: documents.fileSizeBytes,
+        version: documents.version,
+        createdAt: documents.createdAt,
+        roleCategoryId: documents.roleCategoryId,
+        roleCategoryName: roleCategories.name,
+        roleCategoryColor: roleCategories.color,
+      })
+      .from(documents)
+      .leftJoin(roleCategories, eq(documents.roleCategoryId, roleCategories.id))
+      .where(
+        and(
+          eq(documents.roleCategoryId, roleId),
+          eq(documents.userId, userId),
+          eq(documents.isLatest, true),
+        ),
+      )
+      .orderBy(desc(documents.createdAt)),
+    db
+      .select({
+        id: roleCategories.id,
+        name: roleCategories.name,
+        color: roleCategories.color,
+      })
+      .from(roleCategories)
+      .where(eq(roleCategories.userId, userId))
+      .orderBy(asc(roleCategories.name)),
+    checkResourceLimit(userId, 'documents', sub.tier),
   ]);
+
+  const serializedRoleDocs = roleDocs.map((d) => ({
+    ...d,
+    createdAt: d.createdAt.toISOString(),
+  }));
 
   return (
     <RetroWindow title={`sys://roles/${role.name}`}>
@@ -135,11 +184,12 @@ export default async function RoleDetailPage({
           globalTemplateCount={globalTemplateCount.count}
         />
 
-        <div className="border-border rounded-md border p-6 text-center">
-          <p className="font-body text-muted-foreground text-sm">
-            Linked documents will appear here in Step 13.
-          </p>
-        </div>
+        <RoleDocumentList
+          roleId={roleId}
+          initialDocuments={serializedRoleDocs}
+          roles={allRoles}
+          globalDocumentCount={docLimit.current}
+        />
 
         <div className="pt-2">
           <RetroButton asChild variant="secondary" size="sm">
