@@ -35,6 +35,7 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', [
 
 export const aiFeatureEnum = pgEnum('ai_feature', [
   'parse',
+  'jd_extraction',
   'match',
   'cover_letter',
   'interview_prep',

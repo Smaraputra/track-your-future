@@ -5,6 +5,7 @@ import { calculateCost } from './costs';
 /** Features that have a corresponding DB enum value in ai_feature */
 export type AiDbFeature =
   | 'parse'
+  | 'jd_extraction'
   | 'match'
   | 'cover_letter'
   | 'interview_prep'
