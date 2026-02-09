@@ -18,8 +18,8 @@ const themeWrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe('NAV_ITEMS', () => {
-  it('has 6 navigation items', () => {
-    expect(NAV_ITEMS).toHaveLength(6);
+  it('has 7 navigation items', () => {
+    expect(NAV_ITEMS).toHaveLength(7);
   });
 
   it('each item has label, href, and icon', () => {
@@ -34,6 +34,7 @@ describe('NAV_ITEMS', () => {
     const hrefs = NAV_ITEMS.map((i) => i.href);
     expect(hrefs).toContain('/dashboard');
     expect(hrefs).toContain('/applications');
+    expect(hrefs).toContain('/roles');
     expect(hrefs).toContain('/documents');
     expect(hrefs).toContain('/settings');
   });
