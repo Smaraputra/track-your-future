@@ -92,7 +92,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         publicPaths.some(
           (p) => p !== '/' && nextUrl.pathname.startsWith(p + '/'),
         ) ||
-        nextUrl.pathname.startsWith('/api/auth/');
+        nextUrl.pathname.startsWith('/api/auth/') ||
+        nextUrl.pathname.startsWith('/api/webhooks/');
       if (!isPublic && !isLoggedIn) {
         return false;
       }

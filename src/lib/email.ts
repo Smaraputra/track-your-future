@@ -49,6 +49,25 @@ export async function sendVerificationEmail(
   });
 }
 
+export async function sendTrialEndingEmail(
+  email: string,
+  trialEnd: Date | null,
+): Promise<void> {
+  const endDate = trialEnd
+    ? trialEnd.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : 'soon';
+  const url = `${getBaseUrl()}/settings`;
+  await sendEmail({
+    to: email,
+    subject: 'Your trial is ending soon - Track Your Future',
+    html: `<p>Your Pro trial ends on ${endDate}.</p><p>To keep your Pro features, add a payment method in your <a href="${url}">account settings</a>.</p><p>If you don't add a payment method, your account will be downgraded to the Free plan.</p>`,
+  });
+}
+
 export async function sendPasswordResetEmail(
   email: string,
   token: string,
