@@ -4,6 +4,8 @@ import { Download, FileText, Trash2 } from 'lucide-react';
 
 import { RetroButton } from '@/components/retro-button';
 import { DocumentTypeBadge } from '@/components/documents/document-type-badge';
+import { ParseCvButton } from '@/components/documents/parse-cv-button';
+import { ParsedProfileViewer } from '@/components/documents/parsed-profile-viewer';
 import { Badge } from '@/components/ui/badge';
 
 function formatBytes(bytes: number): string {
@@ -34,15 +36,20 @@ export interface DocumentItem {
   roleCategoryId: string | null;
   roleCategoryName: string | null;
   roleCategoryColor: string | null;
+  parsedProfileId: string | null;
 }
 
 interface DocumentRowProps {
   document: DocumentItem;
   onDownload: (id: string) => void;
   onDelete: (doc: DocumentItem) => void;
+  onParse?: () => void;
 }
 
-export function DocumentRow({ document, onDownload, onDelete }: DocumentRowProps) {
+export function DocumentRow({ document, onDownload, onDelete, onParse }: DocumentRowProps) {
+  const isCv = document.documentType === 'cv';
+  const hasParsedProfile = !!document.parsedProfileId;
+
   return (
     <div className="border-border flex items-center gap-3 rounded-md border p-3">
       <FileText className="text-muted-foreground size-5 shrink-0" />
@@ -56,6 +63,19 @@ export function DocumentRow({ document, onDownload, onDelete }: DocumentRowProps
             <span className="font-body text-muted-foreground text-xs">
               v{document.version}
             </span>
+          )}
+          {hasParsedProfile && (
+            <ParsedProfileViewer
+              documentId={document.id}
+              trigger={
+                <Badge
+                  variant="outline"
+                  className="text-primary cursor-pointer text-xs"
+                >
+                  Parsed
+                </Badge>
+              }
+            />
           )}
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -85,7 +105,14 @@ export function DocumentRow({ document, onDownload, onDelete }: DocumentRowProps
         </div>
       </div>
 
-      <div className="flex shrink-0 gap-1">
+      <div className="flex shrink-0 items-center gap-1">
+        {isCv && onParse && (
+          <ParseCvButton
+            documentId={document.id}
+            hasParsedProfile={hasParsedProfile}
+            onParsed={onParse}
+          />
+        )}
         <RetroButton
           variant="ghost"
           size="icon"

@@ -3,6 +3,7 @@ import { and, asc, desc, eq, sum } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { documents, roleCategories } from '@/db/schema/core';
+import { parsedProfiles } from '@/db/schema/ai';
 import { getUserSubscription, checkResourceLimit } from '@/lib/billing/feature-gate';
 import { RetroWindow } from '@/components/retro-window';
 import { DocumentsPageContent } from '@/components/documents/documents-page-content';
@@ -27,9 +28,11 @@ export default async function DocumentsPage() {
         roleCategoryId: documents.roleCategoryId,
         roleCategoryName: roleCategories.name,
         roleCategoryColor: roleCategories.color,
+        parsedProfileId: parsedProfiles.id,
       })
       .from(documents)
       .leftJoin(roleCategories, eq(documents.roleCategoryId, roleCategories.id))
+      .leftJoin(parsedProfiles, eq(documents.id, parsedProfiles.documentId))
       .where(and(eq(documents.userId, userId), eq(documents.isLatest, true)))
       .orderBy(desc(documents.createdAt)),
     db

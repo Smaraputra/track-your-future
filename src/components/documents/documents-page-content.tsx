@@ -79,6 +79,10 @@ export function DocumentsPageContent({
     refreshDocuments();
   }
 
+  function handleParsed() {
+    refreshDocuments();
+  }
+
   function handleDeleted() {
     setDeleteTarget(null);
     refreshDocuments();
@@ -177,6 +181,7 @@ export function DocumentsPageContent({
               document={doc}
               onDownload={handleDownload}
               onDelete={setDeleteTarget}
+              onParse={handleParsed}
             />
           ))}
         </div>
