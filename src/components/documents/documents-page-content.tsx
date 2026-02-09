@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useSubscription } from '@/hooks/use-subscription';
-import { PLAN_LIMITS } from '@/lib/billing/plans';
 
 interface Role {
   id: string;
