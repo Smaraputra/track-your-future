@@ -102,7 +102,7 @@ draft -> applied -> phone_screen -> interview -> offer
 
 ## Status
 
-- [ ] 9.1 Role categories CRUD
+- [x] 9.1 Role categories CRUD
 - [ ] 9.2 Form field templates CRUD
 - [ ] 9.3 Document upload/download (MinIO presigned URLs)
 - [ ] 9.4 Applications CRUD + status pipeline
