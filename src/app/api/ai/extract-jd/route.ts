@@ -10,7 +10,7 @@ import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { canAccess } from '@/lib/billing/plans';
 import { checkAiLimit } from '@/lib/billing/feature-gate';
 import { fetchUrlAsText } from '@/lib/ai/jina-reader';
-import { parseJdText, calculateJdConfidence } from '@/lib/ai/jd-parser';
+import { parseJdText } from '@/lib/ai/jd-parser';
 import { getCachedJd, setCachedJd } from '@/lib/ai/jd-cache';
 import { logAiUsage } from '@/lib/ai/usage';
 import { MODEL_NAMES } from '@/lib/ai/models';

@@ -63,6 +63,12 @@ vi.mock('lucide-react', () => ({
   ChevronUpIcon: (props: Record<string, unknown>) => (
     <svg data-testid="icon-chevron-up" {...props} />
   ),
+  Sparkles: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-sparkles" {...props} />
+  ),
+  Loader2: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-loader" {...props} />
+  ),
 }));
 
 const mockApplication = {
@@ -122,6 +128,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(
@@ -137,6 +144,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(screen.getByText('Senior Engineer')).toBeDefined();
@@ -150,6 +158,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(screen.getByText('Edit')).toBeDefined();
@@ -164,6 +173,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     const link = screen.getByText('View posting');
@@ -180,6 +190,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(screen.getByText('Frontend Developer')).toBeDefined();
@@ -193,6 +204,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(
@@ -208,6 +220,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(
@@ -223,6 +236,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(screen.getByText('resume.pdf')).toBeDefined();
@@ -236,6 +250,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     expect(screen.getByText('Match Score')).toBeDefined();
@@ -252,6 +267,7 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        jobAnalysis={null}
       />,
     );
     const proTexts = screen.getAllByText(/Pro feature/);

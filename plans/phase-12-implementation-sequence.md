@@ -18,7 +18,7 @@ Ordered steps with phase references and effort estimates.
 | 12 | 9.2 | 1 day | Form Field Templates CRUD | Complete |
 | 13 | 9.3 | 2 days | Document upload/download (MinIO presigned URLs) | Complete |
 | 14 | 8.1 | 2 days | AI: CV parsing (pdf-parse + mammoth + LLM extraction) | Complete |
-| 15 | 8.2 | 1 day | AI: JD extraction (Jina Reader + LLM) | Pending |
+| 15 | 8.2 | 1 day | AI: JD extraction (Jina Reader + LLM) | Complete |
 | 16 | 9.4 | 2-3 days | Applications CRUD + status pipeline | Complete |
 | 17 | 8.3 | 1-2 days | AI: Match scoring + gap analysis | Pending |
 | 18 | 8.4 | 1-2 days | AI: Cover letter generation | Pending |
