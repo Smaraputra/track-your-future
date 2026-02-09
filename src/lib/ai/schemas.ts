@@ -148,3 +148,96 @@ export const jdExtractedDataSchema = z.object({
 });
 
 export type JdExtractedData = z.infer<typeof jdExtractedDataSchema>;
+
+export const matchScoreResultSchema = z.object({
+  overallScore: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Overall match score from 0 to 100'),
+  skillsMatch: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Skills alignment score from 0 to 100'),
+  experienceMatch: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Experience relevance score from 0 to 100'),
+  educationMatch: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Education fit score from 0 to 100'),
+  keywordCoverage: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Percentage of JD keywords covered in the CV from 0 to 100'),
+  strengths: z
+    .array(z.string())
+    .describe('Key strengths of the candidate relative to the job'),
+  weaknesses: z
+    .array(z.string())
+    .describe('Key gaps or weaknesses relative to the job requirements'),
+  suggestions: z
+    .array(z.string())
+    .describe('Actionable suggestions to improve the match'),
+});
+
+export type MatchScoreResult = z.infer<typeof matchScoreResultSchema>;
+
+export const interviewPrepResultSchema = z.object({
+  categories: z
+    .array(
+      z.object({
+        name: z
+          .enum(['behavioral', 'technical', 'situational'])
+          .describe('Category of interview questions'),
+        questions: z
+          .array(
+            z.object({
+              question: z.string().describe('The interview question'),
+              starHint: z
+                .string()
+                .describe('STAR method hint for structuring the answer'),
+              suggestedAnswer: z
+                .string()
+                .describe('A suggested answer tailored to the candidate'),
+            }),
+          )
+          .describe('Questions in this category'),
+      }),
+    )
+    .describe('Interview question categories'),
+});
+
+export type InterviewPrepResult = z.infer<typeof interviewPrepResultSchema>;
+
+export const resumeSuggestionResultSchema = z.object({
+  suggestions: z
+    .array(
+      z.object({
+        category: z
+          .enum(['content', 'formatting', 'keywords', 'impact'])
+          .describe('Type of suggestion'),
+        title: z.string().describe('Short title for the suggestion'),
+        description: z.string().describe('Detailed description of the suggestion'),
+        before: z
+          .string()
+          .optional()
+          .describe('Example of the current text to improve'),
+        after: z
+          .string()
+          .optional()
+          .describe('Example of the improved text'),
+        priority: z
+          .enum(['high', 'medium', 'low'])
+          .describe('Priority level of the suggestion'),
+      }),
+    )
+    .describe('List of resume improvement suggestions'),
+});
+
+export type ResumeSuggestionResult = z.infer<typeof resumeSuggestionResultSchema>;
