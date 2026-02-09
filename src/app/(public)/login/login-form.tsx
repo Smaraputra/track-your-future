@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { loginSchema, type LoginInput } from '@/lib/auth/schemas';
 import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
-import { RetroFormField } from '@/components/auth/retro-form-field';
+import { RetroFormField } from '@/components/retro-form-field';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
 import { AuthMessage } from '@/components/auth/auth-message';
 

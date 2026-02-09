@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { RetroFormField } from '@/components/auth/retro-form-field';
+import { RetroFormField } from '@/components/retro-form-field';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
 import { AuthMessage } from '@/components/auth/auth-message';
 
