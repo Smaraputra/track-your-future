@@ -5,6 +5,7 @@ import { NAV_ITEMS } from '@/components/nav-items';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { UpgradeGate } from '@/components/upgrade-gate';
 import { ThemeProvider } from '@/hooks/use-theme';
+import { SubscriptionProvider } from '@/hooks/use-subscription';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -118,9 +119,11 @@ describe('Header', async () => {
 describe('UpgradeGate', () => {
   it('renders children normally for pro tier', () => {
     render(
-      <UpgradeGate tier="pro">
-        <div data-testid="content">Pro Feature</div>
-      </UpgradeGate>
+      <SubscriptionProvider value={{ tier: 'pro', status: 'active', trialEnd: null, cancelAtPeriodEnd: false, currentPeriodEnd: null }}>
+        <UpgradeGate>
+          <div data-testid="content">Pro Feature</div>
+        </UpgradeGate>
+      </SubscriptionProvider>
     );
     const content = screen.getByTestId('content');
     expect(content).not.toHaveClass('opacity-40');
@@ -129,14 +132,26 @@ describe('UpgradeGate', () => {
 
   it('dims content and shows lock for free tier', () => {
     render(
-      <UpgradeGate tier="free">
-        <div data-testid="content">Pro Feature</div>
-      </UpgradeGate>
+      <SubscriptionProvider value={{ tier: 'free', status: null, trialEnd: null, cancelAtPeriodEnd: false, currentPeriodEnd: null }}>
+        <UpgradeGate>
+          <div data-testid="content">Pro Feature</div>
+        </UpgradeGate>
+      </SubscriptionProvider>
     );
     // Content should be dimmed
     const dimmedWrapper = screen.getByTestId('content').parentElement;
     expect(dimmedWrapper).toHaveClass('opacity-40');
     // Lock label should appear
     expect(screen.getByText('Pro')).toBeDefined();
+  });
+
+  it('defaults to free tier without provider', () => {
+    render(
+      <UpgradeGate>
+        <div data-testid="content">Pro Feature</div>
+      </UpgradeGate>
+    );
+    const dimmedWrapper = screen.getByTestId('content').parentElement;
+    expect(dimmedWrapper).toHaveClass('opacity-40');
   });
 });
