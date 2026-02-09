@@ -1,13 +1,36 @@
-import { RetroWindow } from '@/components/retro-window';
+import type { Metadata } from 'next';
+import { auth } from '@/auth';
+import { getUserSubscription } from '@/lib/billing/feature-gate';
+import { PricingTable } from '@/components/pricing-table';
+import type { Tier } from '@/lib/billing/plans';
 
-export default function PricingPage() {
+export const metadata: Metadata = {
+  title: 'Pricing - Track Your Future',
+};
+
+export default async function PricingPage() {
+  const session = await auth();
+  let currentTier: Tier = 'free';
+
+  if (session?.user?.id) {
+    const sub = await getUserSubscription(session.user.id);
+    currentTier = sub.tier;
+  }
+
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4">
-      <RetroWindow title="sys://pricing">
-        <p className="font-body text-muted-foreground text-sm">
-          Pricing -- coming in Step 9
+    <div className="py-8 px-4">
+      <div className="mx-auto max-w-4xl text-center mb-8">
+        <h1 className="font-heading text-foreground text-4xl mb-2">
+          Pricing
+        </h1>
+        <p className="font-body text-muted-foreground">
+          Choose the plan that fits your job search
         </p>
-      </RetroWindow>
+      </div>
+      <PricingTable
+        currentTier={currentTier}
+        isAuthenticated={!!session?.user}
+      />
     </div>
   );
 }
