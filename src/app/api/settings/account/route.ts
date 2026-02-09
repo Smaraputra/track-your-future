@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
+import { documents } from '@/db/schema/core';
 import { subscriptions } from '@/db/schema/billing';
+import { deleteObjects } from '@/lib/minio/presign';
 
 const deleteAccountSchema = z.object({
   confirmation: z.literal('DELETE MY ACCOUNT'),
@@ -35,7 +37,15 @@ export async function DELETE(request: Request) {
     );
   }
 
-  // TODO: Query documents.fileKey for this user and delete from MinIO/S3 when SDK is installed
+  // Delete all user files from MinIO
+  const userDocs = await db
+    .select({ fileKey: documents.fileKey })
+    .from(documents)
+    .where(eq(documents.userId, userId));
+
+  if (userDocs.length > 0) {
+    await deleteObjects(userDocs.map((d) => d.fileKey));
+  }
 
   // Cancel active Stripe subscription if exists
   const userSubscription = await db.query.subscriptions.findFirst({
