@@ -6,12 +6,12 @@ Ordered steps with phase references and effort estimates.
 |------|-------|--------|-------------|--------|
 | 1 | 1.1-1.3 | 1 day | Scaffold + Docker + Drizzle setup | Complete |
 | 2 | 2 | 1 day | Database schema (all tables) | Complete |
-| 3 | 3 | 2-3 days | Auth (NextAuth v5 + credentials + OAuth + email verification) | Pending |
-| 4 | 4 | 2 days | Design system + retro components | Pending |
-| 5 | 5 | 0.5 day | Route structure + layouts (stubs) | Pending |
-| 6 | 11 | 1 day | Legal pages + cookie consent + GDPR endpoints | Pending |
-| 7 | 5 | 1-2 days | Landing page (boot animation) | Pending |
-| 8 | 3 | 1-2 days | Login/register/verify/reset pages | Pending |
+| 3 | 3 | 2-3 days | Auth (NextAuth v5 + credentials + OAuth + email verification) | Complete |
+| 4 | 4 | 2 days | Design system + retro components | Complete |
+| 5 | 5 | 0.5 day | Route structure + layouts (stubs) | Complete |
+| 6 | 11 | 1 day | Legal pages + cookie consent + GDPR endpoints | Complete |
+| 7 | 5 | 1-2 days | Landing page (boot animation) | Complete |
+| 8 | 3 | 1-2 days | Login/register/verify/reset pages | Complete |
 | 9 | 7 | 2-3 days | Stripe billing (checkout, webhooks, portal, feature gating) | Pending |
 | 10 | 7 | 0.5 day | Pricing page | Pending |
 | 11 | 9.1 | 1-2 days | Role Categories CRUD | Pending |
