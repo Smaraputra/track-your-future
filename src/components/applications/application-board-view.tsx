@@ -21,7 +21,6 @@ import { RetroStatusBadge } from '@/components/retro-status-badge';
 import { DraggableApplicationCard } from './draggable-application-card';
 import {
   APPLICATION_STATUSES,
-  STATUS_CONFIG,
   type ApplicationStatus,
 } from '@/lib/applications';
 import { type ApplicationItem } from './applications-page-content';
@@ -39,7 +38,6 @@ function DroppableColumn({
   applications: ApplicationItem[];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
-  const config = STATUS_CONFIG[status];
 
   return (
     <div className="flex w-[200px] shrink-0 flex-col">

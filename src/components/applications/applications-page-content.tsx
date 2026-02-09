@@ -124,7 +124,7 @@ export function ApplicationsPageContent({
         <div className="flex items-center gap-2">
           <div className="border-border flex rounded-md border">
             <RetroButton
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              variant={viewMode === 'list' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('list')}
               aria-label="List view"
@@ -133,7 +133,7 @@ export function ApplicationsPageContent({
               <List className="size-4" />
             </RetroButton>
             <RetroButton
-              variant={viewMode === 'board' ? 'default' : 'ghost'}
+              variant={viewMode === 'board' ? 'primary' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('board')}
               aria-label="Board view"
