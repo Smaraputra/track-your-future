@@ -13,7 +13,15 @@ import {
   applicationDocuments,
 } from './applications';
 import { subscriptions, payments } from './billing';
-import { parsedProfiles, jobAnalyses, aiUsage } from './ai';
+import {
+  parsedProfiles,
+  jobAnalyses,
+  matchScores,
+  coverLetters,
+  interviewPreps,
+  resumeSuggestions,
+  aiUsage,
+} from './ai';
 import { notifications } from './notifications';
 
 // --- Auth relations ---
@@ -29,6 +37,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   payments: many(payments),
   parsedProfiles: many(parsedProfiles),
   jobAnalyses: many(jobAnalyses),
+  matchScores: many(matchScores),
+  coverLetters: many(coverLetters),
+  interviewPreps: many(interviewPreps),
+  resumeSuggestions: many(resumeSuggestions),
   aiUsage: many(aiUsage),
   notifications: many(notifications),
 }));
@@ -82,6 +94,7 @@ export const documentsRelations = relations(documents, ({ one, many }) => ({
     references: [roleCategories.id],
   }),
   parsedProfiles: many(parsedProfiles),
+  resumeSuggestions: many(resumeSuggestions),
   applicationDocuments: many(applicationDocuments),
 }));
 
@@ -115,6 +128,10 @@ export const applicationsRelations = relations(
     statusHistory: many(applicationStatusHistory),
     applicationDocuments: many(applicationDocuments),
     jobAnalyses: many(jobAnalyses),
+    matchScores: many(matchScores),
+    coverLetters: many(coverLetters),
+    interviewPreps: many(interviewPreps),
+    resumeSuggestions: many(resumeSuggestions),
     notifications: many(notifications),
   }),
 );
@@ -193,6 +210,60 @@ export const jobAnalysesRelations = relations(jobAnalyses, ({ one }) => ({
     references: [applications.id],
   }),
 }));
+
+export const matchScoresRelations = relations(matchScores, ({ one }) => ({
+  user: one(users, {
+    fields: [matchScores.userId],
+    references: [users.id],
+  }),
+  application: one(applications, {
+    fields: [matchScores.applicationId],
+    references: [applications.id],
+  }),
+}));
+
+export const coverLettersRelations = relations(coverLetters, ({ one }) => ({
+  user: one(users, {
+    fields: [coverLetters.userId],
+    references: [users.id],
+  }),
+  application: one(applications, {
+    fields: [coverLetters.applicationId],
+    references: [applications.id],
+  }),
+}));
+
+export const interviewPrepsRelations = relations(
+  interviewPreps,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [interviewPreps.userId],
+      references: [users.id],
+    }),
+    application: one(applications, {
+      fields: [interviewPreps.applicationId],
+      references: [applications.id],
+    }),
+  }),
+);
+
+export const resumeSuggestionsRelations = relations(
+  resumeSuggestions,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [resumeSuggestions.userId],
+      references: [users.id],
+    }),
+    application: one(applications, {
+      fields: [resumeSuggestions.applicationId],
+      references: [applications.id],
+    }),
+    document: one(documents, {
+      fields: [resumeSuggestions.documentId],
+      references: [documents.id],
+    }),
+  }),
+);
 
 export const aiUsageRelations = relations(aiUsage, ({ one }) => ({
   user: one(users, {

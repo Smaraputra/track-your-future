@@ -49,6 +49,59 @@ export const jobAnalyses = pgTable(
   (t) => [index('job_analyses_source_url_idx').on(t.sourceUrl)],
 );
 
+export const matchScores = pgTable('match_scores', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  applicationId: uuid('application_id').references(() => applications.id, {
+    onDelete: 'set null',
+  }),
+  score: numeric('score', { precision: 5, scale: 2 }).notNull(),
+  result: jsonb('result').notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const coverLetters = pgTable('cover_letters', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  applicationId: uuid('application_id').references(() => applications.id, {
+    onDelete: 'set null',
+  }),
+  tone: text('tone').notNull(),
+  content: text('content').notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const interviewPreps = pgTable('interview_preps', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  applicationId: uuid('application_id').references(() => applications.id, {
+    onDelete: 'set null',
+  }),
+  result: jsonb('result').notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+export const resumeSuggestions = pgTable('resume_suggestions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  applicationId: uuid('application_id').references(() => applications.id, {
+    onDelete: 'set null',
+  }),
+  documentId: uuid('document_id').references(() => documents.id, {
+    onDelete: 'set null',
+  }),
+  result: jsonb('result').notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
 export const aiUsage = pgTable(
   'ai_usage',
   {
