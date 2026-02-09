@@ -78,8 +78,9 @@ describe('GDPR account deletion endpoint', () => {
     expect(source).toContain("status: 400");
   });
 
-  it('has TODO for MinIO file cleanup', () => {
-    expect(source).toContain('MinIO/S3');
+  it('deletes user files from MinIO before account deletion', () => {
+    expect(source).toContain('deleteObjects');
+    expect(source).toContain('documents.fileKey');
   });
 
   it('cancels active Stripe subscription on deletion', () => {
