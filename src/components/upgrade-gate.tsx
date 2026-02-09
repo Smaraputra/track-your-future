@@ -7,15 +7,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useSubscription } from '@/hooks/use-subscription';
 import { cn } from '@/lib/utils';
 
 interface UpgradeGateProps {
-  tier: 'free' | 'pro';
   children: React.ReactNode;
   className?: string;
 }
 
-export function UpgradeGate({ tier, children, className }: UpgradeGateProps) {
+export function UpgradeGate({ children, className }: UpgradeGateProps) {
+  const { tier } = useSubscription();
+
   if (tier === 'pro') {
     return <>{children}</>;
   }
