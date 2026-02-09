@@ -93,3 +93,58 @@ export const cvParsedDataSchema = z.object({
 });
 
 export type CvParsedData = z.infer<typeof cvParsedDataSchema>;
+
+export const jdExtractedDataSchema = z.object({
+  companyName: z
+    .string()
+    .optional()
+    .describe('Name of the hiring company or organization'),
+  jobTitle: z
+    .string()
+    .optional()
+    .describe('Official job title from the posting'),
+  location: z
+    .string()
+    .optional()
+    .describe('Job location (city, state/province, country)'),
+  locationType: z
+    .enum(['remote', 'hybrid', 'onsite'])
+    .optional()
+    .describe('Whether the role is remote, hybrid, or onsite'),
+  salaryMin: z
+    .number()
+    .optional()
+    .describe('Minimum annual salary in the stated currency'),
+  salaryMax: z
+    .number()
+    .optional()
+    .describe('Maximum annual salary in the stated currency'),
+  salaryCurrency: z
+    .string()
+    .optional()
+    .describe('ISO 4217 currency code for the salary (e.g., USD, EUR, GBP)'),
+  requiredSkills: z
+    .array(z.string())
+    .describe('Skills explicitly listed as required or must-have'),
+  preferredSkills: z
+    .array(z.string())
+    .describe('Skills listed as preferred, nice-to-have, or bonus'),
+  experienceYears: z
+    .number()
+    .optional()
+    .describe('Minimum years of experience required'),
+  educationRequired: z
+    .string()
+    .optional()
+    .describe('Minimum education requirement (e.g., Bachelor\'s in CS)'),
+  responsibilities: z
+    .array(z.string())
+    .optional()
+    .describe('Key job responsibilities or duties'),
+  benefits: z
+    .array(z.string())
+    .optional()
+    .describe('Listed benefits, perks, or compensation extras'),
+});
+
+export type JdExtractedData = z.infer<typeof jdExtractedDataSchema>;
