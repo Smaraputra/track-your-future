@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Trash2, ExternalLink, Lock, Sparkles } from 'lucide-react';
+import { Pencil, Trash2, ExternalLink, Sparkles } from 'lucide-react';
 
 import { RetroButton } from '@/components/retro-button';
 import { ApplicationStatusSelect } from './application-status-select';
@@ -11,8 +11,10 @@ import { ApplicationDocumentLinker } from './application-document-linker';
 import { DeleteApplicationDialog } from './delete-application-dialog';
 import { ExtractJdButton } from './extract-jd-button';
 import { JdAnalysisViewer } from './jd-analysis-viewer';
+import { MatchScoreButton } from './match-score-button';
+import { MatchScoreViewer } from './match-score-viewer';
 import { type ApplicationItem } from './applications-page-content';
-import type { JdExtractedData } from '@/lib/ai/schemas';
+import type { JdExtractedData, MatchScoreResult } from '@/lib/ai/schemas';
 
 interface StatusHistoryEntry {
   id: string;
@@ -40,13 +42,22 @@ interface JobAnalysisData {
   createdAt: string;
 }
 
+interface MatchScoreData {
+  id: string;
+  score: string;
+  result: unknown;
+  createdAt: string;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
   linkedDocuments: LinkedDocument[];
   availableDocuments: AvailableDocument[];
   isPro: boolean;
+  hasParsedCv: boolean;
   jobAnalysis: JobAnalysisData | null;
+  matchScore: MatchScoreData | null;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -65,7 +76,9 @@ export function ApplicationDetail({
   linkedDocuments: initialLinkedDocs,
   availableDocuments: initialAvailableDocs,
   isPro,
+  hasParsedCv: initialHasParsedCv,
   jobAnalysis: initialJobAnalysis,
+  matchScore: initialMatchScore,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
@@ -73,6 +86,8 @@ export function ApplicationDetail({
   const [availableDocuments, setAvailableDocuments] =
     useState(initialAvailableDocs);
   const [jobAnalysis, setJobAnalysis] = useState(initialJobAnalysis);
+  const [matchScore, setMatchScore] = useState(initialMatchScore);
+  const [hasParsedCv] = useState(initialHasParsedCv);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const refreshDetail = useCallback(async () => {
@@ -129,6 +144,19 @@ export function ApplicationDetail({
     if (docsRes.ok) {
       const docs = await docsRes.json();
       setAvailableDocuments(docs);
+    }
+  }, [application.id]);
+
+  const refreshMatchScore = useCallback(async () => {
+    const res = await fetch(`/api/ai/match/${application.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setMatchScore({
+        id: data.id,
+        score: data.score,
+        result: data.result,
+        createdAt: data.createdAt,
+      });
     }
   }, [application.id]);
 
@@ -291,10 +319,39 @@ export function ApplicationDetail({
         )}
       </div>
 
+      {/* Match Score */}
+      <div className="border-border rounded-md border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-foreground text-lg">Match Score</h2>
+          <MatchScoreButton
+            applicationId={application.id}
+            hasScore={!!matchScore}
+            hasParsedCv={hasParsedCv}
+            hasJdAnalysis={!!jobAnalysis}
+            onScored={refreshMatchScore}
+          />
+        </div>
+        {matchScore ? (
+          <MatchScoreViewer
+            data={matchScore.result as MatchScoreResult}
+          />
+        ) : (
+          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
+            <Sparkles className="size-4" />
+            {!hasParsedCv && !jobAnalysis
+              ? 'Parse a CV and extract the JD to enable match scoring'
+              : !hasParsedCv
+                ? 'Parse a CV to enable match scoring'
+                : !jobAnalysis
+                  ? 'Extract the JD to enable match scoring'
+                  : 'Click "Score Match" to analyze fit'}
+          </p>
+        )}
+      </div>
+
       {/* AI Placeholders */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { title: 'Match Score', step: 'Step 17' },
           { title: 'Cover Letter', step: 'Step 18' },
           { title: 'Interview Prep', step: 'Step 19' },
           { title: 'Resume Suggestions', step: 'Step 20' },
@@ -304,14 +361,13 @@ export function ApplicationDetail({
             className="border-border rounded-md border p-4 opacity-50"
           >
             <div className="flex items-center gap-2">
-              <Lock className="text-muted-foreground size-4" />
+              <Sparkles className="text-muted-foreground size-4" />
               <h3 className="font-heading text-foreground text-sm">
                 {ai.title}
               </h3>
             </div>
             <p className="font-body text-muted-foreground mt-1 text-xs">
-              AI-powered {ai.title.toLowerCase()} -- coming in {ai.step}
-              {!isPro && '. Pro feature.'}
+              Coming in {ai.step}
             </p>
           </div>
         ))}

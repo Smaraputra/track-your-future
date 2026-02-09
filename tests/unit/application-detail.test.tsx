@@ -128,7 +128,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(
@@ -144,7 +146,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(screen.getByText('Senior Engineer')).toBeDefined();
@@ -158,7 +162,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(screen.getByText('Edit')).toBeDefined();
@@ -173,7 +179,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     const link = screen.getByText('View posting');
@@ -190,7 +198,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(screen.getByText('Frontend Developer')).toBeDefined();
@@ -204,7 +214,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(
@@ -220,7 +232,9 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(
@@ -236,13 +250,15 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
     expect(screen.getByText('resume.pdf')).toBeDefined();
   });
 
-  it('renders AI placeholder cards', () => {
+  it('renders Match Score section and AI placeholder cards', () => {
     render(
       <ApplicationDetail
         application={mockApplication}
@@ -250,16 +266,18 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
-    expect(screen.getByText('Match Score')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Match Score' })).toBeDefined();
     expect(screen.getByText('Cover Letter')).toBeDefined();
     expect(screen.getByText('Interview Prep')).toBeDefined();
     expect(screen.getByText('Resume Suggestions')).toBeDefined();
   });
 
-  it('shows Pro feature text for free users', () => {
+  it('shows match score empty state when no CV and no JD', () => {
     render(
       <ApplicationDetail
         application={mockApplication}
@@ -267,10 +285,13 @@ describe('ApplicationDetail', () => {
         linkedDocuments={mockLinkedDocuments}
         availableDocuments={mockAvailableDocuments}
         isPro={false}
+        hasParsedCv={false}
         jobAnalysis={null}
+        matchScore={null}
       />,
     );
-    const proTexts = screen.getAllByText(/Pro feature/);
-    expect(proTexts.length).toBe(4);
+    expect(
+      screen.getByText('Parse a CV and extract the JD to enable match scoring'),
+    ).toBeDefined();
   });
 });
