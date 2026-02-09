@@ -9,6 +9,7 @@ import {
   applicationDocuments,
 } from '@/db/schema/applications';
 import { roleCategories, documents } from '@/db/schema/core';
+import { jobAnalyses } from '@/db/schema/ai';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { RetroWindow } from '@/components/retro-window';
 import { ApplicationDetail } from '@/components/applications/application-detail';
@@ -50,7 +51,7 @@ export default async function ApplicationDetailPage({
     notFound();
   }
 
-  const [sub, history, linkedDocs, allDocs] = await Promise.all([
+  const [sub, history, linkedDocs, allDocs, jobAnalysis] = await Promise.all([
     getUserSubscription(userId),
     db
       .select()
@@ -77,6 +78,12 @@ export default async function ApplicationDetailPage({
       .where(
         and(eq(documents.userId, userId), eq(documents.isLatest, true)),
       ),
+    db.query.jobAnalyses.findFirst({
+      where: and(
+        eq(jobAnalyses.applicationId, applicationId),
+        eq(jobAnalyses.userId, userId),
+      ),
+    }),
   ]);
 
   const serializedApp = {
@@ -99,6 +106,15 @@ export default async function ApplicationDetailPage({
         linkedDocuments={linkedDocs}
         availableDocuments={allDocs}
         isPro={sub.tier === 'pro'}
+        jobAnalysis={
+          jobAnalysis
+            ? {
+                id: jobAnalysis.id,
+                analysis: jobAnalysis.analysis,
+                createdAt: jobAnalysis.createdAt.toISOString(),
+              }
+            : null
+        }
       />
     </RetroWindow>
   );
