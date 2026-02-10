@@ -15,8 +15,10 @@ import { MatchScoreButton } from './match-score-button';
 import { MatchScoreViewer } from './match-score-viewer';
 import { CoverLetterSection } from './cover-letter-section';
 import { CoverLetterViewer } from './cover-letter-viewer';
+import { InterviewPrepButton } from './interview-prep-button';
+import { InterviewPrepViewer } from './interview-prep-viewer';
 import { type ApplicationItem } from './applications-page-content';
-import type { JdExtractedData, MatchScoreResult } from '@/lib/ai/schemas';
+import type { JdExtractedData, MatchScoreResult, InterviewPrepResult } from '@/lib/ai/schemas';
 
 interface StatusHistoryEntry {
   id: string;
@@ -58,6 +60,12 @@ interface CoverLetterData {
   createdAt: string;
 }
 
+interface InterviewPrepData {
+  id: string;
+  result: unknown;
+  createdAt: string;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
@@ -68,6 +76,7 @@ interface ApplicationDetailProps {
   jobAnalysis: JobAnalysisData | null;
   matchScore: MatchScoreData | null;
   coverLetter: CoverLetterData | null;
+  interviewPrep: InterviewPrepData | null;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -90,6 +99,7 @@ export function ApplicationDetail({
   jobAnalysis: initialJobAnalysis,
   matchScore: initialMatchScore,
   coverLetter: initialCoverLetter,
+  interviewPrep: initialInterviewPrep,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
@@ -99,6 +109,7 @@ export function ApplicationDetail({
   const [jobAnalysis, setJobAnalysis] = useState(initialJobAnalysis);
   const [matchScore, setMatchScore] = useState(initialMatchScore);
   const [coverLetter, setCoverLetter] = useState(initialCoverLetter);
+  const [interviewPrep, setInterviewPrep] = useState(initialInterviewPrep);
   const [hasParsedCv] = useState(initialHasParsedCv);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -166,6 +177,18 @@ export function ApplicationDetail({
       setMatchScore({
         id: data.id,
         score: data.score,
+        result: data.result,
+        createdAt: data.createdAt,
+      });
+    }
+  }, [application.id]);
+
+  const refreshInterviewPrep = useCallback(async () => {
+    const res = await fetch(`/api/ai/interview-prep/${application.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setInterviewPrep({
+        id: data.id,
         result: data.result,
         createdAt: data.createdAt,
       });
@@ -405,27 +428,47 @@ export function ApplicationDetail({
         )}
       </div>
 
-      {/* AI Placeholders */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {[
-          { title: 'Interview Prep', step: 'Step 19' },
-          { title: 'Resume Suggestions', step: 'Step 20' },
-        ].map((ai) => (
-          <div
-            key={ai.title}
-            className="border-border rounded-md border p-4 opacity-50"
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="text-muted-foreground size-4" />
-              <h3 className="font-heading text-foreground text-sm">
-                {ai.title}
-              </h3>
-            </div>
-            <p className="font-body text-muted-foreground mt-1 text-xs">
-              Coming in {ai.step}
-            </p>
-          </div>
-        ))}
+      {/* Interview Prep */}
+      <div className="border-border rounded-md border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-foreground text-lg">
+            Interview Prep
+          </h2>
+          <InterviewPrepButton
+            applicationId={application.id}
+            hasPrep={!!interviewPrep}
+            hasJdAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            onGenerated={refreshInterviewPrep}
+          />
+        </div>
+        {interviewPrep ? (
+          <InterviewPrepViewer
+            data={interviewPrep.result as InterviewPrepResult}
+          />
+        ) : (
+          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
+            <Sparkles className="size-4" />
+            {!isPro
+              ? 'Pro plan required for interview prep'
+              : !jobAnalysis
+                ? 'Extract the JD to generate interview prep'
+                : 'Click "Generate" to create interview preparation materials'}
+          </p>
+        )}
+      </div>
+
+      {/* Resume Suggestions Placeholder */}
+      <div className="border-border rounded-md border p-4 opacity-50">
+        <div className="flex items-center gap-2">
+          <Sparkles className="text-muted-foreground size-4" />
+          <h3 className="font-heading text-foreground text-sm">
+            Resume Suggestions
+          </h3>
+        </div>
+        <p className="font-body text-muted-foreground mt-1 text-xs">
+          Coming in Step 20
+        </p>
       </div>
 
       <DeleteApplicationDialog
