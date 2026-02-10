@@ -138,6 +138,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(
@@ -157,6 +158,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(screen.getByText('Senior Engineer')).toBeDefined();
@@ -174,6 +176,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(screen.getByText('Edit')).toBeDefined();
@@ -192,6 +195,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     const link = screen.getByText('View posting');
@@ -212,6 +216,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(screen.getByText('Frontend Developer')).toBeDefined();
@@ -229,6 +234,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(
@@ -248,6 +254,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(
@@ -267,12 +274,13 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(screen.getByText('resume.pdf')).toBeDefined();
   });
 
-  it('renders Match Score and Cover Letter sections plus remaining placeholders', () => {
+  it('renders AI sections plus remaining placeholders', () => {
     render(
       <ApplicationDetail
         application={mockApplication}
@@ -284,11 +292,12 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(screen.getByRole('heading', { name: 'Match Score' })).toBeDefined();
     expect(screen.getByRole('heading', { name: 'Cover Letter' })).toBeDefined();
-    expect(screen.getByText('Interview Prep')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Interview Prep' })).toBeDefined();
     expect(screen.getByText('Resume Suggestions')).toBeDefined();
   });
 
@@ -304,6 +313,7 @@ describe('ApplicationDetail', () => {
         jobAnalysis={null}
         matchScore={null}
         coverLetter={null}
+        interviewPrep={null}
       />,
     );
     expect(
