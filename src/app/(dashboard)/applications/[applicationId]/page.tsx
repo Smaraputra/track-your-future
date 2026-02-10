@@ -14,6 +14,7 @@ import {
   matchScores,
   coverLetters,
   interviewPreps,
+  resumeSuggestions,
   parsedProfiles,
 } from '@/db/schema/ai';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
@@ -57,7 +58,7 @@ export default async function ApplicationDetailPage({
     notFound();
   }
 
-  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, coverLetter, interviewPrep, hasParsedCv] =
+  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, coverLetter, interviewPrep, resumeSuggestion, hasParsedCv] =
     await Promise.all([
       getUserSubscription(userId),
       db
@@ -107,6 +108,12 @@ export default async function ApplicationDetailPage({
         where: and(
           eq(interviewPreps.applicationId, applicationId),
           eq(interviewPreps.userId, userId),
+        ),
+      }),
+      db.query.resumeSuggestions.findFirst({
+        where: and(
+          eq(resumeSuggestions.applicationId, applicationId),
+          eq(resumeSuggestions.userId, userId),
         ),
       }),
       db
@@ -182,6 +189,15 @@ export default async function ApplicationDetailPage({
                 id: interviewPrep.id,
                 result: interviewPrep.result,
                 createdAt: interviewPrep.createdAt.toISOString(),
+              }
+            : null
+        }
+        resumeSuggestions={
+          resumeSuggestion
+            ? {
+                id: resumeSuggestion.id,
+                result: resumeSuggestion.result,
+                createdAt: resumeSuggestion.createdAt.toISOString(),
               }
             : null
         }

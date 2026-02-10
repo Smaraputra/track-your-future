@@ -17,8 +17,10 @@ import { CoverLetterSection } from './cover-letter-section';
 import { CoverLetterViewer } from './cover-letter-viewer';
 import { InterviewPrepButton } from './interview-prep-button';
 import { InterviewPrepViewer } from './interview-prep-viewer';
+import { ResumeSuggestionsButton } from './resume-suggestions-button';
+import { ResumeSuggestionsViewer } from './resume-suggestions-viewer';
 import { type ApplicationItem } from './applications-page-content';
-import type { JdExtractedData, MatchScoreResult, InterviewPrepResult } from '@/lib/ai/schemas';
+import type { JdExtractedData, MatchScoreResult, InterviewPrepResult, ResumeSuggestionResult } from '@/lib/ai/schemas';
 
 interface StatusHistoryEntry {
   id: string;
@@ -66,6 +68,12 @@ interface InterviewPrepData {
   createdAt: string;
 }
 
+interface ResumeSuggestionsData {
+  id: string;
+  result: unknown;
+  createdAt: string;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
@@ -77,6 +85,7 @@ interface ApplicationDetailProps {
   matchScore: MatchScoreData | null;
   coverLetter: CoverLetterData | null;
   interviewPrep: InterviewPrepData | null;
+  resumeSuggestions: ResumeSuggestionsData | null;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -100,6 +109,7 @@ export function ApplicationDetail({
   matchScore: initialMatchScore,
   coverLetter: initialCoverLetter,
   interviewPrep: initialInterviewPrep,
+  resumeSuggestions: initialResumeSuggestions,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
@@ -110,6 +120,7 @@ export function ApplicationDetail({
   const [matchScore, setMatchScore] = useState(initialMatchScore);
   const [coverLetter, setCoverLetter] = useState(initialCoverLetter);
   const [interviewPrep, setInterviewPrep] = useState(initialInterviewPrep);
+  const [resumeSuggestions, setResumeSuggestions] = useState(initialResumeSuggestions);
   const [hasParsedCv] = useState(initialHasParsedCv);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -203,6 +214,18 @@ export function ApplicationDetail({
         id: data.id,
         tone: data.tone,
         content: data.content,
+        createdAt: data.createdAt,
+      });
+    }
+  }, [application.id]);
+
+  const refreshResumeSuggestions = useCallback(async () => {
+    const res = await fetch(`/api/ai/resume-suggestions/${application.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setResumeSuggestions({
+        id: data.id,
+        result: data.result,
         createdAt: data.createdAt,
       });
     }
@@ -458,17 +481,34 @@ export function ApplicationDetail({
         )}
       </div>
 
-      {/* Resume Suggestions Placeholder */}
-      <div className="border-border rounded-md border p-4 opacity-50">
-        <div className="flex items-center gap-2">
-          <Sparkles className="text-muted-foreground size-4" />
-          <h3 className="font-heading text-foreground text-sm">
+      {/* Resume Suggestions */}
+      <div className="border-border rounded-md border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-foreground text-lg">
             Resume Suggestions
-          </h3>
+          </h2>
+          <ResumeSuggestionsButton
+            applicationId={application.id}
+            hasSuggestions={!!resumeSuggestions}
+            hasParsedCv={hasParsedCv}
+            isPro={isPro}
+            onGenerated={refreshResumeSuggestions}
+          />
         </div>
-        <p className="font-body text-muted-foreground mt-1 text-xs">
-          Coming in Step 20
-        </p>
+        {resumeSuggestions ? (
+          <ResumeSuggestionsViewer
+            data={resumeSuggestions.result as ResumeSuggestionResult}
+          />
+        ) : (
+          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
+            <Sparkles className="size-4" />
+            {!isPro
+              ? 'Pro plan required for resume suggestions'
+              : !hasParsedCv
+                ? 'Parse a CV to enable resume suggestions'
+                : 'Click "Generate" to get resume improvement suggestions'}
+          </p>
+        )}
       </div>
 
       <DeleteApplicationDialog
