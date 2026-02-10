@@ -7,6 +7,7 @@ import { applications } from '@/db/schema/applications';
 import { roleCategories } from '@/db/schema/core';
 import { createApplicationSchema } from '@/lib/applications/schemas';
 import { getUserSubscription, checkResourceLimit } from '@/lib/billing/feature-gate';
+import { detectMilestones } from '@/lib/notifications/milestones';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -123,6 +124,12 @@ export async function POST(request: Request) {
       notes: parsed.data.notes || null,
     })
     .returning();
+
+  // Fire-and-forget milestone detection
+  detectMilestones(session.user.id, {
+    event: 'app_created',
+    applicationId: application.id,
+  }).catch(() => {});
 
   return NextResponse.json(application, { status: 201 });
 }
