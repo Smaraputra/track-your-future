@@ -31,9 +31,9 @@
 
 ## Status
 
-- [ ] Notification bell component
-- [ ] Notification dropdown
-- [ ] Mark as read
-- [ ] Stale application detection cron
-- [ ] Email digest (Pro)
-- [ ] Milestone detection
+- [x] Notification bell component
+- [x] Notification dropdown
+- [x] Mark as read
+- [x] Stale application detection cron
+- [x] Email digest (Pro)
+- [x] Milestone detection

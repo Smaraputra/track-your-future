@@ -104,7 +104,7 @@ draft -> applied -> phone_screen -> interview -> offer
 
 - [x] 9.1 Role categories CRUD
 - [x] 9.2 Form field templates CRUD
-- [ ] 9.3 Document upload/download (MinIO presigned URLs)
-- [ ] 9.4 Applications CRUD + status pipeline
-- [ ] 9.5 Dashboard
-- [ ] 9.6 Analytics page
+- [x] 9.3 Document upload/download (MinIO presigned URLs)
+- [x] 9.4 Applications CRUD + status pipeline
+- [x] 9.5 Dashboard
+- [x] 9.6 Analytics page

@@ -35,11 +35,11 @@
 
 ## Status
 
-- [ ] Settings page layout
-- [ ] Theme toggle
-- [ ] Profile editing
-- [ ] Password change
-- [ ] Subscription management
-- [ ] AI usage dashboard
-- [ ] Data export (JSON + CSV)
-- [ ] Account deletion
+- [x] Settings page layout
+- [x] Theme toggle
+- [x] Profile editing
+- [x] Password change
+- [x] Subscription management
+- [x] AI usage dashboard
+- [x] Data export (JSON + CSV)
+- [x] Account deletion

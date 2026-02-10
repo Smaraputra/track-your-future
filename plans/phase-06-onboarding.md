@@ -22,10 +22,10 @@ Multi-step onboarding flow shown to new users on first dashboard visit.
 
 ## Status
 
-- [ ] Onboarding state tracking
-- [ ] Step 1: Name entry
-- [ ] Step 2: First role category creation
-- [ ] Step 3: CV upload with progress bar
-- [ ] Step 4: Summary card + initialize button
-- [ ] Skip functionality
-- [ ] Redirect logic (show wizard vs dashboard)
+- [x] Onboarding state tracking
+- [x] Step 1: Name entry
+- [x] Step 2: First role category creation
+- [x] Step 3: CV upload with progress bar
+- [x] Step 4: Summary card + initialize button
+- [x] Skip functionality
+- [x] Redirect logic (show wizard vs dashboard)
