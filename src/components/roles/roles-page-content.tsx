@@ -25,6 +25,10 @@ export function RolesPageContent({ initialRoles }: RolesPageContentProps) {
     setDeleteTarget(role);
   }, []);
 
+  const handleRolesChange = useCallback((newRoles: Role[]) => {
+    setRoles(newRoles);
+  }, []);
+
   const handleDeleted = useCallback(async () => {
     setDeleteTarget(null);
     const res = await fetch('/api/roles');
@@ -35,7 +39,11 @@ export function RolesPageContent({ initialRoles }: RolesPageContentProps) {
 
   return (
     <>
-      <RoleList initialRoles={roles} onDeleteRequest={handleDeleteRequest} />
+      <RoleList
+        roles={roles}
+        onDeleteRequest={handleDeleteRequest}
+        onRolesChange={handleRolesChange}
+      />
 
       {deleteTarget && (
         <DeleteRoleDialog

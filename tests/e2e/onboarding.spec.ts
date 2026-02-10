@@ -21,7 +21,7 @@ test.describe('Onboarding Wizard', () => {
     const nameInput = page.getByPlaceholder('Your name');
     await nameInput.clear();
     await nameInput.fill('E2E Onboarded User');
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
 
     // Step 2: Role -- skip it
     await expect(
