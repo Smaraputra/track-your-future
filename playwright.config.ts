@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: process.env.BASE_URL || 'http://localhost:3001',
     trace: 'on-first-retry',
   },
   projects: [
@@ -23,7 +23,7 @@ export default defineConfig({
         storageState: 'tests/e2e/.auth/user.json',
       },
       dependencies: ['setup'],
-      testIgnore: /onboarding\.spec\.ts/,
+      testIgnore: /(onboarding|auth|landing|pricing)\.spec\.ts/,
     },
     {
       name: 'fresh-user',
@@ -37,12 +37,13 @@ export default defineConfig({
     {
       name: 'unauthenticated',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
       testMatch: /(landing|pricing|auth)\.spec\.ts/,
     },
   ],
   webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:3000',
+    command: 'PORT=3001 NEXTAUTH_URL=http://localhost:3001 pnpm dev',
+    url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI,
   },
 });

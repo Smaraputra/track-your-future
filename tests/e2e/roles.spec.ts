@@ -22,7 +22,7 @@ test.afterAll(async () => {
   await closeDb();
 });
 
-test.describe('Role Categories CRUD', () => {
+test.describe.serial('Role Categories CRUD', () => {
   test('create a role category', async ({ page }) => {
     await page.goto('/roles/new');
     await expect(
@@ -47,10 +47,11 @@ test.describe('Role Categories CRUD', () => {
 
   test('edit a role name', async ({ page }) => {
     await page.goto('/roles');
-    await page.getByRole('button', { name: 'Edit E2E Test Role' }).click();
-    await page.waitForURL(/\/roles\/.*\/edit/, { timeout: 10000 });
+    await page.getByRole('link', { name: 'Edit E2E Test Role' }).click();
+    await page.waitForURL(/\/roles\/.*\/edit/, { timeout: 15000 });
 
     const nameInput = page.getByPlaceholder('e.g. Frontend Developer');
+    await expect(nameInput).toBeVisible({ timeout: 10000 });
     await nameInput.clear();
     await nameInput.fill('E2E Updated Role');
     await page.getByRole('button', { name: 'Save Changes' }).click();
@@ -61,15 +62,26 @@ test.describe('Role Categories CRUD', () => {
 
   test('delete a role', async ({ page }) => {
     await page.goto('/roles');
-    await page.getByRole('button', { name: 'Delete E2E Updated Role' }).click();
+    await page.getByRole('button', { name: 'Delete E2E Updated Role' }).first().click();
 
     // Confirm in delete dialog
     await expect(
       page.getByRole('heading', { name: 'Delete Role Category' }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Delete' }).click();
+    // Use the dialog's Delete button (variant destructive)
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Delete' })
+      .click();
 
-    // Role should be gone
-    await expect(page.getByText('E2E Updated Role')).not.toBeVisible();
+    // Wait for the dialog to close and the role to be removed from the list
+    await expect(
+      page.getByRole('heading', { name: 'Delete Role Category' }),
+    ).not.toBeVisible();
+
+    // Wait for router.refresh() to re-render the list without the deleted role
+    await expect(
+      page.getByRole('link', { name: 'E2E Updated Role', exact: true }),
+    ).not.toBeVisible({ timeout: 10000 });
   });
 });

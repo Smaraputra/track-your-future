@@ -38,6 +38,9 @@ export async function createTestUser(opts: {
   const db = getDb();
   const hashedPassword = await bcrypt.hash(opts.password, 12);
 
+  // Delete existing user first to ensure clean state
+  await db.delete(schema.users).where(eq(schema.users.email, opts.email));
+
   const [user] = await db
     .insert(schema.users)
     .values({
@@ -47,7 +50,6 @@ export async function createTestUser(opts: {
       emailVerified: new Date(),
       onboardingCompleted: opts.onboardingCompleted ?? true,
     })
-    .onConflictDoNothing()
     .returning();
 
   return user;
@@ -60,6 +62,14 @@ export async function deleteTestUsers() {
 
 export async function createTestRole(userId: string, name: string, color?: string) {
   const db = getDb();
+
+  // Check if role already exists
+  const existing = await db.query.roleCategories.findFirst({
+    where: (rc, { and, eq }) =>
+      and(eq(rc.userId, userId), eq(rc.name, name)),
+  });
+  if (existing) return existing;
+
   const [role] = await db
     .insert(schema.roleCategories)
     .values({

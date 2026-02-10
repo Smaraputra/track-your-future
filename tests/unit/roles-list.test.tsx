@@ -120,7 +120,7 @@ describe('RoleList', () => {
 
   it('shows empty state when no roles', () => {
     render(
-      <RoleList initialRoles={[]} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={[]} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -130,7 +130,7 @@ describe('RoleList', () => {
 
   it('renders role list with names and descriptions', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -141,7 +141,7 @@ describe('RoleList', () => {
 
   it('shows role count with limit for free tier', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -150,7 +150,7 @@ describe('RoleList', () => {
 
   it('shows role count without limit for pro tier', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: proWrapper },
     );
 
@@ -159,7 +159,7 @@ describe('RoleList', () => {
 
   it('disables up arrow on first item and down arrow on last', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -172,7 +172,7 @@ describe('RoleList', () => {
 
   it('enables down arrow on first item and up arrow on last', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -185,7 +185,7 @@ describe('RoleList', () => {
 
   it('calls onDeleteRequest when delete button clicked', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -196,7 +196,7 @@ describe('RoleList', () => {
 
   it('has edit links for each role', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -206,7 +206,7 @@ describe('RoleList', () => {
 
   it('has detail links for each role name', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -220,7 +220,7 @@ describe('RoleList', () => {
       { id: 'role-3', name: 'DevOps', description: null, color: '#ef4444', position: 2 },
     ];
     render(
-      <RoleList initialRoles={threeRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={threeRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -230,7 +230,7 @@ describe('RoleList', () => {
 
   it('does not show limit message for pro users', () => {
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: proWrapper },
     );
 
@@ -244,7 +244,7 @@ describe('RoleList', () => {
     });
 
     render(
-      <RoleList initialRoles={mockRoles} onDeleteRequest={onDeleteRequest} />,
+      <RoleList roles={mockRoles} onDeleteRequest={onDeleteRequest} onRolesChange={vi.fn()} />,
       { wrapper: freeWrapper },
     );
 
@@ -262,8 +262,9 @@ describe('RoleList', () => {
   it('shows singular "role" text for single role', () => {
     render(
       <RoleList
-        initialRoles={[mockRoles[0]]}
+        roles={[mockRoles[0]]}
         onDeleteRequest={onDeleteRequest}
+        onRolesChange={vi.fn()}
       />,
       { wrapper: freeWrapper },
     );

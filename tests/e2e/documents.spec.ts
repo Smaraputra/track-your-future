@@ -5,20 +5,21 @@ test.describe('Documents Page', () => {
     await page.goto('/documents');
   });
 
-  test('documents page renders', async ({ page }) => {
-    await expect(page.getByText(/document/i)).toBeVisible();
+  test('documents page renders with window title', async ({ page }) => {
+    await expect(page.getByText('sys://documents')).toBeVisible();
   });
 
   test('upload button is visible', async ({ page }) => {
     await expect(
-      page.getByRole('button', { name: /upload/i }),
+      page.getByRole('button', { name: 'Upload', exact: true }),
     ).toBeVisible();
   });
 
-  test('empty state shown when no documents', async ({ page }) => {
-    // If no documents exist, should show empty state
-    const emptyState = page.getByText(/no documents yet|upload/i);
-    await expect(emptyState.first()).toBeVisible();
+  test('empty state or document list shown', async ({ page }) => {
+    // Either empty state or document count is visible
+    const hasEmptyState = await page.getByText('No Documents Yet').isVisible().catch(() => false);
+    const hasDocCount = await page.getByText(/\d+ documents?/).isVisible().catch(() => false);
+    expect(hasEmptyState || hasDocCount).toBe(true);
   });
 
   test('filter dropdowns are visible', async ({ page }) => {

@@ -25,7 +25,7 @@ test.describe('Authentication', () => {
     await page.getByRole('button', { name: 'Login' }).click();
     // NextAuth redirects to /login?error=CredentialsSignin on failure
     await page.waitForURL(/\/login\?error/, { timeout: 15000 });
-    await expect(page.getByText(/invalid email or password/i)).toBeVisible();
+    await expect(page.getByText(/invalid email or password/i).first()).toBeVisible();
   });
 
   test('accessing dashboard unauthenticated redirects to login', async ({

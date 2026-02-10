@@ -29,8 +29,8 @@ test.describe('Pricing Page', () => {
   });
 
   test('shows feature comparison table', async ({ page }) => {
-    await expect(page.getByText('Applications')).toBeVisible();
-    await expect(page.getByText('Documents')).toBeVisible();
-    await expect(page.getByText('Storage')).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Applications' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Documents' })).toBeVisible();
+    await expect(page.getByRole('cell', { name: 'Storage' })).toBeVisible();
   });
 });

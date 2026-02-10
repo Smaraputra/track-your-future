@@ -14,7 +14,7 @@ test.describe('Landing Page', () => {
       page.getByRole('heading', { name: 'Track Your Future' }),
     ).toBeVisible();
     await expect(
-      page.getByText('Your job search command center'),
+      page.getByText('Your job search command center.').first(),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Initialize System' }),
@@ -35,10 +35,10 @@ test.describe('Landing Page', () => {
 
   test('footer links are present', async ({ page }) => {
     await expect(
-      page.getByRole('link', { name: 'Privacy Policy' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Privacy Policy' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Terms of Service' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Terms of Service' }),
     ).toBeVisible();
   });
 
@@ -56,9 +56,11 @@ test.describe('Landing Page', () => {
     ).toBeVisible();
   });
 
-  test('boot animation shows on first visit', async ({ page }) => {
-    // Create a fresh page without the localStorage skip
-    const freshContext = await page.context().browser()!.newContext();
+  test('boot animation shows on first visit', async ({ browser }) => {
+    // Create a fresh context without localStorage skip
+    const freshContext = await browser.newContext({
+      baseURL: process.env.BASE_URL || 'http://localhost:3001',
+    });
     const freshPage = await freshContext.newPage();
     await freshPage.goto('/');
     await expect(freshPage.locator('[data-testid="boot-sequence"]')).toBeVisible();

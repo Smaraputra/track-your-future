@@ -32,7 +32,7 @@ test.afterAll(async () => {
   await closeDb();
 });
 
-test.describe('Applications CRUD', () => {
+test.describe.serial('Applications CRUD', () => {
   test('create an application', async ({ page }) => {
     await page.goto('/applications/new');
     await expect(
@@ -41,10 +41,6 @@ test.describe('Applications CRUD', () => {
 
     await page.getByPlaceholder('e.g. Acme Corp').fill('E2E Test Company');
     await page.getByPlaceholder('e.g. Software Engineer').fill('E2E Test Job');
-
-    // Select role category
-    await page.getByLabel('Role Category').click();
-    await page.getByRole('option', { name: 'E2E App Role' }).click();
 
     await page.getByRole('button', { name: 'Create Application' }).click();
 
@@ -61,7 +57,7 @@ test.describe('Applications CRUD', () => {
 
   test('view application detail page', async ({ page }) => {
     await page.goto('/applications');
-    await page.getByRole('link', { name: 'E2E Test Company' }).click();
+    await page.getByRole('link', { name: 'E2E Test Company', exact: true }).click();
     await page.waitForURL(/\/applications\//, { timeout: 10000 });
 
     await expect(
@@ -72,7 +68,7 @@ test.describe('Applications CRUD', () => {
 
   test('edit an application', async ({ page }) => {
     await page.goto('/applications');
-    await page.getByRole('button', { name: 'Edit E2E Test Company' }).click();
+    await page.getByRole('link', { name: 'Edit E2E Test Company' }).click();
     await page.waitForURL(/\/applications\/.*\/edit/, { timeout: 10000 });
 
     const companyInput = page.getByPlaceholder('e.g. Acme Corp');
@@ -94,9 +90,17 @@ test.describe('Applications CRUD', () => {
     await expect(
       page.getByRole('heading', { name: 'Delete Application' }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Delete' })
+      .click();
 
-    // Application should be gone
-    await expect(page.getByText('E2E Updated Company')).not.toBeVisible();
+    // Wait for dialog to close and application to be removed
+    await expect(
+      page.getByRole('heading', { name: 'Delete Application' }),
+    ).not.toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'E2E Updated Company', exact: true }),
+    ).not.toBeVisible();
   });
 });

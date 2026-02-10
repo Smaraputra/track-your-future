@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { ChevronUp, ChevronDown, Pencil, Trash2, Plus } from 'lucide-react';
 
@@ -18,22 +17,14 @@ interface Role {
 }
 
 interface RoleListProps {
-  initialRoles: Role[];
+  roles: Role[];
   onDeleteRequest: (role: Role) => void;
+  onRolesChange: (roles: Role[]) => void;
 }
 
-export function RoleList({ initialRoles, onDeleteRequest }: RoleListProps) {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
+export function RoleList({ roles, onDeleteRequest, onRolesChange }: RoleListProps) {
   const { tier } = useSubscription();
   const limit = PLAN_LIMITS[tier].resources.roleCategories;
-
-  const refreshRoles = useCallback(async () => {
-    const res = await fetch('/api/roles');
-    if (res.ok) {
-      const data = await res.json();
-      setRoles(data);
-    }
-  }, []);
 
   async function handleReorder(index: number, direction: 'up' | 'down') {
     const newRoles = [...roles];
@@ -42,7 +33,7 @@ export function RoleList({ initialRoles, onDeleteRequest }: RoleListProps) {
 
     // Optimistic update
     [newRoles[index], newRoles[swapIndex]] = [newRoles[swapIndex], newRoles[index]];
-    setRoles(newRoles);
+    onRolesChange(newRoles);
 
     const orderedIds = newRoles.map((r) => r.id);
     const res = await fetch('/api/roles/reorder', {
@@ -52,7 +43,10 @@ export function RoleList({ initialRoles, onDeleteRequest }: RoleListProps) {
     });
 
     if (!res.ok) {
-      refreshRoles();
+      const refreshRes = await fetch('/api/roles');
+      if (refreshRes.ok) {
+        onRolesChange(await refreshRes.json());
+      }
     }
   }
 
