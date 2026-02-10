@@ -13,8 +13,31 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
+      name: 'authenticated',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/e2e/.auth/user.json',
+      },
+      dependencies: ['setup'],
+      testIgnore: /onboarding\.spec\.ts/,
+    },
+    {
+      name: 'fresh-user',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/e2e/.auth/new-user.json',
+      },
+      dependencies: ['setup'],
+      testMatch: /onboarding\.spec\.ts/,
+    },
+    {
+      name: 'unauthenticated',
       use: { ...devices['Desktop Chrome'] },
+      testMatch: /(landing|pricing|auth)\.spec\.ts/,
     },
   ],
   webServer: {
