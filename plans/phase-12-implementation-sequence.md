@@ -24,11 +24,11 @@ Ordered steps with phase references and effort estimates.
 | 18 | 8.4 | 1-2 days | AI: Cover letter generation | Complete |
 | 19 | 8.5 | 1 day | AI: Interview prep | Complete |
 | 20 | 8.6 | 1 day | AI: Resume suggestions | Complete |
-| 21 | 9.5 | 1-2 days | Dashboard + stale reminders | Pending |
-| 22 | 9.6 | 1-2 days | Analytics page | Pending |
-| 23 | 10 | 2 days | Notification system (in-app + email digest) | Pending |
-| 24 | 6 | 1-2 days | Onboarding flow | Pending |
-| 25 | 11 | 1 day | Settings page | Pending |
-| 26 | - | 2 days | Responsive polish + error boundaries | Pending |
+| 21 | 9.5 | 1-2 days | Dashboard + stale reminders | Complete |
+| 22 | 9.6 | 1-2 days | Analytics page | Complete |
+| 23 | 10 | 2 days | Notification system (in-app + email digest) | Complete |
+| 24 | 6 | 1-2 days | Onboarding flow | Complete |
+| 25 | 11 | 1 day | Settings page | Complete |
+| 26 | - | 2 days | Responsive polish + error boundaries | Complete |
 
 **Total estimate**: ~30-40 days
