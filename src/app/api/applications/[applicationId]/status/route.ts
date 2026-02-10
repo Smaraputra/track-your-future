@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { applications, applicationStatusHistory } from '@/db/schema/applications';
 import { updateStatusSchema } from '@/lib/applications/schemas';
+import { detectMilestones } from '@/lib/notifications/milestones';
 
 export async function PATCH(
   request: Request,
@@ -72,6 +73,13 @@ export async function PATCH(
 
     return [app];
   });
+
+  // Fire-and-forget milestone detection
+  detectMilestones(session.user.id, {
+    event: 'status_changed',
+    applicationId,
+    newStatus: parsed.data.status,
+  }).catch(() => {});
 
   return NextResponse.json(updated);
 }

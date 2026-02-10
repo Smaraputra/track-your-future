@@ -14,6 +14,7 @@ import { db } from '@/db';
 import { applications, applicationStatusHistory } from '@/db/schema/applications';
 import { roleCategories } from '@/db/schema/core';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
+import { detectStaleApps } from '@/lib/notifications/stale-detection';
 import { RetroWindow } from '@/components/retro-window';
 import { DashboardContent } from '@/components/dashboard/dashboard-content';
 
@@ -25,6 +26,9 @@ export default async function DashboardPage() {
   const userId = session!.user!.id;
 
   const sub = await getUserSubscription(userId);
+
+  // Detect stale apps and create notifications on each dashboard visit
+  await detectStaleApps(userId);
 
   const staleThreshold = new Date();
   staleThreshold.setDate(staleThreshold.getDate() - STALE_DAYS);

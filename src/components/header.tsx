@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, Bell } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -8,6 +8,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { UserMenu } from '@/components/user-menu';
 import { Sidebar } from '@/components/sidebar';
 import { cn } from '@/lib/utils';
@@ -64,12 +65,7 @@ export function Header({
       {/* Right side controls */}
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        <button
-          className="text-muted-foreground hover:text-foreground relative transition-colors"
-          aria-label="Notifications"
-        >
-          <Bell className="size-4" />
-        </button>
+        <NotificationBell />
         <UserMenu
           name={userName}
           email={userEmail}
