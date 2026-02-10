@@ -20,10 +20,10 @@ Ordered steps with phase references and effort estimates.
 | 14 | 8.1 | 2 days | AI: CV parsing (pdf-parse + mammoth + LLM extraction) | Complete |
 | 15 | 8.2 | 1 day | AI: JD extraction (Jina Reader + LLM) | Complete |
 | 16 | 9.4 | 2-3 days | Applications CRUD + status pipeline | Complete |
-| 17 | 8.3 | 1-2 days | AI: Match scoring + gap analysis | Pending |
-| 18 | 8.4 | 1-2 days | AI: Cover letter generation | Pending |
-| 19 | 8.5 | 1 day | AI: Interview prep | Pending |
-| 20 | 8.6 | 1 day | AI: Resume suggestions | Pending |
+| 17 | 8.3 | 1-2 days | AI: Match scoring + gap analysis | Complete |
+| 18 | 8.4 | 1-2 days | AI: Cover letter generation | Complete |
+| 19 | 8.5 | 1 day | AI: Interview prep | Complete |
+| 20 | 8.6 | 1 day | AI: Resume suggestions | Complete |
 | 21 | 9.5 | 1-2 days | Dashboard + stale reminders | Pending |
 | 22 | 9.6 | 1-2 days | Analytics page | Pending |
 | 23 | 10 | 2 days | Notification system (in-app + email digest) | Pending |

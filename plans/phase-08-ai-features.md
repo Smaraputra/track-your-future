@@ -83,8 +83,8 @@ Multi-provider via Vercel AI SDK (`ai` package).
 - [x] Usage tracking + limit enforcement
 - [x] 8.1 CV parsing pipeline
 - [x] 8.2 JD extraction (URL + text)
-- [ ] 8.3 Match scoring + gap analysis
-- [ ] 8.4 Cover letter generation (streaming)
-- [ ] 8.5 Interview prep questions
-- [ ] 8.6 Resume improvement suggestions
+- [x] 8.3 Match scoring + gap analysis
+- [x] 8.4 Cover letter generation
+- [x] 8.5 Interview prep questions
+- [x] 8.6 Resume improvement suggestions
 - [x] Redis caching layer (JD URL cache)
