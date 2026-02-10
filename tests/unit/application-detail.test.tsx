@@ -69,6 +69,12 @@ vi.mock('lucide-react', () => ({
   Loader2: (props: Record<string, unknown>) => (
     <svg data-testid="icon-loader" {...props} />
   ),
+  Check: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-check-copy" {...props} />
+  ),
+  Copy: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-copy" {...props} />
+  ),
 }));
 
 const mockApplication = {
@@ -131,6 +137,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(
@@ -149,6 +156,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(screen.getByText('Senior Engineer')).toBeDefined();
@@ -165,6 +173,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(screen.getByText('Edit')).toBeDefined();
@@ -182,6 +191,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     const link = screen.getByText('View posting');
@@ -201,6 +211,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(screen.getByText('Frontend Developer')).toBeDefined();
@@ -217,6 +228,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(
@@ -235,6 +247,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(
@@ -253,12 +266,13 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(screen.getByText('resume.pdf')).toBeDefined();
   });
 
-  it('renders Match Score section and AI placeholder cards', () => {
+  it('renders Match Score and Cover Letter sections plus remaining placeholders', () => {
     render(
       <ApplicationDetail
         application={mockApplication}
@@ -269,10 +283,11 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(screen.getByRole('heading', { name: 'Match Score' })).toBeDefined();
-    expect(screen.getByText('Cover Letter')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Cover Letter' })).toBeDefined();
     expect(screen.getByText('Interview Prep')).toBeDefined();
     expect(screen.getByText('Resume Suggestions')).toBeDefined();
   });
@@ -288,6 +303,7 @@ describe('ApplicationDetail', () => {
         hasParsedCv={false}
         jobAnalysis={null}
         matchScore={null}
+        coverLetter={null}
       />,
     );
     expect(

@@ -13,6 +13,8 @@ import { ExtractJdButton } from './extract-jd-button';
 import { JdAnalysisViewer } from './jd-analysis-viewer';
 import { MatchScoreButton } from './match-score-button';
 import { MatchScoreViewer } from './match-score-viewer';
+import { CoverLetterSection } from './cover-letter-section';
+import { CoverLetterViewer } from './cover-letter-viewer';
 import { type ApplicationItem } from './applications-page-content';
 import type { JdExtractedData, MatchScoreResult } from '@/lib/ai/schemas';
 
@@ -49,6 +51,13 @@ interface MatchScoreData {
   createdAt: string;
 }
 
+interface CoverLetterData {
+  id: string;
+  tone: string;
+  content: string;
+  createdAt: string;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
@@ -58,6 +67,7 @@ interface ApplicationDetailProps {
   hasParsedCv: boolean;
   jobAnalysis: JobAnalysisData | null;
   matchScore: MatchScoreData | null;
+  coverLetter: CoverLetterData | null;
 }
 
 function formatDate(dateStr: string | null): string {
@@ -79,6 +89,7 @@ export function ApplicationDetail({
   hasParsedCv: initialHasParsedCv,
   jobAnalysis: initialJobAnalysis,
   matchScore: initialMatchScore,
+  coverLetter: initialCoverLetter,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
@@ -87,6 +98,7 @@ export function ApplicationDetail({
     useState(initialAvailableDocs);
   const [jobAnalysis, setJobAnalysis] = useState(initialJobAnalysis);
   const [matchScore, setMatchScore] = useState(initialMatchScore);
+  const [coverLetter, setCoverLetter] = useState(initialCoverLetter);
   const [hasParsedCv] = useState(initialHasParsedCv);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -155,6 +167,19 @@ export function ApplicationDetail({
         id: data.id,
         score: data.score,
         result: data.result,
+        createdAt: data.createdAt,
+      });
+    }
+  }, [application.id]);
+
+  const refreshCoverLetter = useCallback(async () => {
+    const res = await fetch(`/api/ai/cover-letter/${application.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setCoverLetter({
+        id: data.id,
+        tone: data.tone,
+        content: data.content,
         createdAt: data.createdAt,
       });
     }
@@ -349,10 +374,40 @@ export function ApplicationDetail({
         )}
       </div>
 
+      {/* Cover Letter */}
+      <div className="border-border rounded-md border p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-heading text-foreground text-lg">
+            Cover Letter
+          </h2>
+          <CoverLetterSection
+            applicationId={application.id}
+            hasParsedCv={hasParsedCv}
+            hasJdAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            onGenerated={refreshCoverLetter}
+          />
+        </div>
+        {coverLetter ? (
+          <CoverLetterViewer
+            content={coverLetter.content}
+            tone={coverLetter.tone}
+          />
+        ) : (
+          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
+            <Sparkles className="size-4" />
+            {!isPro
+              ? 'Pro plan required for cover letter generation'
+              : !hasParsedCv || !jobAnalysis
+                ? 'Parse a CV and extract the JD to generate a cover letter'
+                : 'Select a tone and click "Generate" to create a cover letter'}
+          </p>
+        )}
+      </div>
+
       {/* AI Placeholders */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         {[
-          { title: 'Cover Letter', step: 'Step 18' },
           { title: 'Interview Prep', step: 'Step 19' },
           { title: 'Resume Suggestions', step: 'Step 20' },
         ].map((ai) => (

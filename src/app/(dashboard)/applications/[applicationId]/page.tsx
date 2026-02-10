@@ -9,7 +9,12 @@ import {
   applicationDocuments,
 } from '@/db/schema/applications';
 import { roleCategories, documents } from '@/db/schema/core';
-import { jobAnalyses, matchScores, parsedProfiles } from '@/db/schema/ai';
+import {
+  jobAnalyses,
+  matchScores,
+  coverLetters,
+  parsedProfiles,
+} from '@/db/schema/ai';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { RetroWindow } from '@/components/retro-window';
 import { ApplicationDetail } from '@/components/applications/application-detail';
@@ -51,7 +56,7 @@ export default async function ApplicationDetailPage({
     notFound();
   }
 
-  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, hasParsedCv] =
+  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, coverLetter, hasParsedCv] =
     await Promise.all([
       getUserSubscription(userId),
       db
@@ -89,6 +94,12 @@ export default async function ApplicationDetailPage({
         where: and(
           eq(matchScores.applicationId, applicationId),
           eq(matchScores.userId, userId),
+        ),
+      }),
+      db.query.coverLetters.findFirst({
+        where: and(
+          eq(coverLetters.applicationId, applicationId),
+          eq(coverLetters.userId, userId),
         ),
       }),
       db
@@ -145,6 +156,16 @@ export default async function ApplicationDetailPage({
                 score: matchScore.score,
                 result: matchScore.result,
                 createdAt: matchScore.createdAt.toISOString(),
+              }
+            : null
+        }
+        coverLetter={
+          coverLetter
+            ? {
+                id: coverLetter.id,
+                tone: coverLetter.tone,
+                content: coverLetter.content,
+                createdAt: coverLetter.createdAt.toISOString(),
               }
             : null
         }
