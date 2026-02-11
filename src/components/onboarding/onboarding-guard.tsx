@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
 interface OnboardingGuardProps {
   completed: boolean;
@@ -8,9 +8,7 @@ interface OnboardingGuardProps {
 }
 
 export function OnboardingGuard({ completed, children }: OnboardingGuardProps) {
-  const pathname = usePathname();
-
-  if (!completed && pathname !== '/onboarding') {
+  if (!completed) {
     redirect('/onboarding');
   }
 

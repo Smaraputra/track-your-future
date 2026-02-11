@@ -45,13 +45,13 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
         <li key={item.id}>
           <Link
             href={`/applications/${item.applicationId}`}
-            className="hover:bg-accent/50 flex items-baseline gap-2 rounded px-2 py-1.5 transition-colors"
+            className="hover:bg-accent/50 border-glow flex items-baseline gap-2 rounded px-2 py-1.5 transition-colors"
           >
             <span className="text-muted-foreground font-body shrink-0 text-xs">
               {formatRelativeTime(item.changedAt)}
             </span>
             <span className="font-body text-foreground text-sm">
-              <span className="text-primary font-medium">{item.companyName}</span>
+              <span className="text-primary text-phosphor font-medium">{item.companyName}</span>
               {item.fromStatus ? (
                 <>
                   {' '}

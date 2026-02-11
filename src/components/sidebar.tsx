@@ -54,14 +54,19 @@ export function Sidebar({ className }: SidebarProps) {
     <aside
       data-testid="sidebar"
       className={cn(
-        'border-border bg-sidebar flex h-full flex-col border-r transition-[width] duration-200',
+        'border-border bg-sidebar crt-screen flex h-full flex-col border-r transition-[width] duration-200',
         collapsed ? 'w-14' : 'w-56',
         className
       )}
     >
       <div className="border-border flex items-center justify-between border-b p-3">
-        {!collapsed && (
-          <span className="font-heading text-primary text-lg">TYF</span>
+        {collapsed ? (
+          <span className="block size-2 rounded-full bg-primary animate-pulse mx-auto" aria-hidden="true" />
+        ) : (
+          <span className="font-heading text-primary text-shadow-glow flex items-center gap-2 text-lg">
+            <span className="block size-2 rounded-full bg-primary animate-pulse" aria-hidden="true" />
+            TYF
+          </span>
         )}
         <button
           onClick={toggleCollapsed}
@@ -87,7 +92,7 @@ export function Sidebar({ className }: SidebarProps) {
                   className={cn(
                     'flex items-center gap-3 rounded-sm px-3 py-2 text-sm transition-colors',
                     isActive
-                      ? 'text-primary bg-accent font-medium'
+                      ? 'text-primary bg-accent font-medium text-phosphor border-glow'
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                   )}
                   title={collapsed ? item.label : undefined}
@@ -107,6 +112,12 @@ export function Sidebar({ className }: SidebarProps) {
           })}
         </ul>
       </nav>
+
+      {!collapsed && (
+        <div className="border-border border-t p-3">
+          <span className="font-body text-muted-foreground/50 text-xs">TYF v2.0.26</span>
+        </div>
+      )}
     </aside>
   );
 }

@@ -60,6 +60,7 @@ export function DashboardContent({
   return (
     <div className="space-y-6">
       {/* Stat cards */}
+      <p className="font-body text-muted-foreground text-xs">user@tyf:~$ cat /sys/status</p>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
           label="Total Applications"
@@ -89,7 +90,8 @@ export function DashboardContent({
           {/* Stale apps */}
           {staleApps.length > 0 && (
             <section>
-              <h2 className="font-heading text-primary mb-3 text-sm">
+              <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ cat /var/log/alerts</p>
+              <h2 className="font-heading text-primary text-shadow-glow mb-3 text-sm">
                 Needs Attention ({staleApps.length})
               </h2>
               <StaleAppsList apps={staleApps} />
@@ -98,7 +100,8 @@ export function DashboardContent({
 
           {/* Recent activity */}
           <section>
-            <h2 className="font-heading text-primary mb-3 text-sm">
+            <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ tail -f /var/log/activity</p>
+            <h2 className="font-heading text-primary text-shadow-glow mb-3 text-sm">
               Recent Activity
             </h2>
             <ActivityFeed items={recentActivity} />
@@ -109,7 +112,8 @@ export function DashboardContent({
         <div className="space-y-6">
           {/* Role categories */}
           <section>
-            <h2 className="font-heading text-primary mb-3 text-sm">
+            <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ ls /sys/roles/</p>
+            <h2 className="font-heading text-primary text-shadow-glow mb-3 text-sm">
               Roles
             </h2>
             <QuickLinks roleCategories={roleCategories} />
