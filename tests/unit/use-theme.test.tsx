@@ -23,9 +23,9 @@ describe('ThemeProvider', () => {
     expect(screen.getByTestId('child')).toHaveTextContent('hello');
   });
 
-  it('defaults to green theme', () => {
+  it('defaults to amber theme', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.theme).toBe('green');
+    expect(result.current.theme).toBe('amber');
   });
 
   it('reads theme from localStorage', () => {
@@ -38,7 +38,7 @@ describe('ThemeProvider', () => {
   it('ignores invalid localStorage values', () => {
     localStorage.setItem('tyf-theme', 'blue');
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.theme).toBe('green');
+    expect(result.current.theme).toBe('amber');
   });
 });
 
@@ -81,16 +81,16 @@ describe('useTheme', () => {
     expect(document.documentElement.getAttribute('data-theme')).toBe('amber');
   });
 
-  it('toggleTheme switches between green and amber', () => {
+  it('toggleTheme switches between amber and green', () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
-    expect(result.current.theme).toBe('green');
-    act(() => {
-      result.current.toggleTheme();
-    });
     expect(result.current.theme).toBe('amber');
     act(() => {
       result.current.toggleTheme();
     });
     expect(result.current.theme).toBe('green');
+    act(() => {
+      result.current.toggleTheme();
+    });
+    expect(result.current.theme).toBe('amber');
   });
 });

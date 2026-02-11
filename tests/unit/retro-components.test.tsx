@@ -115,15 +115,15 @@ describe('CRTOverlay', () => {
     localStorage.clear();
   });
 
-  it('does not render when localStorage is empty', () => {
-    const { container } = render(<CRTOverlay />);
-    expect(container.querySelector('.crt-overlay')).toBeNull();
-  });
-
-  it('renders when localStorage has crt enabled', () => {
-    localStorage.setItem('tyf-crt', 'true');
+  it('renders by default when localStorage is empty', () => {
     const { container } = render(<CRTOverlay />);
     expect(container.querySelector('.crt-overlay')).not.toBeNull();
+  });
+
+  it('does not render when localStorage has crt disabled', () => {
+    localStorage.setItem('tyf-crt-overlay', 'false');
+    const { container } = render(<CRTOverlay />);
+    expect(container.querySelector('.crt-overlay')).toBeNull();
   });
 });
 
@@ -132,22 +132,23 @@ describe('useCRTOverlay', () => {
     localStorage.clear();
   });
 
-  it('defaults to disabled', () => {
+  it('defaults to enabled', () => {
     const { result } = renderHook(() => useCRTOverlay());
-    expect(result.current.enabled).toBe(false);
+    expect(result.current.enabled).toBe(true);
   });
 
   it('toggle switches enabled state and persists', () => {
     const { result } = renderHook(() => useCRTOverlay());
-    act(() => {
-      result.current.toggle();
-    });
     expect(result.current.enabled).toBe(true);
-    expect(localStorage.getItem('tyf-crt')).toBe('true');
     act(() => {
       result.current.toggle();
     });
     expect(result.current.enabled).toBe(false);
-    expect(localStorage.getItem('tyf-crt')).toBe('false');
+    expect(localStorage.getItem('tyf-crt-overlay')).toBe('false');
+    act(() => {
+      result.current.toggle();
+    });
+    expect(result.current.enabled).toBe(true);
+    expect(localStorage.getItem('tyf-crt-overlay')).toBe('true');
   });
 });

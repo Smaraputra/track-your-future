@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 
-const CRT_STORAGE_KEY = 'tyf-crt';
+const CRT_STORAGE_KEY = 'tyf-crt-overlay';
 
 const crtListeners = new Set<() => void>();
 
@@ -13,14 +13,16 @@ function crtSubscribe(callback: () => void) {
 
 function getCRTSnapshot(): boolean {
   try {
-    return localStorage.getItem(CRT_STORAGE_KEY) === 'true';
+    const stored = localStorage.getItem(CRT_STORAGE_KEY);
+    if (stored === null) return true; // enabled by default
+    return stored === 'true';
   } catch {
-    return false;
+    return true;
   }
 }
 
 function getCRTServerSnapshot(): boolean {
-  return false;
+  return true;
 }
 
 export function CRTOverlay() {

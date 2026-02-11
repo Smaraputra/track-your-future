@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { ApplicationsPageContent } from '@/components/applications/applications-page-content';
@@ -265,6 +265,9 @@ describe('ApplicationsPageContent', () => {
       { wrapper: freeWrapper },
     );
 
+    // Switch to list view (board is default)
+    fireEvent.click(screen.getByLabelText('List view'));
+
     const editLink = screen.getByLabelText('Edit Acme Corp');
     expect(editLink.closest('a')?.getAttribute('href')).toBe(
       '/applications/app-1/edit',
@@ -281,6 +284,9 @@ describe('ApplicationsPageContent', () => {
       />,
       { wrapper: freeWrapper },
     );
+
+    // Switch to list view (board is default)
+    fireEvent.click(screen.getByLabelText('List view'));
 
     expect(screen.getByLabelText('Delete Acme Corp')).toBeDefined();
     expect(screen.getByLabelText('Delete Globex Inc')).toBeDefined();

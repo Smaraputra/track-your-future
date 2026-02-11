@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { RetroWindow } from '@/components/retro-window';
+import { MatrixRain } from '@/components/matrix-rain';
 import { LoginForm } from './login-form';
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -25,8 +26,9 @@ export default async function LoginPage({
     : undefined;
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4">
-      <RetroWindow title="sys://auth/login" className="w-full max-w-sm">
+    <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">
+      <MatrixRain />
+      <RetroWindow title="sys://auth/login" className="relative z-10 w-full max-w-sm">
         <LoginForm initialError={initialError} callbackUrl={callbackUrl} />
       </RetroWindow>
     </div>

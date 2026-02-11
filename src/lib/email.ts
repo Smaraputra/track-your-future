@@ -30,7 +30,7 @@ async function sendEmail(opts: SendEmailOptions): Promise<void> {
   });
 
   await transport.sendMail({
-    from: process.env.EMAIL_FROM ?? 'noreply@trackyourfuture.app',
+    from: process.env.EMAIL_FROM ?? 'artanodestudios@gmail.com',
     to: opts.to,
     subject: opts.subject,
     html: opts.html,

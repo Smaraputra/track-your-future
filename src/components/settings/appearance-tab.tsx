@@ -1,43 +1,11 @@
 'use client';
 
-import { useSyncExternalStore, useCallback } from 'react';
 import { useTheme } from '@/hooks/use-theme';
-
-const CRT_STORAGE_KEY = 'tyf-crt-overlay';
-
-const crtListeners = new Set<() => void>();
-
-function subscribeCrt(callback: () => void) {
-  crtListeners.add(callback);
-  return () => crtListeners.delete(callback);
-}
-
-function getCrtSnapshot(): boolean {
-  try {
-    return localStorage.getItem(CRT_STORAGE_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
-
-function getCrtServerSnapshot(): boolean {
-  return false;
-}
+import { useCRTOverlay } from '@/components/crt-overlay';
 
 export function AppearanceTab() {
   const { theme, toggleTheme } = useTheme();
-  const crtEnabled = useSyncExternalStore(subscribeCrt, getCrtSnapshot, getCrtServerSnapshot);
-
-  const toggleCrt = useCallback(() => {
-    const next = !getCrtSnapshot();
-    try {
-      localStorage.setItem(CRT_STORAGE_KEY, String(next));
-    } catch {
-      // localStorage not available
-    }
-    document.documentElement.classList.toggle('crt-overlay', next);
-    crtListeners.forEach((l) => l());
-  }, []);
+  const { enabled: crtEnabled, toggle: toggleCrt } = useCRTOverlay();
 
   return (
     <div className="space-y-6">

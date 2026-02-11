@@ -8,6 +8,9 @@ import {
   ClipboardList,
 } from 'lucide-react';
 import { RetroButton } from '@/components/retro-button';
+import { MatrixRain } from '@/components/matrix-rain';
+import { TypewriterText } from '@/components/typewriter-text';
+import { cn } from '@/lib/utils';
 
 const FEATURES = [
   {
@@ -42,99 +45,176 @@ const FEATURES = [
   },
 ];
 
+const CAPABILITIES = [
+  { value: '25', label: 'Applications', note: 'Free tier limit' },
+  { value: '10', label: 'Documents', note: 'Free tier limit' },
+  { value: '6', label: 'AI Tools', note: 'Full analysis suite' },
+];
+
 export function LandingContent() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
+    <div>
       {/* Hero */}
-      <section className="mb-16 text-center">
-        <h1 className="font-heading text-primary text-shadow-glow mb-4 text-5xl sm:text-6xl">
-          Track Your Future
-        </h1>
-        <p className="font-body text-muted-foreground mx-auto max-w-xl text-lg">
-          Your job search command center. Track applications, manage documents,
-          and get AI-powered insights -- all in one place.
-        </p>
-        <div className="mt-8">
-          <RetroButton size="lg" asChild>
-            <Link href="/register">Initialize System</Link>
-          </RetroButton>
+      <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <MatrixRain />
         </div>
-      </section>
-
-      {/* Feature Grid */}
-      <section className="mb-16">
-        <h2 className="font-heading text-foreground mb-2 text-center text-2xl">
-          {'> '}System Capabilities
-        </h2>
-        <p className="font-body text-muted-foreground mb-8 text-center text-sm">
-          Available modules in your job search command center
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature) => (
-            <div
-              key={feature.title}
-              className="border-border bg-surface rounded-md border p-4"
-            >
-              <div className="mb-3 flex items-center gap-2">
-                <feature.icon className="text-primary size-5" />
-                <h3 className="font-heading text-foreground text-lg">
-                  {feature.title}
-                </h3>
-              </div>
-              <p className="font-body text-muted-foreground text-sm">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="mb-16 text-center">
-        <div className="border-border bg-surface rounded-md border p-8">
-          <h2 className="font-heading text-primary text-shadow-glow mb-2 text-2xl">
-            Ready to take control?
-          </h2>
-          <p className="font-body text-muted-foreground mb-6 text-sm">
-            Free tier includes 25 applications, 10 documents, and basic AI
-            features.
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-background/30 via-transparent to-background"
+          aria-hidden="true"
+        />
+        <div className="relative z-[2] mx-auto max-w-3xl px-4 py-16 text-center">
+          <p className="font-body text-muted-foreground mb-4 text-sm">
+            <span className="text-primary">user@tyf:~$</span> ./launch --system
           </p>
-          <div className="flex justify-center gap-4">
-            <RetroButton asChild>
-              <Link href="/register">Create Account</Link>
+          <h1 className="font-heading text-primary text-shadow-glow animate-phosphor-on mb-6 text-5xl sm:text-6xl lg:text-7xl">
+            Track Your Future
+          </h1>
+          <div className="font-body text-muted-foreground mx-auto max-w-xl text-lg">
+            <TypewriterText text="Track applications, manage documents, get AI-powered insights." />
+          </div>
+          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <RetroButton size="lg" asChild>
+              <Link href="/register">Initialize System</Link>
             </RetroButton>
-            <RetroButton variant="secondary" asChild>
+            <RetroButton size="lg" variant="secondary" asChild>
               <Link href="/pricing">View Pricing</Link>
             </RetroButton>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-border border-t pt-6">
-        <div className="flex flex-wrap justify-center gap-6 font-body text-sm">
-          <Link
-            href="/privacy"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Privacy Policy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terms of Service
-          </Link>
-          <Link
-            href="/pricing"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Pricing
-          </Link>
+      {/* Features */}
+      <section className="bg-grid py-20">
+        <div className="mx-auto max-w-4xl px-4">
+          <p className="font-body text-muted-foreground mb-6 text-sm">
+            <span className="text-primary">user@tyf:~$</span> ls -la /sys/modules/
+          </p>
+
+          {/* Desktop: terminal table */}
+          <div className="hidden sm:block">
+            <table className="border-border bg-surface w-full border-collapse border crt-screen">
+              <tbody>
+                {FEATURES.map((feature, i) => (
+                  <tr
+                    key={feature.title}
+                    className={cn(
+                      'transition-colors hover:bg-primary/5',
+                      i !== FEATURES.length - 1 && 'border-border border-b',
+                    )}
+                  >
+                    <td className="whitespace-nowrap py-3 pl-4 pr-2">
+                      <span className="flex items-center gap-2">
+                        <feature.icon className="text-primary size-4 shrink-0" />
+                        <span className="font-body text-primary text-sm font-medium">
+                          {feature.title}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="text-dimmed font-body px-2 py-3 text-sm" aria-hidden="true">--</td>
+                    <td className="font-body text-muted-foreground py-3 pl-2 pr-4 text-sm">
+                      {feature.description}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: card grid */}
+          <div className="grid gap-4 sm:hidden">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.title}
+                className="border-border bg-surface border p-4 crt-screen border-glow"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <feature.icon className="text-primary size-5" />
+                  <h3 className="font-heading text-foreground text-lg">{feature.title}</h3>
+                </div>
+                <p className="font-body text-muted-foreground text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="text-muted-foreground mt-4 text-center font-body text-xs">
-          Track Your Future -- {new Date().getFullYear()}
-        </p>
+      </section>
+
+      {/* Capabilities */}
+      <section className="py-20">
+        <div className="mx-auto max-w-4xl px-4">
+          <p className="font-body text-muted-foreground mb-6 text-sm">
+            <span className="text-primary">user@tyf:~$</span> cat /etc/system.conf
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {CAPABILITIES.map((cap) => (
+              <div
+                key={cap.label}
+                className="border-border bg-surface border p-6 text-center crt-screen border-glow"
+              >
+                <p className="font-heading text-primary text-shadow-glow text-4xl">{cap.value}</p>
+                <p className="font-body text-foreground mt-1 text-sm font-medium">{cap.label}</p>
+                <p className="font-body text-muted-foreground mt-1 text-xs">{cap.note}</p>
+              </div>
+            ))}
+          </div>
+          <p className="font-body text-muted-foreground mt-4 text-center text-xs">
+            Unlimited with Pro -- $9/mo
+          </p>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-grid py-20">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="border-primary/30 bg-surface border p-8 text-center crt-screen">
+            <h2 className="font-heading text-primary text-shadow-glow mb-2 text-3xl">
+              Ready to take control?
+            </h2>
+            <p className="font-body text-muted-foreground mb-1 text-sm">
+              Free tier includes 25 applications, 10 documents, and basic AI features.
+            </p>
+            <p className="font-body text-muted-foreground mb-6 text-xs">
+              No credit card required.
+            </p>
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <RetroButton asChild>
+                <Link href="/register">Create Account</Link>
+              </RetroButton>
+              <RetroButton variant="secondary" asChild>
+                <Link href="/pricing">View Pricing</Link>
+              </RetroButton>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-border border-t py-8">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 px-4 sm:flex-row sm:justify-between">
+          <span className="font-heading text-muted-foreground text-sm">
+            TYF:// -- {new Date().getFullYear()}
+          </span>
+          <nav className="flex gap-6 font-body text-sm">
+            <Link
+              href="/privacy"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </Link>
+          </nav>
+        </div>
       </footer>
     </div>
   );

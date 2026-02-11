@@ -19,17 +19,39 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+// Mock MatrixRain (client component with canvas)
+vi.mock('@/components/matrix-rain', () => ({
+  MatrixRain: () => <canvas data-testid="matrix-rain" />,
+}));
+
+// Mock TypewriterText (avoid CSS animation in jsdom)
+vi.mock('@/components/typewriter-text', () => ({
+  TypewriterText: ({ text }: { text: string }) => <span>{text}</span>,
+}));
+
 describe('LandingContent', () => {
   it('renders the hero title', () => {
     render(<LandingContent />);
     expect(screen.getByText('Track Your Future')).toBeDefined();
   });
 
-  it('renders the hero tagline', () => {
+  it('renders the hero subtitle with typewriter text', () => {
     render(<LandingContent />);
     expect(
-      screen.getAllByText(/job search command center/i).length,
-    ).toBeGreaterThan(0);
+      screen.getByText(/Track applications, manage documents, get AI-powered insights/),
+    ).toBeDefined();
+  });
+
+  it('renders terminal prompt lines', () => {
+    render(<LandingContent />);
+    expect(screen.getByText(/\.\/launch --system/)).toBeDefined();
+    expect(screen.getByText(/ls -la \/sys\/modules\//)).toBeDefined();
+    expect(screen.getByText(/cat \/etc\/system\.conf/)).toBeDefined();
+  });
+
+  it('renders MatrixRain in hero', () => {
+    render(<LandingContent />);
+    expect(screen.getByTestId('matrix-rain')).toBeDefined();
   });
 
   it('renders Initialize System CTA linking to /register', () => {
@@ -42,14 +64,22 @@ describe('LandingContent', () => {
     render(<LandingContent />);
     expect(FEATURES).toHaveLength(6);
     for (const feature of FEATURES) {
-      expect(screen.getByText(feature.title)).toBeDefined();
-      expect(screen.getByText(feature.description)).toBeDefined();
+      // Features appear in both desktop and mobile views
+      const titles = screen.getAllByText(feature.title);
+      expect(titles.length).toBeGreaterThan(0);
+      const descriptions = screen.getAllByText(feature.description);
+      expect(descriptions.length).toBeGreaterThan(0);
     }
   });
 
-  it('renders System Capabilities heading', () => {
+  it('renders capabilities section', () => {
     render(<LandingContent />);
-    expect(screen.getByText(/System Capabilities/)).toBeDefined();
+    expect(screen.getByText('25')).toBeDefined();
+    expect(screen.getByText('Applications')).toBeDefined();
+    expect(screen.getByText('10')).toBeDefined();
+    expect(screen.getByText('Documents')).toBeDefined();
+    expect(screen.getByText('6')).toBeDefined();
+    expect(screen.getByText('AI Tools')).toBeDefined();
   });
 
   it('renders Create Account CTA linking to /register', () => {
@@ -58,17 +88,20 @@ describe('LandingContent', () => {
     expect(link.closest('a')?.getAttribute('href')).toBe('/register');
   });
 
-  it('renders View Pricing link', () => {
+  it('renders View Pricing links', () => {
     render(<LandingContent />);
-    const link = screen.getByText('View Pricing');
-    expect(link.closest('a')?.getAttribute('href')).toBe('/pricing');
+    const pricingLinks = screen.getAllByText('View Pricing');
+    const found = pricingLinks.find(
+      (el) => el.closest('a')?.getAttribute('href') === '/pricing',
+    );
+    expect(found).toBeDefined();
   });
 
   it('renders footer links to /privacy, /terms, /pricing', () => {
     render(<LandingContent />);
-    const privacy = screen.getByText('Privacy Policy');
+    const privacy = screen.getByText('Privacy');
     expect(privacy.closest('a')?.getAttribute('href')).toBe('/privacy');
-    const terms = screen.getByText('Terms of Service');
+    const terms = screen.getByText('Terms');
     expect(terms.closest('a')?.getAttribute('href')).toBe('/terms');
     // Pricing appears multiple times; check footer link exists
     const pricingLinks = screen.getAllByText('Pricing');

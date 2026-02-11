@@ -227,7 +227,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-muted-foreground">
               For privacy-related inquiries, contact us at
-              privacy@trackyourfuture.app.
+              artanodestudios@gmail.com.
             </p>
           </section>
         </article>

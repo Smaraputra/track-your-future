@@ -100,7 +100,7 @@ export function BootSequence({ children }: BootSequenceProps) {
   return (
     <div
       data-testid="boot-sequence"
-      className="min-h-screen bg-background p-6 font-body text-sm cursor-pointer"
+      className="min-h-screen bg-background bg-grid p-6 font-body text-sm cursor-pointer"
       onClick={markSeen}
       role="button"
       tabIndex={0}

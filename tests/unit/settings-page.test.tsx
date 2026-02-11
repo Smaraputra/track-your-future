@@ -103,8 +103,8 @@ describe('AppearanceTab', () => {
     render(<AppearanceTab />);
 
     expect(screen.getByText('CRT Overlay')).toBeDefined();
-    // Initial state is disabled
-    expect(screen.getByText('Disabled')).toBeDefined();
+    // Initial state is enabled
+    expect(screen.getByText('Enabled')).toBeDefined();
   });
 });
 

@@ -7,14 +7,10 @@ import {
   type DragEndEvent,
   type DragStartEvent,
   PointerSensor,
+  useDroppable,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { useDroppable } from '@dnd-kit/core';
 import { useState } from 'react';
 
 import { RetroStatusBadge } from '@/components/retro-status-badge';
@@ -53,14 +49,9 @@ function DroppableColumn({
           isOver ? 'border-primary/50 bg-primary/5' : 'bg-surface'
         }`}
       >
-        <SortableContext
-          items={applications.map((a) => a.id)}
-          strategy={verticalListSortingStrategy}
-        >
           {applications.map((app) => (
             <DraggableApplicationCard key={app.id} application={app} />
           ))}
-        </SortableContext>
       </div>
     </div>
   );

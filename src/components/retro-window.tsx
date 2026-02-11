@@ -12,7 +12,7 @@ export function RetroWindow({
 }: RetroWindowProps) {
   return (
     <div
-      className={cn('border-border bg-surface rounded-md border', className)}
+      className={cn('border-border bg-surface rounded-md border crt-screen', className)}
       {...props}
     >
       <div className="border-border flex items-center gap-2 border-b px-3 py-2">

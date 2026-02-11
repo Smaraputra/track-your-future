@@ -113,9 +113,9 @@ describe('Dashboard layout', () => {
     expect(layoutSource).toContain("redirect('/login')");
   });
 
-  it('renders Sidebar and DashboardHeader', () => {
-    expect(layoutSource).toContain('<Sidebar');
-    expect(layoutSource).toContain('<DashboardHeader');
+  it('renders BottomDock and DockStatusBar', () => {
+    expect(layoutSource).toContain('<BottomDock');
+    expect(layoutSource).toContain('<DockStatusBar');
   });
 
   it('passes session user data to header', () => {

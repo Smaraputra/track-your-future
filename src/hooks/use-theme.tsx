@@ -60,7 +60,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     const current = getSnapshot();
-    setTheme(current === 'green' ? 'amber' : 'green');
+    setTheme(current === 'amber' ? 'green' : 'amber');
   }, [setTheme]);
 
   return (
