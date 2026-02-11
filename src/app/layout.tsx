@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import { VT323, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { CookieConsent } from "@/components/cookie-consent";
+import { CRTOverlay } from "@/components/crt-overlay";
 import { THEME_STORAGE_KEY, DEFAULT_THEME } from "@/lib/theme";
 import "./globals.css";
 
@@ -31,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="green" suppressHydrationWarning>
+    <html lang="en" data-theme="amber" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
@@ -41,6 +42,7 @@ export default function RootLayout({
         <SessionProvider>
           <ThemeProvider>
             {children}
+            <CRTOverlay />
             <CookieConsent />
           </ThemeProvider>
         </SessionProvider>

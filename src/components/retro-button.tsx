@@ -3,7 +3,7 @@ import { Slot } from 'radix-ui';
 import { cn } from '@/lib/utils';
 
 const retroButtonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap font-body text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] cursor-pointer',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap font-body text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] cursor-pointer hover-glitch',
   {
     variants: {
       variant: {

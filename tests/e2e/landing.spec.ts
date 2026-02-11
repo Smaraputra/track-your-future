@@ -14,7 +14,7 @@ test.describe('Landing Page', () => {
       page.getByRole('heading', { name: 'Track Your Future' }),
     ).toBeVisible();
     await expect(
-      page.getByText('Your job search command center.').first(),
+      page.getByText('Track applications, manage documents, get AI-powered insights.').first(),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Initialize System' }),
@@ -26,19 +26,28 @@ test.describe('Landing Page', () => {
     await expect(cta).toHaveAttribute('href', '/register');
   });
 
-  test('feature cards are visible', async ({ page }) => {
-    await expect(page.getByText('System Capabilities')).toBeVisible();
-    await expect(page.getByText('Application Tracker')).toBeVisible();
-    await expect(page.getByText('Document Manager')).toBeVisible();
-    await expect(page.getByText('AI Analysis Engine')).toBeVisible();
+  test('feature list is visible', async ({ page }) => {
+    await expect(page.getByText('Application Tracker').first()).toBeVisible();
+    await expect(page.getByText('Document Manager').first()).toBeVisible();
+    await expect(page.getByText('AI Analysis Engine').first()).toBeVisible();
+  });
+
+  test('hero contains MatrixRain canvas', async ({ page }) => {
+    await expect(page.locator('canvas[aria-hidden="true"]').first()).toBeVisible();
+  });
+
+  test('capabilities section shows system limits', async ({ page }) => {
+    await expect(page.getByText('25').first()).toBeVisible();
+    await expect(page.getByText('Applications').first()).toBeVisible();
+    await expect(page.getByText('AI Tools').first()).toBeVisible();
   });
 
   test('footer links are present', async ({ page }) => {
     await expect(
-      page.getByRole('contentinfo').getByRole('link', { name: 'Privacy Policy' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Privacy' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('contentinfo').getByRole('link', { name: 'Terms of Service' }),
+      page.getByRole('contentinfo').getByRole('link', { name: 'Terms' }),
     ).toBeVisible();
   });
 

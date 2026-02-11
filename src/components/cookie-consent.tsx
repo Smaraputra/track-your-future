@@ -50,7 +50,7 @@ export function CookieConsent() {
   return (
     <div
       data-testid="cookie-consent"
-      className="border-border bg-surface fixed inset-x-0 bottom-0 z-50 border-t p-4"
+      className="border-border bg-surface fixed inset-x-0 bottom-20 z-50 border-t p-4"
     >
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
         <p className="font-body text-muted-foreground text-sm">

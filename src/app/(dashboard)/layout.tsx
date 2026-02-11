@@ -4,8 +4,8 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
-import { Sidebar } from '@/components/sidebar';
-import { DashboardHeader } from '@/components/dashboard-header';
+import { BottomDock } from '@/components/dock';
+import { DockStatusBar } from '@/components/dock-status-bar';
 import { PastDueBanner } from '@/components/past-due-banner';
 import { OnboardingGuard } from '@/components/onboarding/onboarding-guard';
 import { SubscriptionProvider } from '@/hooks/use-subscription';
@@ -40,21 +40,19 @@ export default async function DashboardLayout({
           subscription.currentPeriodEnd?.toISOString() ?? null,
       }}
     >
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar className="hidden lg:flex" />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <DashboardHeader
-            userName={session.user.name}
-            userEmail={session.user.email}
-            userImage={session.user.image}
-          />
-          <PastDueBanner />
-          <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-            <OnboardingGuard completed={onboardingCompleted}>
-              {children}
-            </OnboardingGuard>
-          </main>
-        </div>
+      <div className="flex h-screen flex-col overflow-hidden">
+        <PastDueBanner />
+        <DockStatusBar
+          userName={session.user.name}
+          userEmail={session.user.email}
+          userImage={session.user.image}
+        />
+        <main className="flex-1 overflow-y-auto pb-24 p-4 lg:p-6 bg-dotmatrix">
+          <OnboardingGuard completed={onboardingCompleted}>
+            {children}
+          </OnboardingGuard>
+        </main>
+        <BottomDock />
       </div>
     </SubscriptionProvider>
   );

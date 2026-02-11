@@ -8,7 +8,7 @@ export default async function ResetPasswordPage() {
   if (session?.user) redirect('/dashboard');
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4">
+    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4 bg-dotmatrix">
       <RetroWindow title="sys://auth/reset" className="w-full max-w-sm">
         <ResetPasswordForm />
       </RetroWindow>

@@ -8,9 +8,10 @@
   --surface: #111111;
   --dimmed: #404040;
 
-  /* Primary (green theme default) */
-  --primary: #22c55e;
+  /* Primary (amber theme default) */
+  --primary: #f59e0b;
   --primary-foreground: #0a0a0a;
+  --primary-rgb: 245, 158, 11;
 
   /* Secondary */
   --secondary: #1a1a1a;
@@ -21,8 +22,8 @@
   --muted-foreground: #737373;
 
   /* Accent */
-  --accent: #162415;
-  --accent-foreground: #22c55e;
+  --accent: #251a04;
+  --accent-foreground: #f59e0b;
 
   /* Destructive */
   --destructive: #ef4444;
@@ -37,7 +38,7 @@
   /* Border / Input / Ring */
   --border: #262626;
   --input: #262626;
-  --ring: #22c55e;
+  --ring: #f59e0b;
 
   /* Radius */
   --radius: 0.25rem;
@@ -45,37 +46,38 @@
   /* Sidebar */
   --sidebar: #0a0a0a;
   --sidebar-foreground: #e5e5e5;
-  --sidebar-primary: #22c55e;
-  --sidebar-primary-foreground: #0a0a0a;
-  --sidebar-accent: #162415;
-  --sidebar-accent-foreground: #22c55e;
-  --sidebar-border: #262626;
-  --sidebar-ring: #22c55e;
-
-  /* Chart */
-  --chart-1: #22c55e;
-  --chart-2: #16a34a;
-  --chart-3: #15803d;
-  --chart-4: #166534;
-  --chart-5: #14532d;
-}
-
-[data-theme="amber"] {
-  --primary: #f59e0b;
-  --primary-foreground: #0a0a0a;
-  --accent: #251a04;
-  --accent-foreground: #f59e0b;
-  --ring: #f59e0b;
   --sidebar-primary: #f59e0b;
   --sidebar-primary-foreground: #0a0a0a;
   --sidebar-accent: #251a04;
   --sidebar-accent-foreground: #f59e0b;
+  --sidebar-border: #262626;
   --sidebar-ring: #f59e0b;
+
+  /* Chart */
   --chart-1: #f59e0b;
   --chart-2: #d97706;
   --chart-3: #b45309;
   --chart-4: #92400e;
   --chart-5: #78350f;
+}
+
+[data-theme="green"] {
+  --primary: #22c55e;
+  --primary-foreground: #0a0a0a;
+  --primary-rgb: 34, 197, 94;
+  --accent: #162415;
+  --accent-foreground: #22c55e;
+  --ring: #22c55e;
+  --sidebar-primary: #22c55e;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #162415;
+  --sidebar-accent-foreground: #22c55e;
+  --sidebar-ring: #22c55e;
+  --chart-1: #22c55e;
+  --chart-2: #16a34a;
+  --chart-3: #15803d;
+  --chart-4: #166534;
+  --chart-5: #14532d;
 }
 
 @theme inline {
@@ -122,6 +124,11 @@
   --animate-glow: glow 2s ease-in-out infinite alternate;
   --animate-blink: blink 1s step-end infinite;
   --animate-scanline: scanline 8s linear infinite;
+  --animate-flicker: flicker 8s ease-in-out infinite;
+  --animate-phosphor-on: phosphor-on 0.6s ease-out both;
+  --animate-glitch: glitch-shift 0.3s ease-in-out;
+  --animate-dock-bounce: dock-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-folder-open: folder-open 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes glow {
@@ -152,12 +159,67 @@
   }
 }
 
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  10% { opacity: 0.98; }
+  20% { opacity: 1; }
+  40% { opacity: 0.97; }
+  50% { opacity: 1; }
+  70% { opacity: 0.985; }
+  80% { opacity: 0.97; }
+  90% { opacity: 1; }
+}
+
+@keyframes scanline-sweep {
+  0% { top: -8%; }
+  100% { top: 108%; }
+}
+
+@keyframes glitch-shift {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes phosphor-on {
+  0% {
+    filter: brightness(2) blur(4px);
+    opacity: 0;
+  }
+  50% {
+    filter: brightness(1.2) blur(1px);
+    opacity: 0.8;
+  }
+  100% {
+    filter: brightness(1) blur(0);
+    opacity: 1;
+  }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { border-color: var(--primary); }
+  50% { border-color: transparent; }
+}
+
+@keyframes typewriter {
+  from { max-width: 0; }
+  to { max-width: calc(var(--char-count, 40) * 1ch + 2px); }
+}
+
+@keyframes glow-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Utility: text glow using current primary */
 .text-shadow-glow {
   text-shadow: 0 0 8px var(--primary), 0 0 16px var(--primary);
 }
 
-/* CRT scanline overlay */
+/* CRT scanline overlay (toggle-dependent) */
 .crt-overlay {
   position: fixed;
   inset: 0;
@@ -167,9 +229,205 @@
     0deg,
     transparent,
     transparent 2px,
-    rgba(0, 0, 0, 0.08) 2px,
-    rgba(0, 0, 0, 0.08) 4px
+    rgba(0, 0, 0, 0.06) 2px,
+    rgba(0, 0, 0, 0.06) 4px
   );
+  box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.4);
+  animation: flicker 8s ease-in-out infinite;
+}
+
+.crt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    transparent 0%,
+    rgba(var(--primary-rgb), 0.03) 50%,
+    transparent 100%
+  );
+  height: 8%;
+  animation: scanline-sweep 8s linear infinite;
+}
+
+/* Always-on: phosphor text bleeding */
+.text-phosphor {
+  text-shadow: 0 0 4px rgba(var(--primary-rgb), 0.5),
+    0 0 8px rgba(var(--primary-rgb), 0.2);
+}
+
+/* Always-on: glitch on hover */
+.hover-glitch:hover {
+  animation: glitch-shift 0.3s ease-in-out;
+}
+
+/* Always-on: power-on entrance */
+.animate-phosphor-on {
+  animation: phosphor-on 0.6s ease-out both;
+}
+
+/* Always-on: grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(var(--primary-rgb), 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--primary-rgb), 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Always-on: dot matrix background */
+.bg-dotmatrix {
+  background-image: radial-gradient(
+    rgba(var(--primary-rgb), 0.04) 1px,
+    transparent 1px
+  );
+  background-size: 12px 12px;
+}
+
+/* Always-on: blinking terminal cursor */
+.cursor-terminal {
+  border-right: 2px solid var(--primary);
+  animation: cursor-blink 1s step-end infinite;
+}
+
+/* Always-on: screen curvature/inset shadow + subtle outer glow */
+.crt-screen {
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(var(--primary-rgb), 0.04);
+}
+
+/* Always-on: border glow on hover */
+.border-glow {
+  transition: box-shadow 0.2s ease;
+}
+.border-glow:hover {
+  box-shadow: 0 0 8px rgba(var(--primary-rgb), 0.15);
+}
+
+/* Typewriter effect: static on mobile, animated on sm+ */
+.typewriter {
+  display: inline-block;
+}
+
+@media (min-width: 640px) {
+  .typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--primary);
+    max-width: 0;
+    animation:
+      typewriter 2s steps(var(--char-count, 40), end) 0.5s forwards,
+      cursor-blink 1s step-end 0.5s infinite;
+  }
+}
+
+/* Glow sweep border (navbar) */
+.border-glow-sweep {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--primary-rgb), 0.6) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: glow-sweep 4s linear infinite;
+}
+
+/* Input focus glow */
+input:focus,
+textarea:focus {
+  text-shadow: 0 0 1px var(--primary);
+}
+
+/* Dock bounce animation */
+@keyframes dock-bounce {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-12px); }
+  50% { transform: translateY(-4px); }
+  70% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+/* Folder open animation */
+@keyframes folder-open {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: brightness(1.8);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.animate-folder-open {
+  animation: folder-open 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: var(--folder-origin-x, 50%) var(--folder-origin-y, 100%);
+}
+
+/* Dock magnification via CSS :has() */
+@media (hover: hover) {
+  .dock-item {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .dock-items:has(.dock-item:hover) .dock-item:hover {
+    transform: scale(1.5) translateY(-6px);
+  }
+  .dock-items:has(.dock-item:hover) .dock-item:hover + .dock-item,
+  .dock-items:has(.dock-item:hover) .dock-item:has(+ .dock-item:hover) {
+    transform: scale(1.25) translateY(-3px);
+  }
+  .dock-items:has(.dock-item:hover) .dock-item:hover + .dock-item + .dock-item,
+  .dock-items:has(.dock-item:hover) .dock-item:has(+ .dock-item + .dock-item:hover) {
+    transform: scale(1.1) translateY(-1px);
+  }
+}
+
+/* Dock active indicator */
+.dock-item-active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 6px var(--primary);
+}
+
+/* Reduced motion: disable all CRT animations */
+@media (prefers-reduced-motion: reduce) {
+  .crt-overlay,
+  .crt-overlay::after,
+  .hover-glitch:hover,
+  .animate-phosphor-on,
+  .cursor-terminal,
+  .typewriter,
+  .border-glow-sweep,
+  .animate-folder-open {
+    animation: none !important;
+  }
+  .animate-folder-open {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .typewriter {
+    max-width: none !important;
+    border-right: none !important;
+  }
+  .dock-item {
+    transition: none !important;
+  }
 }
 
 body {

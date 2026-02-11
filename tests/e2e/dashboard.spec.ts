@@ -22,13 +22,12 @@ test.describe('Dashboard', () => {
     ).toBeVisible();
   });
 
-  test('sidebar navigation is present', async ({ page }) => {
-    // Desktop sidebar -- use testid to scope to sidebar nav
-    const sidebar = page.getByTestId('sidebar');
-    await expect(sidebar.getByRole('link', { name: 'Dashboard' })).toBeVisible();
-    await expect(sidebar.getByRole('link', { name: 'Applications' })).toBeVisible();
-    await expect(sidebar.getByRole('link', { name: 'Roles' })).toBeVisible();
-    await expect(sidebar.getByRole('link', { name: 'Documents' })).toBeVisible();
-    await expect(sidebar.getByRole('link', { name: 'Settings' })).toBeVisible();
+  test('dock navigation is present', async ({ page }) => {
+    const dock = page.getByTestId('dock');
+    await expect(dock.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+    await expect(dock.getByRole('link', { name: 'Applications' })).toBeVisible();
+    await expect(dock.getByRole('link', { name: 'Roles' })).toBeVisible();
+    await expect(dock.getByRole('link', { name: 'Documents' })).toBeVisible();
+    await expect(dock.getByRole('link', { name: 'Settings' })).toBeVisible();
   });
 });

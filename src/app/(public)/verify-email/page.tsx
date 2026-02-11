@@ -20,7 +20,7 @@ export default async function VerifyEmailPage({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4">
+    <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center p-4 bg-dotmatrix">
       <RetroWindow title="sys://auth/verify" className="w-full max-w-sm">
         <div className="space-y-4">
           <h1 className="font-heading text-primary text-2xl">

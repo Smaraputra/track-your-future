@@ -57,7 +57,7 @@ export function ApplicationsPageContent({
   const [appCount, setAppCount] = useState(initialCount);
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [viewMode, setViewMode] = useState<'list' | 'board'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'board'>('board');
   const [deleteTarget, setDeleteTarget] = useState<ApplicationItem | null>(
     null,
   );
@@ -90,6 +90,13 @@ export function ApplicationsPageContent({
     applicationId: string,
     newStatus: string,
   ) {
+    // Optimistic update: move card immediately
+    setApplications((prev) =>
+      prev.map((app) =>
+        app.id === applicationId ? { ...app, currentStatus: newStatus } : app,
+      ),
+    );
+
     const res = await fetch(`/api/applications/${applicationId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -97,6 +104,9 @@ export function ApplicationsPageContent({
     });
 
     if (res.ok) {
+      refreshApplications();
+    } else {
+      // Revert on failure
       refreshApplications();
     }
   }

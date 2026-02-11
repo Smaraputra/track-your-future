@@ -236,7 +236,7 @@ export default function TermsPage() {
             </h2>
             <p className="text-muted-foreground">
               For questions about these Terms, contact us at
-              legal@trackyourfuture.app.
+              artanodestudios@gmail.com.
             </p>
           </section>
         </article>

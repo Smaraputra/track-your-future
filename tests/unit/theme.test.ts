@@ -8,8 +8,8 @@ describe('Theme constants', () => {
     expect(THEMES).toEqual(['green', 'amber']);
   });
 
-  it('defaults to green', () => {
-    expect(DEFAULT_THEME).toBe('green');
+  it('defaults to amber', () => {
+    expect(DEFAULT_THEME).toBe('amber');
   });
 
   it('has a storage key', () => {
@@ -28,12 +28,12 @@ describe('globals.css', () => {
     expect(css).toContain('--background: #0a0a0a');
     expect(css).toContain('--foreground: #e5e5e5');
     expect(css).toContain('--surface: #111111');
-    expect(css).toContain('--primary: #22c55e');
+    expect(css).toContain('--primary: #f59e0b');
   });
 
-  it('contains [data-theme="amber"] selector', () => {
-    expect(css).toContain('[data-theme="amber"]');
-    expect(css).toContain('--primary: #f59e0b');
+  it('contains [data-theme="green"] selector', () => {
+    expect(css).toContain('[data-theme="green"]');
+    expect(css).toContain('--primary: #22c55e');
   });
 
   it('contains all required shadcn CSS variables', () => {
@@ -93,7 +93,7 @@ describe('layout.tsx', () => {
   });
 
   it('sets data-theme on html element', () => {
-    expect(layout).toContain('data-theme="green"');
+    expect(layout).toContain('data-theme="amber"');
   });
 
   it('has suppressHydrationWarning', () => {
