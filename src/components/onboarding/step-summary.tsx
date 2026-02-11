@@ -19,7 +19,8 @@ export function StepSummary({ data, loading, onComplete, onBack }: StepSummaryPr
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="font-heading text-primary text-lg">Ready to Launch</h2>
+        <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ init --step=confirm</p>
+        <h2 className="font-heading text-primary text-shadow-glow text-lg">Ready to Launch</h2>
         <p className="font-body text-muted-foreground text-sm">
           Review your setup and initialize your dashboard.
         </p>

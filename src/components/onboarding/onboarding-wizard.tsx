@@ -88,27 +88,12 @@ export function OnboardingWizard({
   return (
     <div className="mx-auto max-w-lg space-y-6">
       {/* Progress */}
-      <div className="flex items-center gap-2">
-        {STEPS.map((step, i) => (
-          <div key={step} className="flex items-center gap-2">
-            <div
-              className={`flex size-6 items-center justify-center rounded-full text-xs font-bold ${
-                i <= stepIndex
-                  ? 'bg-primary text-black'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {i + 1}
-            </div>
-            {i < STEPS.length - 1 && (
-              <div
-                className={`h-px w-8 ${
-                  i < stepIndex ? 'bg-primary' : 'bg-muted'
-                }`}
-              />
-            )}
-          </div>
-        ))}
+      <div className="font-body text-sm">
+        <span className="text-primary text-shadow-glow">INIT</span>{' '}
+        <span className="text-muted-foreground">
+          [{STEPS.map((_, i) => (i <= stepIndex ? '#' : '.')).join('')}]
+        </span>{' '}
+        <span className="text-foreground">step {stepIndex + 1}/{STEPS.length}</span>
       </div>
 
       {/* Step content */}

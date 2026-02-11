@@ -28,7 +28,8 @@ export function StepRole({
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="font-heading text-primary text-lg">First Role</h2>
+        <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ init --step=role</p>
+        <h2 className="font-heading text-primary text-shadow-glow text-lg">First Role</h2>
         <p className="font-body text-muted-foreground text-sm">
           Create a role category to organize your applications (e.g. &quot;Frontend Developer&quot;, &quot;Product Manager&quot;).
           You can skip this step.

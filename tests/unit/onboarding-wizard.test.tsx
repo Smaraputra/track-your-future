@@ -126,13 +126,13 @@ describe('OnboardingWizard', () => {
   });
 
   it('renders progress indicators', () => {
-    const { container } = render(
+    render(
       <OnboardingWizard initialName="" initialEmail="test@test.com" />,
     );
 
-    // Should have 4 step indicators
-    const indicators = container.querySelectorAll('.rounded-full.flex');
-    expect(indicators.length).toBe(4);
+    // Should show terminal-style progress bar
+    expect(screen.getByText('INIT')).toBeDefined();
+    expect(screen.getByText(/step 1\/4/)).toBeDefined();
   });
 
   it('renders color picker in role step', () => {

@@ -14,7 +14,8 @@ export function StepName({ name, email, onNameChange, onNext }: StepNameProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="font-heading text-primary text-lg">Welcome</h2>
+        <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ init --step=identity</p>
+        <h2 className="font-heading text-primary text-shadow-glow text-lg">Welcome</h2>
         <p className="font-body text-muted-foreground text-sm">
           Let&apos;s set up your profile. Signed in as {email}.
         </p>

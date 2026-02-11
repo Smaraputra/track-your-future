@@ -37,7 +37,7 @@ export function StaleAppsList({ apps }: StaleAppsListProps) {
         <li key={app.id}>
           <Link
             href={`/applications/${app.id}`}
-            className="border-border hover:border-primary/50 flex items-center gap-3 rounded-md border p-3 transition-colors"
+            className="border-border hover:border-primary/50 crt-screen border-glow flex items-center gap-3 rounded-md border p-3 transition-colors"
           >
             <AlertTriangle className="text-yellow-500 size-4 shrink-0" />
             <div className="min-w-0 flex-1">

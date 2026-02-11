@@ -12,7 +12,8 @@ export function StepCvUpload({ onNext, onBack }: StepCvUploadProps) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="font-heading text-primary text-lg">Upload CV</h2>
+        <p className="font-body text-muted-foreground text-xs mb-1">user@tyf:~$ init --step=documents</p>
+        <h2 className="font-heading text-primary text-shadow-glow text-lg">Upload CV</h2>
         <p className="font-body text-muted-foreground text-sm">
           Upload your CV to enable AI-powered features like CV parsing and match scoring.
           You can do this later from the Documents page.

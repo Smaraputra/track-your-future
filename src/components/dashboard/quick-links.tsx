@@ -30,7 +30,7 @@ export function QuickLinks({ roleCategories }: QuickLinksProps) {
             <li key={role.id}>
               <Link
                 href={`/roles/${role.id}`}
-                className="hover:bg-accent/50 flex items-center gap-2 rounded px-2 py-1.5 transition-colors"
+                className="hover:bg-accent/50 border-glow flex items-center gap-2 rounded px-2 py-1.5 transition-colors"
               >
                 {role.color && (
                   <span
@@ -52,19 +52,19 @@ export function QuickLinks({ roleCategories }: QuickLinksProps) {
       <div className="flex gap-2">
         <Link
           href="/applications"
-          className="font-body text-primary text-xs hover:underline"
+          className="font-body text-primary text-phosphor text-xs hover:underline"
         >
           All Applications
         </Link>
         <Link
           href="/roles"
-          className="font-body text-primary text-xs hover:underline"
+          className="font-body text-primary text-phosphor text-xs hover:underline"
         >
           All Roles
         </Link>
         <Link
           href="/documents"
-          className="font-body text-primary text-xs hover:underline"
+          className="font-body text-primary text-phosphor text-xs hover:underline"
         >
           Documents
         </Link>
