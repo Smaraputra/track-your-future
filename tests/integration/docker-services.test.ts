@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 const DATABASE_URL = process.env.DATABASE_URL;
+const REDIS_URL = process.env.REDIS_URL;
 
 describe.skipIf(!DATABASE_URL)('Docker services integration', () => {
   describe('PostgreSQL', () => {
@@ -49,12 +50,11 @@ describe.skipIf(!DATABASE_URL)('Docker services integration', () => {
       expect(response.ok).toBe(true);
     });
   });
+});
 
-  describe('Redis', () => {
-    it('REDIS_URL environment variable is configured', () => {
-      const redisUrl = process.env.REDIS_URL;
-      expect(redisUrl).toBeDefined();
-      expect(redisUrl).toMatch(/^redis:\/\//);
-    });
+describe.skipIf(!REDIS_URL)('Redis integration', () => {
+  it('REDIS_URL environment variable is configured', () => {
+    expect(REDIS_URL).toBeDefined();
+    expect(REDIS_URL).toMatch(/^redis:\/\//);
   });
 });

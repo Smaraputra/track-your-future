@@ -67,8 +67,9 @@ test.describe('Landing Page', () => {
 
   test('boot animation shows on first visit', async ({ browser }) => {
     // Create a fresh context without localStorage skip
+    const port = process.env.E2E_PORT || '3001';
     const freshContext = await browser.newContext({
-      baseURL: process.env.BASE_URL || 'http://localhost:3001',
+      baseURL: process.env.BASE_URL || `http://localhost:${port}`,
     });
     const freshPage = await freshContext.newPage();
     await freshPage.goto('/');

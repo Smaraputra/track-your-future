@@ -53,8 +53,9 @@ setup('create test users and authenticate', async ({ page }) => {
   await page.context().storageState({ path: 'tests/e2e/.auth/user.json' });
 
   // Login fresh user in a new context and save its storage state
+  const port = process.env.E2E_PORT || '3001';
   const freshContext = await page.context().browser()!.newContext({
-    baseURL: process.env.BASE_URL || 'http://localhost:3001',
+    baseURL: process.env.BASE_URL || `http://localhost:${port}`,
   });
   const freshPage = await freshContext.newPage();
   await freshPage.addInitScript(() => {
