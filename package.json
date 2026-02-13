@@ -21,6 +21,7 @@
     "db:seed": "node scripts/seed.mjs"
   },
   "dependencies": {
+    "@ai-sdk/mistral": "^3.0.20",
     "@ai-sdk/openai": "^3.0.26",
     "@auth/drizzle-adapter": "1.11.0",
     "@aws-sdk/client-s3": "^3.985.0",

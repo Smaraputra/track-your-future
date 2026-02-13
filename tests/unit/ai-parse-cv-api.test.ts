@@ -48,8 +48,8 @@ describe('POST /api/ai/parse-cv route', () => {
     expect(source).toContain('Monthly CV parsing limit reached');
   });
 
-  it('returns 503 when API key not configured', () => {
-    expect(source).toContain('OPENAI_API_KEY');
+  it('returns 503 when no AI provider configured', () => {
+    expect(source).toContain('isAIAvailable()');
     expect(source).toContain('AI service not configured');
     expect(source).toContain('status: 503');
   });

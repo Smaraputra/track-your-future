@@ -80,6 +80,18 @@ describe('calculateCost', () => {
     expect(cost).toBeCloseTo(1000);
   });
 
+  it('calculates cost for mistral-small-latest correctly', () => {
+    const cost = calculateCost('mistral-small-latest', 1_000_000, 1_000_000);
+    // 10 + 30 = 40
+    expect(cost).toBeCloseTo(40);
+  });
+
+  it('calculates cost for mistral-large-latest correctly', () => {
+    const cost = calculateCost('mistral-large-latest', 1_000_000, 1_000_000);
+    // 200 + 600 = 800
+    expect(cost).toBeCloseTo(800);
+  });
+
   it('returns proportional cost for smaller token counts', () => {
     // 1000 input tokens at 10 cents/1M = 0.01 cents
     // 500 output tokens at 40 cents/1M = 0.02 cents
@@ -108,11 +120,31 @@ describe('AI providers', () => {
     expect(source).toContain("from '@ai-sdk/openai'");
   });
 
+  it('imports createMistral from @ai-sdk/mistral', () => {
+    expect(source).toContain("from '@ai-sdk/mistral'");
+  });
+
   it('reads OPENAI_API_KEY from environment', () => {
     expect(source).toContain('OPENAI_API_KEY');
   });
 
+  it('reads MISTRAL_API_KEY from environment', () => {
+    expect(source).toContain('MISTRAL_API_KEY');
+  });
+
   it('exports openai provider instance', () => {
     expect(source).toContain('export const openai');
+  });
+
+  it('exports mistral provider instance', () => {
+    expect(source).toContain('export const mistral');
+  });
+
+  it('exports isAIAvailable helper', () => {
+    expect(source).toContain('export function isAIAvailable');
+  });
+
+  it('exports activeProvider with priority logic', () => {
+    expect(source).toContain('export const activeProvider');
   });
 });

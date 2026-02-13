@@ -45,8 +45,8 @@ describe('POST /api/ai/extract-jd route', () => {
     expect(source).toContain('Monthly JD extraction limit reached');
   });
 
-  it('returns 503 when API key not configured', () => {
-    expect(source).toContain('OPENAI_API_KEY');
+  it('returns 503 when no AI provider configured', () => {
+    expect(source).toContain('isAIAvailable()');
     expect(source).toContain('AI service not configured');
     expect(source).toContain('status: 503');
   });

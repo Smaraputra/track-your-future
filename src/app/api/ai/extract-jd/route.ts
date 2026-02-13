@@ -14,6 +14,7 @@ import { parseJdText } from '@/lib/ai/jd-parser';
 import { getCachedJd, setCachedJd } from '@/lib/ai/jd-cache';
 import { logAiUsage } from '@/lib/ai/usage';
 import { MODEL_NAMES } from '@/lib/ai/models';
+import { isAIAvailable } from '@/lib/ai/providers';
 
 const bodySchema = z
   .object({
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (!isAIAvailable()) {
     return NextResponse.json(
       { error: 'AI service not configured' },
       { status: 503 },
