@@ -67,3 +67,16 @@ jobs:
             docker compose -f docker-compose.prod.yml pull app
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
+
+            # Wait for health check
+            echo "Waiting for app to be healthy..."
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:${APP_PORT:-3100}/api/health > /dev/null 2>&1; then
+                echo "App is healthy"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Health check failed after 60s"
+            docker compose -f docker-compose.prod.yml logs app --tail=50
+            exit 1

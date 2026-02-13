@@ -25,7 +25,7 @@ try {
 
   // Create demo user
   await db.execute(sql`
-    INSERT INTO users (id, name, email, password_hash, email_verified, onboarding_completed)
+    INSERT INTO users (id, name, email, hashed_password, email_verified, onboarding_completed)
     VALUES (
       ${DEMO_USER_ID},
       'Demo User',
@@ -60,7 +60,7 @@ try {
 
   for (const [i, role] of roles.entries()) {
     await db.execute(sql`
-      INSERT INTO role_categories (id, user_id, name, color, sort_order)
+      INSERT INTO role_categories (id, user_id, name, color, position)
       VALUES (${role.id}, ${DEMO_USER_ID}, ${role.name}, ${role.color}, ${i})
       ON CONFLICT (id) DO NOTHING
     `);
@@ -69,26 +69,26 @@ try {
 
   // Create form field templates
   const fields = [
-    { roleId: roles[0].id, label: 'Years of Experience', fieldType: 'short_text', value: '5 years' },
-    { roleId: roles[0].id, label: 'Tech Stack', fieldType: 'long_text', value: 'TypeScript, React, Node.js, PostgreSQL, AWS' },
-    { roleId: roles[0].id, label: 'Salary Expectation', fieldType: 'short_text', value: '$120,000 - $150,000' },
-    { roleId: roles[1].id, label: 'Years of Experience', fieldType: 'short_text', value: '3 years' },
-    { roleId: roles[1].id, label: 'Tech Stack', fieldType: 'long_text', value: 'Python, TensorFlow, PyTorch, SQL, Spark' },
-    { roleId: roles[1].id, label: 'Salary Expectation', fieldType: 'short_text', value: '$130,000 - $160,000' },
-    { roleId: roles[2].id, label: 'Years of Experience', fieldType: 'short_text', value: '4 years' },
-    { roleId: roles[2].id, label: 'Domain Expertise', fieldType: 'long_text', value: 'B2B SaaS, Developer Tools, Platform Products' },
-    { roleId: roles[2].id, label: 'Salary Expectation', fieldType: 'short_text', value: '$140,000 - $170,000' },
+    { roleId: roles[0].id, fieldKey: 'Years of Experience', fieldValue: '5 years' },
+    { roleId: roles[0].id, fieldKey: 'Tech Stack', fieldValue: 'TypeScript, React, Node.js, PostgreSQL, AWS' },
+    { roleId: roles[0].id, fieldKey: 'Salary Expectation', fieldValue: '$120,000 - $150,000' },
+    { roleId: roles[1].id, fieldKey: 'Years of Experience', fieldValue: '3 years' },
+    { roleId: roles[1].id, fieldKey: 'Tech Stack', fieldValue: 'Python, TensorFlow, PyTorch, SQL, Spark' },
+    { roleId: roles[1].id, fieldKey: 'Salary Expectation', fieldValue: '$130,000 - $160,000' },
+    { roleId: roles[2].id, fieldKey: 'Years of Experience', fieldValue: '4 years' },
+    { roleId: roles[2].id, fieldKey: 'Domain Expertise', fieldValue: 'B2B SaaS, Developer Tools, Platform Products' },
+    { roleId: roles[2].id, fieldKey: 'Salary Expectation', fieldValue: '$140,000 - $170,000' },
   ];
 
   for (const [i, field] of fields.entries()) {
     await db.execute(sql`
-      INSERT INTO form_field_templates (id, role_category_id, label, field_type, default_value, sort_order)
+      INSERT INTO form_field_templates (id, user_id, role_category_id, field_key, field_value, position)
       VALUES (
         ${`00000000-0000-4000-8000-0000000001${(20 + i).toString()}`},
+        ${DEMO_USER_ID},
         ${field.roleId},
-        ${field.label},
-        ${field.fieldType},
-        ${field.value},
+        ${field.fieldKey},
+        ${field.fieldValue},
         ${i % 3}
       )
       ON CONFLICT (id) DO NOTHING
@@ -109,7 +109,7 @@ try {
   ];
 
   for (const app of apps) {
-    const appliedAt = app.status === 'draft' ? null : new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+    const appliedAt = app.status === 'draft' ? null : new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString();
     await db.execute(sql`
       INSERT INTO applications (id, user_id, role_category_id, company_name, job_title, current_status, applied_at)
       VALUES (
@@ -140,7 +140,7 @@ try {
     if (app.status === 'draft') continue;
     const progression = statusProgression[app.status] || [];
     for (let i = 1; i < progression.length; i++) {
-      const changedAt = new Date(Date.now() - (progression.length - i) * 3 * 24 * 60 * 60 * 1000);
+      const changedAt = new Date(Date.now() - (progression.length - i) * 3 * 24 * 60 * 60 * 1000).toISOString();
       await db.execute(sql`
         INSERT INTO application_status_history (id, application_id, from_status, to_status, changed_at)
         VALUES (
