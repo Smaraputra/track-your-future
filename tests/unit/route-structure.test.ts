@@ -43,6 +43,25 @@ describe('Route structure', () => {
     expect(existsSync(resolve(ROOT, path))).toBe(true);
   });
 
+  const onboardingPages = [
+    'src/app/(onboarding)/layout.tsx',
+    'src/app/(onboarding)/onboarding/page.tsx',
+  ];
+
+  const infrastructureRoutes = [
+    'src/app/(dashboard)/template.tsx',
+    'src/app/api/health/route.ts',
+    'src/app/api/cron/detect-stale/route.ts',
+  ];
+
+  it.each(onboardingPages)('onboarding page exists: %s', (path) => {
+    expect(existsSync(resolve(ROOT, path))).toBe(true);
+  });
+
+  it.each(infrastructureRoutes)('infrastructure route exists: %s', (path) => {
+    expect(existsSync(resolve(ROOT, path))).toBe(true);
+  });
+
   it('old root page.tsx is deleted', () => {
     expect(existsSync(resolve(ROOT, 'src/app/page.tsx'))).toBe(false);
   });

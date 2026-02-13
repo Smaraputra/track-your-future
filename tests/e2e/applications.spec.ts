@@ -68,6 +68,8 @@ test.describe.serial('Applications CRUD', () => {
 
   test('edit an application', async ({ page }) => {
     await page.goto('/applications');
+    // Switch to list view where edit links are available
+    await page.getByRole('button', { name: 'List view' }).click();
     await page.getByRole('link', { name: 'Edit E2E Test Company' }).click();
     await page.waitForURL(/\/applications\/.*\/edit/, { timeout: 10000 });
 
@@ -82,6 +84,8 @@ test.describe.serial('Applications CRUD', () => {
 
   test('delete an application', async ({ page }) => {
     await page.goto('/applications');
+    // Switch to list view where delete buttons are available
+    await page.getByRole('button', { name: 'List view' }).click();
     await page
       .getByRole('button', { name: 'Delete E2E Updated Company' })
       .click();

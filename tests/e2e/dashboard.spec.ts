@@ -24,10 +24,11 @@ test.describe('Dashboard', () => {
 
   test('dock navigation is present', async ({ page }) => {
     const dock = page.getByTestId('dock');
-    await expect(dock.getByRole('link', { name: 'Dashboard' })).toBeVisible();
-    await expect(dock.getByRole('link', { name: 'Applications' })).toBeVisible();
-    await expect(dock.getByRole('link', { name: 'Roles' })).toBeVisible();
-    await expect(dock.getByRole('link', { name: 'Documents' })).toBeVisible();
-    await expect(dock.getByRole('link', { name: 'Settings' })).toBeVisible();
+    await expect(dock).toBeVisible();
+    await expect(dock.locator('a[href="/dashboard"]')).toBeVisible();
+    await expect(dock.locator('a[href="/applications"]')).toBeVisible();
+    await expect(dock.locator('a[href="/roles"]')).toBeVisible();
+    await expect(dock.locator('a[href="/documents"]')).toBeVisible();
+    await expect(dock.locator('a[href="/settings"]')).toBeVisible();
   });
 });

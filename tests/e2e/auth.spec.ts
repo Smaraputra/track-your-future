@@ -56,4 +56,25 @@ test.describe('Authentication', () => {
     await expect(page.getByPlaceholder('Enter password')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
   });
+
+  test('reset password page renders form with email input', async ({ page }) => {
+    await page.goto('/reset-password');
+    await expect(
+      page.getByRole('heading', { name: 'Reset Password' }),
+    ).toBeVisible();
+    await expect(page.getByPlaceholder('user@example.com')).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Send Reset Link' }),
+    ).toBeVisible();
+  });
+
+  test('reset password confirm page without token shows Invalid Link', async ({ page }) => {
+    await page.goto('/reset-password/confirm');
+    await expect(
+      page.getByRole('heading', { name: 'Invalid Link' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Request reset link' }),
+    ).toBeVisible();
+  });
 });
