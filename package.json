@@ -16,7 +16,9 @@
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:migrate:kit": "drizzle-kit migrate",
+    "db:seed": "node scripts/seed.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.26",
