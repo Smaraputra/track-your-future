@@ -2,6 +2,7 @@ node_modules
 .next
 .git
 .gitignore
+.github
 coverage
 test-results
 playwright-report

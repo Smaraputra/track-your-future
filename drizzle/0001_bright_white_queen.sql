@@ -1,0 +1,1 @@
+ALTER TYPE "public"."ai_feature" ADD VALUE 'jd_extraction' BEFORE 'match';

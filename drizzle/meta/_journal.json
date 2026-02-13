@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1770538541665,
+      "tag": "0000_material_calypso",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770654386339,
+      "tag": "0001_bright_white_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770660749741,
+      "tag": "0002_puzzling_the_order",
+      "breakpoints": true
+    }
+  ]
+}

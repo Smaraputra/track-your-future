@@ -1,0 +1,7 @@
+{$DOMAIN} {
+	reverse_proxy app:3000
+}
+
+minio.{$DOMAIN} {
+	reverse_proxy minio:9000
+}

@@ -46,9 +46,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# drizzle migrations (generated)
-drizzle/
-
 # AI assistant instructions
 CLAUDE.md
 
