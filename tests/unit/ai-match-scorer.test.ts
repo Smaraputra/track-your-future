@@ -67,8 +67,8 @@ describe('match API route module', () => {
     expect(source).toContain("checkAiLimit(userId, 'match', sub.tier)");
   });
 
-  it('checks OPENAI_API_KEY', () => {
-    expect(source).toContain('process.env.OPENAI_API_KEY');
+  it('checks AI provider availability', () => {
+    expect(source).toContain('isAIAvailable()');
     expect(source).toContain('status: 503');
   });
 
