@@ -1,7 +1,14 @@
-{$DOMAIN} {
-	reverse_proxy app:3000
-}
+# Host-level Caddy snippet for Track Your Future
+#
+# Add this to your VPS's main Caddyfile (e.g. /etc/caddy/Caddyfile).
+# Replace {DOMAIN} with your actual domain and {APP_PORT} with the port
+# configured in docker-compose.prod.yml (default: 3100).
+#
+# Example:
+#   trackyourfuture.app {
+#       reverse_proxy localhost:3100
+#   }
 
-minio.{$DOMAIN} {
-	reverse_proxy minio:9000
+{$DOMAIN} {
+	reverse_proxy localhost:{$APP_PORT:3100}
 }
