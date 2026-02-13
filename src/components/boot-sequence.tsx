@@ -1,27 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-
-const BOOT_SEEN_KEY = 'tyf-boot-seen';
-
-const bootListeners = new Set<() => void>();
-
-function bootSubscribe(callback: () => void) {
-  bootListeners.add(callback);
-  return () => bootListeners.delete(callback);
-}
-
-function getBootSeenSnapshot(): boolean {
-  try {
-    return localStorage.getItem(BOOT_SEEN_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
-
-function getBootSeenServerSnapshot(): boolean {
-  return true;
-}
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore
+} from 'react';
+import { bootStore } from '@/lib/boot-store';
 
 const BOOT_LINES = [
   { text: 'TYF BIOS v2.0.26', delay: 0 },
@@ -44,33 +32,52 @@ const BOOT_LINES = [
 
 const TOTAL_DURATION = 3200;
 
+interface BootContextType {
+  wasBooted: boolean;
+}
+
+const BootContext = createContext<BootContextType>({ wasBooted: false });
+
+export const useBootContext = () => useContext(BootContext);
+
 interface BootSequenceProps {
   children: React.ReactNode;
 }
 
 export function BootSequence({ children }: BootSequenceProps) {
   const seen = useSyncExternalStore(
-    bootSubscribe,
-    getBootSeenSnapshot,
-    getBootSeenServerSnapshot,
+    bootStore.subscribe,
+    bootStore.getSnapshot,
+    bootStore.getServerSnapshot,
   );
 
   const [completed, setCompleted] = useState(false);
   const [visibleLines, setVisibleLines] = useState(0);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const [wasBooted, setWasBooted] = useState(false);
+  
+  // Track if we started with 'seen' already (e.g. refresh)
+  // If so, we skip boot sequence and wasBooted remains false (no reveal animation)
+  const initialSeenRef = useRef<boolean | null>(null);
+  
+  // Initialize ref on client mount
+  useEffect(() => {
+    if (initialSeenRef.current === null) {
+      initialSeenRef.current = seen;
+    }
+  }, [seen]);
 
   const markSeen = useCallback(() => {
-    try {
-      localStorage.setItem(BOOT_SEEN_KEY, 'true');
-    } catch {
-      // localStorage not available
-    }
-    bootListeners.forEach((l) => l());
+    bootStore.markComplete();
     setCompleted(true);
   }, []);
 
   useEffect(() => {
+    // If we've already seen it (persisted) or completed this session, stop.
     if (seen || completed) return;
+
+    // If we are running this effect, it means we are booting.
+    // So when we finish, we should consider it "booted".
+    setWasBooted(true);
 
     const timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -86,21 +93,27 @@ export function BootSequence({ children }: BootSequenceProps) {
     }, TOTAL_DURATION);
     timers.push(completeTimer);
 
-    timersRef.current = timers;
-
     return () => {
       timers.forEach(clearTimeout);
     };
   }, [seen, completed, markSeen]);
 
-  if (seen || completed) {
-    return <>{children}</>;
+  // If already seen from start (refresh), just show children immediately
+  // If running sequence, show children only after completion
+  const showChildren = seen || completed;
+
+  if (showChildren) {
+    return (
+      <BootContext.Provider value={{ wasBooted }}>
+        {children}
+      </BootContext.Provider>
+    );
   }
 
   return (
     <div
       data-testid="boot-sequence"
-      className="min-h-screen bg-background bg-grid p-6 font-body text-sm cursor-pointer"
+      className="min-h-screen bg-background bg-grid p-6 font-body text-sm cursor-pointer select-none"
       onClick={markSeen}
       role="button"
       tabIndex={0}
@@ -110,7 +123,7 @@ export function BootSequence({ children }: BootSequenceProps) {
     >
       <div className="mx-auto max-w-2xl">
         {BOOT_LINES.slice(0, visibleLines).map((line, i) => (
-          <div key={i} className="text-primary leading-relaxed">
+          <div key={i} className="text-primary leading-relaxed whitespace-pre-wrap">
             {line.text || '\u00A0'}
           </div>
         ))}
@@ -122,4 +135,5 @@ export function BootSequence({ children }: BootSequenceProps) {
   );
 }
 
-export { BOOT_SEEN_KEY, BOOT_LINES };
+export { BOOT_LINES };
+export { BOOT_SEEN_KEY } from '@/lib/boot-store';

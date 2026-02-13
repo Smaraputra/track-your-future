@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
+import { PublicHeader } from '@/components/public-header';
 
 export default async function PublicLayout({
   children,
@@ -10,7 +11,7 @@ export default async function PublicLayout({
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
+      <PublicHeader className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
         <div className="flex h-16 items-center justify-between px-4">
           <Link
             href="/"
@@ -53,7 +54,7 @@ export default async function PublicLayout({
           </nav>
         </div>
         <div className="border-glow-sweep" aria-hidden="true" />
-      </header>
+      </PublicHeader>
       {children}
     </div>
   );
