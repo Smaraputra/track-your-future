@@ -20,15 +20,11 @@ export function PublicHeader({ children, className }: PublicHeaderProps) {
   // This is safe because it's evaluated once on mount
   const shouldAnimate = typeof window !== 'undefined' && !bootStore.getSnapshot();
 
-  // If boot not completed yet, hide navbar
-  if (!seen) {
-    return null;
-  }
-
   return (
     <header
       className={cn(
         className,
+        !seen && 'hidden',
         shouldAnimate && 'animate-slide-in-from-top'
       )}
       suppressHydrationWarning
