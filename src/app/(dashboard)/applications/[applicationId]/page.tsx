@@ -58,7 +58,7 @@ export default async function ApplicationDetailPage({
     notFound();
   }
 
-  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, coverLetter, interviewPrep, resumeSuggestion, hasParsedCv] =
+  const [sub, history, linkedDocs, allDocs, jobAnalysis, matchScore, coverLetter, interviewPrep, resumeSuggestion, hasParsedCv, userRoles] =
     await Promise.all([
       getUserSubscription(userId),
       db
@@ -131,6 +131,14 @@ export default async function ApplicationDetailPage({
         )
         .limit(1)
         .then((rows) => rows.length > 0),
+      db
+        .select({
+          id: roleCategories.id,
+          name: roleCategories.name,
+          color: roleCategories.color,
+        })
+        .from(roleCategories)
+        .where(eq(roleCategories.userId, userId)),
     ]);
 
   const serializedApp = {
@@ -153,6 +161,7 @@ export default async function ApplicationDetailPage({
         linkedDocuments={linkedDocs}
         availableDocuments={allDocs}
         isPro={sub.tier === 'pro'}
+        roles={userRoles}
         hasParsedCv={hasParsedCv}
         jobAnalysis={
           jobAnalysis

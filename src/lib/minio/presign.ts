@@ -39,6 +39,19 @@ export async function createPresignedGetUrl(
   return getSignedUrl(s3, command, { expiresIn: GET_EXPIRY_SECONDS });
 }
 
+export async function createPresignedInlineUrl(
+  fileKey: string,
+  fileName: string,
+): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET,
+    Key: fileKey,
+    ResponseContentDisposition: `inline; filename="${fileName}"`,
+  });
+
+  return getSignedUrl(s3, command, { expiresIn: GET_EXPIRY_SECONDS });
+}
+
 export async function headObject(
   fileKey: string,
 ): Promise<{ contentLength: number; contentType: string } | null> {

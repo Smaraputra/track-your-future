@@ -31,13 +31,22 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-// Mock lucide-react (needed by RetroSelect via shadcn Select)
+// Mock lucide-react (needed by RetroSelect via shadcn Select and RetroDateTimePicker)
 vi.mock('lucide-react', () => ({
+  CalendarIcon: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-calendar" {...props} />
+  ),
   CheckIcon: (props: Record<string, unknown>) => (
     <svg data-testid="icon-check" {...props} />
   ),
   ChevronDownIcon: (props: Record<string, unknown>) => (
     <svg data-testid="icon-chevron-down" {...props} />
+  ),
+  ChevronLeftIcon: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-chevron-left" {...props} />
+  ),
+  ChevronRightIcon: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-chevron-right" {...props} />
   ),
   ChevronUpIcon: (props: Record<string, unknown>) => (
     <svg data-testid="icon-chevron-up" {...props} />

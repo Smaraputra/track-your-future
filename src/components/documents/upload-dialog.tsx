@@ -26,7 +26,7 @@ interface Role {
 interface UploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUploaded: () => void;
+  onUploaded: (documentId?: string) => void;
   roles: Role[];
   defaultRoleId?: string;
 }
@@ -85,15 +85,15 @@ export function UploadDialog({
 
     if (!file) return;
 
-    const success = await upload({
+    const docId = await upload({
       file,
       documentType,
       customTypeName: documentType === 'custom' ? customTypeName : undefined,
       roleCategoryId: roleCategoryId || undefined,
     });
 
-    if (success) {
-      onUploaded();
+    if (docId) {
+      onUploaded(docId);
       handleClose();
     }
   }

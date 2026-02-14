@@ -32,13 +32,13 @@ vi.mock('@/components/typewriter-text', () => ({
 describe('LandingContent', () => {
   it('renders the hero title', () => {
     render(<LandingContent />);
-    expect(screen.getByText('Track Your Future')).toBeDefined();
+    expect(screen.getByText('Tracked Your Future')).toBeDefined();
   });
 
   it('renders the hero subtitle with typewriter text', () => {
     render(<LandingContent />);
     expect(
-      screen.getByText(/Track applications, manage documents, get AI-powered insights/),
+      screen.getByText(/Track and manage job applications/),
     ).toBeDefined();
   });
 
@@ -54,10 +54,10 @@ describe('LandingContent', () => {
     expect(screen.getByTestId('matrix-rain')).toBeDefined();
   });
 
-  it('renders Initialize System CTA linking to /register', () => {
+  it('renders Initialize System CTA linking to /login', () => {
     render(<LandingContent />);
     const link = screen.getByText('Initialize System');
-    expect(link.closest('a')?.getAttribute('href')).toBe('/register');
+    expect(link.closest('a')?.getAttribute('href')).toBe('/login');
   });
 
   it('renders all 6 feature items', () => {
@@ -82,10 +82,10 @@ describe('LandingContent', () => {
     expect(screen.getByText('AI Tools')).toBeDefined();
   });
 
-  it('renders Create Account CTA linking to /register', () => {
+  it('renders Create Account CTA linking to /login', () => {
     render(<LandingContent />);
     const link = screen.getByText('Create Account');
-    expect(link.closest('a')?.getAttribute('href')).toBe('/register');
+    expect(link.closest('a')?.getAttribute('href')).toBe('/login');
   });
 
   it('renders View Pricing links', () => {

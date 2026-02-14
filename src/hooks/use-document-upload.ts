@@ -14,6 +14,7 @@ interface UploadState {
   status: UploadStatus;
   progress: number;
   error: string | null;
+  documentId: string | null;
 }
 
 interface UploadParams {
@@ -29,14 +30,15 @@ export function useDocumentUpload() {
     status: 'idle',
     progress: 0,
     error: null,
+    documentId: null,
   });
   const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   const upload = useCallback(
-    async (params: UploadParams): Promise<boolean> => {
+    async (params: UploadParams): Promise<string | null> => {
       const { file, documentType, customTypeName, roleCategoryId, previousDocumentId } = params;
 
-      setState({ status: 'presigning', progress: 0, error: null });
+      setState({ status: 'presigning', progress: 0, error: null, documentId: null });
 
       try {
         // Step 1: Get presigned URL
@@ -56,14 +58,14 @@ export function useDocumentUpload() {
 
         if (!presignRes.ok) {
           const err = await presignRes.json();
-          setState({ status: 'error', progress: 0, error: err.error ?? 'Failed to get upload URL' });
-          return false;
+          setState({ status: 'error', progress: 0, error: err.error ?? 'Failed to get upload URL', documentId: null });
+          return null;
         }
 
         const presignData = await presignRes.json();
 
         // Step 2: Upload file via XHR (for progress tracking)
-        setState({ status: 'uploading', progress: 0, error: null });
+        setState({ status: 'uploading', progress: 0, error: null, documentId: null });
 
         const uploadSuccess = await new Promise<boolean>((resolve) => {
           const xhr = new XMLHttpRequest();
@@ -97,12 +99,12 @@ export function useDocumentUpload() {
         });
 
         if (!uploadSuccess) {
-          setState({ status: 'error', progress: 0, error: 'Upload failed or was cancelled' });
-          return false;
+          setState({ status: 'error', progress: 0, error: 'Upload failed or was cancelled', documentId: null });
+          return null;
         }
 
         // Step 3: Confirm upload
-        setState({ status: 'confirming', progress: 100, error: null });
+        setState({ status: 'confirming', progress: 100, error: null, documentId: null });
 
         const confirmRes = await fetch('/api/documents/confirm', {
           method: 'POST',
@@ -123,16 +125,16 @@ export function useDocumentUpload() {
 
         if (!confirmRes.ok) {
           const err = await confirmRes.json();
-          setState({ status: 'error', progress: 0, error: err.error ?? 'Failed to confirm upload' });
-          return false;
+          setState({ status: 'error', progress: 0, error: err.error ?? 'Failed to confirm upload', documentId: null });
+          return null;
         }
 
-        setState({ status: 'success', progress: 100, error: null });
-        return true;
+        setState({ status: 'success', progress: 100, error: null, documentId: presignData.documentId });
+        return presignData.documentId as string;
       } catch (e) {
         const message = e instanceof Error ? e.message : 'Upload failed';
-        setState({ status: 'error', progress: 0, error: message });
-        return false;
+        setState({ status: 'error', progress: 0, error: message, documentId: null });
+        return null;
       }
     },
     [],
@@ -143,11 +145,11 @@ export function useDocumentUpload() {
       xhrRef.current.abort();
       xhrRef.current = null;
     }
-    setState({ status: 'idle', progress: 0, error: null });
+    setState({ status: 'idle', progress: 0, error: null, documentId: null });
   }, []);
 
   const reset = useCallback(() => {
-    setState({ status: 'idle', progress: 0, error: null });
+    setState({ status: 'idle', progress: 0, error: null, documentId: null });
   }, []);
 
   return {

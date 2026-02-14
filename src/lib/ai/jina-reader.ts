@@ -13,6 +13,11 @@ export async function fetchUrlAsText(url: string): Promise<string> {
     });
 
     if (!res.ok) {
+      if (res.status === 451) {
+        throw new Error(
+          'This website blocks automated access. Paste the job description text manually.',
+        );
+      }
       throw new Error(`Jina Reader returned HTTP ${res.status}`);
     }
 

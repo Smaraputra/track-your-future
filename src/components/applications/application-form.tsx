@@ -15,6 +15,7 @@ import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { RetroSelect } from '@/components/retro-select';
+import { RetroDateTimePicker } from '@/components/retro-date-time-picker';
 import { AuthMessage } from '@/components/auth/auth-message';
 
 interface Role {
@@ -173,7 +174,16 @@ export function ApplicationForm({
         </RetroFormField>
 
         <RetroFormField label="Applied At" error={errors.appliedAt?.message}>
-          <RetroInput type="datetime-local" {...register('appliedAt')} />
+          <Controller
+            control={control}
+            name="appliedAt"
+            render={({ field }) => (
+              <RetroDateTimePicker
+                value={field.value ?? ''}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </RetroFormField>
 
         <RetroFormField label="Notes" error={errors.notes?.message}>
