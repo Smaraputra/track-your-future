@@ -19,6 +19,7 @@ import { InterviewPrepButton } from './interview-prep-button';
 import { InterviewPrepViewer } from './interview-prep-viewer';
 import { ResumeSuggestionsButton } from './resume-suggestions-button';
 import { ResumeSuggestionsViewer } from './resume-suggestions-viewer';
+import { MatchScoreActions } from './match-score-actions';
 import { type ApplicationItem } from './applications-page-content';
 import type { JdExtractedData, MatchScoreResult, InterviewPrepResult, ResumeSuggestionResult } from '@/lib/ai/schemas';
 
@@ -74,6 +75,12 @@ interface ResumeSuggestionsData {
   createdAt: string;
 }
 
+interface Role {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
 interface ApplicationDetailProps {
   application: ApplicationItem;
   statusHistory: StatusHistoryEntry[];
@@ -86,6 +93,7 @@ interface ApplicationDetailProps {
   coverLetter: CoverLetterData | null;
   interviewPrep: InterviewPrepData | null;
   resumeSuggestions: ResumeSuggestionsData | null;
+  roles?: Role[];
 }
 
 function formatDate(dateStr: string | null): string {
@@ -110,6 +118,7 @@ export function ApplicationDetail({
   coverLetter: initialCoverLetter,
   interviewPrep: initialInterviewPrep,
   resumeSuggestions: initialResumeSuggestions,
+  roles,
 }: ApplicationDetailProps) {
   const [application, setApplication] = useState(initialApp);
   const [statusHistory, setStatusHistory] = useState(initialHistory);
@@ -256,6 +265,18 @@ export function ApplicationDetail({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          {application.jobUrl && (
+            <RetroButton variant="secondary" size="sm" asChild>
+              <a
+                href={application.jobUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="size-4" />
+                Open Job Site
+              </a>
+            </RetroButton>
+          )}
           <RetroButton variant="secondary" size="sm" asChild>
             <Link href={`/applications/${application.id}/edit`}>
               <Pencil className="size-4" />
@@ -287,22 +308,6 @@ export function ApplicationDetail({
       <div className="border-border rounded-md border p-4">
         <h2 className="font-heading text-foreground mb-3 text-lg">Details</h2>
         <dl className="font-body space-y-2 text-sm">
-          {application.jobUrl && (
-            <div className="flex items-center gap-2">
-              <dt className="text-muted-foreground w-24 shrink-0">URL</dt>
-              <dd>
-                <a
-                  href={application.jobUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary inline-flex items-center gap-1 hover:underline"
-                >
-                  View posting
-                  <ExternalLink className="size-3" />
-                </a>
-              </dd>
-            </div>
-          )}
           {application.roleCategoryName && (
             <div className="flex items-center gap-2">
               <dt className="text-muted-foreground w-24 shrink-0">Role</dt>
@@ -356,6 +361,7 @@ export function ApplicationDetail({
           linkedDocuments={linkedDocuments}
           availableDocuments={availableDocuments}
           onChanged={refreshDocuments}
+          roles={roles}
         />
       </div>
 
@@ -365,33 +371,29 @@ export function ApplicationDetail({
           <h2 className="font-heading text-foreground text-lg">
             Job Description
           </h2>
-          {application.jobUrl && (
-            <ExtractJdButton
-              applicationId={application.id}
-              jobUrl={application.jobUrl}
-              hasAnalysis={!!jobAnalysis}
-              onExtracted={refreshJobAnalysis}
-            />
-          )}
+          <ExtractJdButton
+            applicationId={application.id}
+            jobUrl={application.jobUrl}
+            hasAnalysis={!!jobAnalysis}
+            onExtracted={refreshJobAnalysis}
+          />
         </div>
         {jobAnalysis ? (
           <JdAnalysisViewer
             data={jobAnalysis.analysis as JdExtractedData}
           />
-        ) : application.jobUrl ? (
+        ) : (
           <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
             <Sparkles className="size-4" />
-            Click &quot;Extract JD&quot; to analyze the job posting
-          </p>
-        ) : (
-          <p className="font-body text-muted-foreground text-sm">
-            Add a job URL to enable JD extraction
+            {application.jobUrl
+              ? 'Click "Extract JD" to analyze the job posting'
+              : 'Paste a job description or add a URL to enable extraction'}
           </p>
         )}
       </div>
 
       {/* Match Score */}
-      <div className="border-border rounded-md border p-4">
+      <div id="section-match-score" className="border-border rounded-md border p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-foreground text-lg">Match Score</h2>
           <MatchScoreButton
@@ -403,9 +405,20 @@ export function ApplicationDetail({
           />
         </div>
         {matchScore ? (
-          <MatchScoreViewer
-            data={matchScore.result as MatchScoreResult}
-          />
+          <>
+            <MatchScoreViewer
+              data={matchScore.result as MatchScoreResult}
+            />
+            <MatchScoreActions
+              overallScore={(matchScore.result as MatchScoreResult).overallScore}
+              hasParsedCv={hasParsedCv}
+              hasJdAnalysis={!!jobAnalysis}
+              isPro={isPro}
+              hasResumeSuggestions={!!resumeSuggestions}
+              hasCoverLetter={!!coverLetter}
+              hasInterviewPrep={!!interviewPrep}
+            />
+          </>
         ) : (
           <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
             <Sparkles className="size-4" />
@@ -421,7 +434,7 @@ export function ApplicationDetail({
       </div>
 
       {/* Cover Letter */}
-      <div className="border-border rounded-md border p-4">
+      <div id="section-cover-letter" className="border-border rounded-md border p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-foreground text-lg">
             Cover Letter
@@ -452,7 +465,7 @@ export function ApplicationDetail({
       </div>
 
       {/* Interview Prep */}
-      <div className="border-border rounded-md border p-4">
+      <div id="section-interview-prep" className="border-border rounded-md border p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-foreground text-lg">
             Interview Prep
@@ -482,7 +495,7 @@ export function ApplicationDetail({
       </div>
 
       {/* Resume Suggestions */}
-      <div className="border-border rounded-md border p-4">
+      <div id="section-resume-suggestions" className="border-border rounded-md border p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-heading text-foreground text-lg">
             Resume Suggestions

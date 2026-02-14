@@ -64,8 +64,32 @@ describe('ExtractJdButton', () => {
         onExtracted={() => {}}
       />,
     );
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: /Extract JD/ });
     expect(button.hasAttribute('disabled')).toBe(false);
+  });
+
+  it('shows paste toggle when jobUrl is provided', () => {
+    render(
+      <ExtractJdButton
+        applicationId="app-1"
+        jobUrl="https://example.com/job"
+        hasAnalysis={false}
+        onExtracted={() => {}}
+      />,
+    );
+    expect(screen.getByText('Paste manually')).toBeDefined();
+  });
+
+  it('shows "Extract from Text" when in paste mode (no URL)', () => {
+    render(
+      <ExtractJdButton
+        applicationId="app-1"
+        jobUrl={null}
+        hasAnalysis={false}
+        onExtracted={() => {}}
+      />,
+    );
+    expect(screen.getByText('Extract from Text')).toBeDefined();
   });
 });
 
@@ -176,7 +200,7 @@ describe('ApplicationDetail JD section', () => {
   });
 
   it('shows message when no URL', () => {
-    expect(source).toContain('Add a job URL to enable JD extraction');
+    expect(source).toContain('Paste a job description or add a URL to enable extraction');
   });
 
   it('refreshes job analysis after extraction', () => {

@@ -48,6 +48,12 @@ vi.mock('lucide-react', () => ({
   FileText: (props: Record<string, unknown>) => (
     <svg data-testid="icon-file" {...props} />
   ),
+  Eye: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-eye" {...props} />
+  ),
+  Upload: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-upload" {...props} />
+  ),
   X: (props: Record<string, unknown>) => (
     <svg data-testid="icon-x" {...props} />
   ),
@@ -74,6 +80,15 @@ vi.mock('lucide-react', () => ({
   ),
   Copy: (props: Record<string, unknown>) => (
     <svg data-testid="icon-copy" {...props} />
+  ),
+  ArrowDown: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-arrow-down" {...props} />
+  ),
+  FileEdit: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-file-edit" {...props} />
+  ),
+  MessageSquare: (props: Record<string, unknown>) => (
+    <svg data-testid="icon-message-square" {...props} />
   ),
 }));
 
@@ -186,7 +201,7 @@ describe('ApplicationDetail', () => {
     expect(screen.getByText('Delete')).toBeDefined();
   });
 
-  it('shows job URL link', () => {
+  it('shows Open Job Site button when job URL exists', () => {
     render(
       <ApplicationDetail
         application={mockApplication}
@@ -202,10 +217,30 @@ describe('ApplicationDetail', () => {
         resumeSuggestions={null}
       />,
     );
-    const link = screen.getByText('View posting');
+    const link = screen.getByText('Open Job Site');
     expect(link.closest('a')?.getAttribute('href')).toBe(
       'https://acme.com/jobs/1',
     );
+  });
+
+  it('hides Open Job Site button when no job URL', () => {
+    const appNoUrl = { ...mockApplication, jobUrl: null };
+    render(
+      <ApplicationDetail
+        application={appNoUrl}
+        statusHistory={mockStatusHistory}
+        linkedDocuments={mockLinkedDocuments}
+        availableDocuments={mockAvailableDocuments}
+        isPro={false}
+        hasParsedCv={false}
+        jobAnalysis={null}
+        matchScore={null}
+        coverLetter={null}
+        interviewPrep={null}
+        resumeSuggestions={null}
+      />,
+    );
+    expect(screen.queryByText('Open Job Site')).toBeNull();
   });
 
   it('shows role category name', () => {
