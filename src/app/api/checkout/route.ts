@@ -3,8 +3,7 @@ import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { auth } from '@/auth';
-import { stripe } from '@/lib/billing/stripe';
-import { PRICES } from '@/lib/billing/plans';
+import { getBillingProvider } from '@/lib/billing/provider';
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
 import { users } from '@/db/schema/auth';
@@ -14,7 +13,8 @@ const checkoutSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (!stripe) {
+  const provider = await getBillingProvider();
+  if (!provider) {
     return NextResponse.json(
       { error: 'Billing not configured' },
       { status: 503 },
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   // Check for existing active subscription
   const existing = await db.query.subscriptions.findFirst({
     where: eq(subscriptions.userId, session.user.id),
-    columns: { status: true },
+    columns: { status: true, providerCustomerId: true },
   });
 
   if (
@@ -55,49 +55,18 @@ export async function POST(request: Request) {
     );
   }
 
-  // Get or create Stripe customer
   const user = await db.query.users.findFirst({
     where: eq(users.id, session.user.id),
     columns: { email: true, name: true },
   });
 
-  let customerId: string | undefined;
-
-  if (existing) {
-    const subRow = await db.query.subscriptions.findFirst({
-      where: eq(subscriptions.userId, session.user.id),
-      columns: { providerCustomerId: true },
-    });
-    customerId = subRow?.providerCustomerId ?? undefined;
-  }
-
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user?.email ?? undefined,
-      name: user?.name ?? undefined,
-      metadata: { userId: session.user.id },
-    });
-    customerId = customer.id;
-  }
-
-  const priceId =
-    parsed.data.interval === 'monthly'
-      ? PRICES.monthly.priceId
-      : PRICES.annual.priceId;
-
-  const baseUrl = process.env.AUTH_URL ?? 'http://localhost:3000';
-
-  const checkoutSession = await stripe.checkout.sessions.create({
-    customer: customerId,
-    client_reference_id: session.user.id,
-    mode: 'subscription',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${baseUrl}/settings?checkout=success`,
-    cancel_url: `${baseUrl}/pricing?checkout=cancelled`,
-    subscription_data: {
-      trial_period_days: PRICES.trialDays,
-    },
+  const result = await provider.createCheckout({
+    userId: session.user.id,
+    email: user?.email ?? null,
+    name: user?.name ?? null,
+    interval: parsed.data.interval,
+    existingCustomerId: existing?.providerCustomerId ?? null,
   });
 
-  return NextResponse.json({ url: checkoutSession.url });
+  return NextResponse.json({ url: result.url });
 }

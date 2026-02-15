@@ -2,12 +2,13 @@ import { NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 
 import { auth } from '@/auth';
-import { stripe } from '@/lib/billing/stripe';
+import { getBillingProvider } from '@/lib/billing/provider';
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
 
 export async function POST() {
-  if (!stripe) {
+  const provider = await getBillingProvider();
+  if (!provider) {
     return NextResponse.json(
       { error: 'Billing not configured' },
       { status: 503 },
@@ -31,12 +32,9 @@ export async function POST() {
     );
   }
 
-  const baseUrl = process.env.AUTH_URL ?? 'http://localhost:3000';
-
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: sub.providerCustomerId,
-    return_url: `${baseUrl}/settings`,
+  const result = await provider.createPortalSession({
+    providerCustomerId: sub.providerCustomerId,
   });
 
-  return NextResponse.json({ url: portalSession.url });
+  return NextResponse.json({ url: result.url });
 }
