@@ -1,4 +1,4 @@
-# Track Your Future -- Shipping Checklist
+# Tracked Your Future -- Shipping Checklist
 
 **Status**: Feature-complete (26/26 steps), 1299+ tests passing, clean builds.
 **Production readiness**: ~75% -- code is solid, infrastructure and ops tooling missing.

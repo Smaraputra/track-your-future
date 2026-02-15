@@ -44,7 +44,7 @@ Internet -> Caddy (SSL) -> Next.js App (:3000)
 
 ### Step 6: Seed Script
 - [x] `scripts/seed.mjs` (plain ESM, no build step)
-- Demo user: `demo@trackyourfuture.app` / `demo-password-2026!`
+- Demo user: `demo@trackedyourfuture.com` / `demo-password-2026!`
 - Free subscription, 3 role categories, form field templates
 - 8 sample applications across statuses with history
 - All inserts use `ON CONFLICT DO NOTHING` for idempotency

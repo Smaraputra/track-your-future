@@ -32,7 +32,7 @@
 | Applications | 25 | Unlimited |
 | Documents | 10 | Unlimited |
 | Role categories | 3 | Unlimited |
-| Storage | 50 MB | 2 GB |
+| Storage | 50 MB | 200 MB |
 | Form field templates | 20 | Unlimited |
 | AI: CV parses/mo | 3 | Unlimited |
 | AI: JD extractions/mo | 5 | Unlimited |

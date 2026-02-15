@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { RetroWindow } from '@/components/retro-window';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Track Your Future',
-  description: 'Terms and conditions for using Track Your Future.',
+  title: 'Terms of Service | Tracked Your Future',
+  description: 'Terms and conditions for using Tracked Your Future.',
 };
 
 export default function TermsPage() {
@@ -25,7 +25,7 @@ export default function TermsPage() {
               1. Acceptance of Terms
             </h2>
             <p className="text-muted-foreground">
-              By creating an account or using Track Your Future (the
+              By creating an account or using Tracked Your Future (the
               &quot;Service&quot;), you agree to be bound by these Terms of
               Service (&quot;Terms&quot;). If you do not agree, do not use the
               Service.
@@ -37,7 +37,7 @@ export default function TermsPage() {
               2. Description of Service
             </h2>
             <p className="text-muted-foreground">
-              Track Your Future is a multi-tenant SaaS platform for tracking job
+              Tracked Your Future is a multi-tenant SaaS platform for tracking job
               applications. The Service allows you to store CVs and cover
               letters, manage reusable form field answers, track applications
               through a status pipeline, and access AI-powered insights. The
@@ -171,7 +171,7 @@ export default function TermsPage() {
               10. Limitation of Liability
             </h2>
             <p className="text-muted-foreground">
-              To the maximum extent permitted by law, Track Your Future and its
+              To the maximum extent permitted by law, Tracked Your Future and its
               operators shall not be liable for any indirect, incidental, special,
               consequential, or punitive damages, including loss of profits, data,
               or business opportunities arising from your use of the Service. Our
@@ -236,7 +236,7 @@ export default function TermsPage() {
             </h2>
             <p className="text-muted-foreground">
               For questions about these Terms, contact us at
-              artanodestudios@gmail.com.
+              smara.putra2001@gmail.com.
             </p>
           </section>
         </article>

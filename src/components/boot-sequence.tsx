@@ -13,7 +13,7 @@ import { bootStore } from '@/lib/boot-store';
 
 const BOOT_LINES = [
   { text: 'TYF BIOS v2.0.26', delay: 0 },
-  { text: 'Copyright (C) 2026 Track Your Future Systems', delay: 100 },
+  { text: 'Copyright (C) 2026 Tracked Your Future Systems', delay: 100 },
   { text: '', delay: 200 },
   { text: 'Checking memory... 640K OK', delay: 400 },
   { text: 'Extended memory: 2048K OK', delay: 600 },

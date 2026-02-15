@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { RetroWindow } from '@/components/retro-window';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Track Your Future',
-  description: 'How Track Your Future collects, uses, and protects your data.',
+  title: 'Privacy Policy | Tracked Your Future',
+  description: 'How Tracked Your Future collects, uses, and protects your data.',
 };
 
 export default function PrivacyPage() {
@@ -25,9 +25,9 @@ export default function PrivacyPage() {
               1. Introduction
             </h2>
             <p className="text-muted-foreground">
-              Track Your Future (&quot;we,&quot; &quot;our,&quot; or
+              Tracked Your Future (&quot;we,&quot; &quot;our,&quot; or
               &quot;us&quot;) operates a job application tracking platform
-              available at trackyourfuture.app (the &quot;Service&quot;). This
+              available at trackedyourfuture.com (the &quot;Service&quot;). This
               Privacy Policy explains how we collect, use, disclose, and protect
               your personal data when you use our Service.
             </p>
@@ -227,7 +227,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-muted-foreground">
               For privacy-related inquiries, contact us at
-              artanodestudios@gmail.com.
+              smara.putra2001@gmail.com.
             </p>
           </section>
         </article>

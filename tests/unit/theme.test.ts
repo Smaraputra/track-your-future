@@ -106,6 +106,6 @@ describe('layout.tsx', () => {
   });
 
   it('sets correct metadata', () => {
-    expect(layout).toContain('Track Your Future');
+    expect(layout).toContain('Tracked Your Future');
   });
 });
