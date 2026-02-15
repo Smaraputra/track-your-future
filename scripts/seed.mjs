@@ -13,7 +13,7 @@ if (!DATABASE_URL) {
 const client = postgres(DATABASE_URL, { max: 1 });
 const db = drizzle(client);
 
-const DEMO_EMAIL = 'demo@trackyourfuture.app';
+const DEMO_EMAIL = 'demo@trackedyourfuture.com';
 const DEMO_PASSWORD = 'demo-password-2026!';
 const DEMO_USER_ID = '00000000-0000-4000-8000-000000000001';
 

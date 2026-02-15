@@ -19,7 +19,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Track Your Future",
+  title: "Tracked Your Future",
   description:
     "Job search command center. Track applications, manage documents, and get AI-powered insights.",
 };

@@ -11,7 +11,7 @@ test.describe('Landing Page', () => {
 
   test('displays hero section with heading and CTA', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Track Your Future' }),
+      page.getByRole('heading', { name: 'Tracked Your Future' }),
     ).toBeVisible();
     await expect(
       page.getByText('Track applications, manage documents, get AI-powered insights.').first(),
@@ -21,9 +21,9 @@ test.describe('Landing Page', () => {
     ).toBeVisible();
   });
 
-  test('"Initialize System" links to register', async ({ page }) => {
+  test('"Initialize System" links to login', async ({ page }) => {
     const cta = page.getByRole('link', { name: 'Initialize System' });
-    await expect(cta).toHaveAttribute('href', '/register');
+    await expect(cta).toHaveAttribute('href', '/login');
   });
 
   test('feature list is visible', async ({ page }) => {
@@ -54,14 +54,14 @@ test.describe('Landing Page', () => {
   test('renders correctly at mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(
-      page.getByRole('heading', { name: 'Track Your Future' }),
+      page.getByRole('heading', { name: 'Tracked Your Future' }),
     ).toBeVisible();
   });
 
   test('renders correctly at desktop viewport', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await expect(
-      page.getByRole('heading', { name: 'Track Your Future' }),
+      page.getByRole('heading', { name: 'Tracked Your Future' }),
     ).toBeVisible();
   });
 

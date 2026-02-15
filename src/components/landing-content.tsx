@@ -70,14 +70,14 @@ export function LandingContent() {
               <span className="text-primary">user@tyf:~$</span> ./launch --system
             </p>
             <h1 className="font-heading text-primary text-shadow-glow animate-phosphor-on mb-6 text-5xl sm:text-6xl lg:text-7xl">
-              Track Your Future
+              Tracked Your Future
             </h1>
-            <div className="font-body text-muted-foreground mx-auto max-w-xl text-lg">
-              <TypewriterText text="Track applications, manage documents, get AI-powered insights." />
+            <div className="font-body text-muted-foreground mx-auto text-center max-w-xl text-lg">
+              <TypewriterText className='text-center' text="Track and manage job applications." />
             </div>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <RetroButton size="lg" asChild>
-                <Link href="/register">Initialize System</Link>
+                <Link href="/login">Initialize System</Link>
               </RetroButton>
               <RetroButton size="lg" variant="secondary" asChild>
                 <Link href="/pricing">View Pricing</Link>
@@ -186,7 +186,7 @@ export function LandingContent() {
               </p>
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <RetroButton asChild>
-                  <Link href="/register">Create Account</Link>
+                  <Link href="/login">Create Account</Link>
                 </RetroButton>
                 <RetroButton variant="secondary" asChild>
                   <Link href="/pricing">View Pricing</Link>
