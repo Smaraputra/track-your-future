@@ -47,7 +47,7 @@ export async function DELETE(request: Request) {
     await deleteObjects(userDocs.map((d) => d.fileKey));
   }
 
-  // Cancel active Stripe subscription if exists
+  // Cancel active subscription if exists
   const userSubscription = await db.query.subscriptions.findFirst({
     where: eq(subscriptions.userId, userId),
     columns: { providerSubscriptionId: true, status: true },
@@ -56,11 +56,12 @@ export async function DELETE(request: Request) {
     userSubscription?.providerSubscriptionId &&
     ['active', 'trialing', 'past_due'].includes(userSubscription.status)
   ) {
-    const { stripe } = await import('@/lib/billing/stripe');
-    if (stripe) {
-      await stripe.subscriptions.cancel(
-        userSubscription.providerSubscriptionId,
-      );
+    const { getBillingProvider } = await import('@/lib/billing/provider');
+    const provider = await getBillingProvider();
+    if (provider) {
+      await provider.cancelSubscription({
+        providerSubscriptionId: userSubscription.providerSubscriptionId,
+      });
     }
   }
 

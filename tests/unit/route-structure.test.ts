@@ -9,12 +9,8 @@ describe('Route structure', () => {
     'src/app/(public)/page.tsx',
     'src/app/(public)/layout.tsx',
     'src/app/(public)/login/page.tsx',
-    'src/app/(public)/register/page.tsx',
     'src/app/(public)/privacy/page.tsx',
     'src/app/(public)/terms/page.tsx',
-    'src/app/(public)/verify-email/page.tsx',
-    'src/app/(public)/reset-password/page.tsx',
-    'src/app/(public)/reset-password/confirm/page.tsx',
     'src/app/(public)/pricing/page.tsx',
   ];
 
@@ -83,11 +79,8 @@ describe('Auth authorized callback', () => {
     const requiredPaths = [
       "'/'",
       "'/login'",
-      "'/register'",
       "'/privacy'",
       "'/terms'",
-      "'/verify-email'",
-      "'/reset-password'",
       "'/pricing'",
     ];
     for (const path of requiredPaths) {
@@ -115,9 +108,8 @@ describe('Public layout', () => {
     expect(layoutSource).toContain('TYF://');
   });
 
-  it('has login and register links', () => {
+  it('has login link', () => {
     expect(layoutSource).toContain('href="/login"');
-    expect(layoutSource).toContain('href="/register"');
   });
 });
 

@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
 import { generateToken, hashToken } from '@/lib/auth/tokens';
-import {
-  registerSchema,
-  loginSchema,
-  resetPasswordRequestSchema,
-  resetPasswordConfirmSchema,
-} from '@/lib/auth/schemas';
+import { loginSchema } from '@/lib/auth/schemas';
 
 describe('password helpers', () => {
   it('hashPassword produces a bcrypt hash', async () => {
@@ -63,52 +58,6 @@ describe('token helpers', () => {
 });
 
 describe('Zod schemas', () => {
-  describe('registerSchema', () => {
-    it('accepts valid input', () => {
-      const result = registerSchema.safeParse({
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'password123',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejects missing name', () => {
-      const result = registerSchema.safeParse({
-        email: 'test@example.com',
-        password: 'password123',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejects invalid email', () => {
-      const result = registerSchema.safeParse({
-        name: 'Test',
-        email: 'not-an-email',
-        password: 'password123',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejects short password', () => {
-      const result = registerSchema.safeParse({
-        name: 'Test',
-        email: 'test@example.com',
-        password: '1234567',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejects password over 128 chars', () => {
-      const result = registerSchema.safeParse({
-        name: 'Test',
-        email: 'test@example.com',
-        password: 'a'.repeat(129),
-      });
-      expect(result.success).toBe(false);
-    });
-  });
-
   describe('loginSchema', () => {
     it('accepts valid input', () => {
       const result = loginSchema.safeParse({
@@ -127,45 +76,4 @@ describe('Zod schemas', () => {
     });
   });
 
-  describe('resetPasswordRequestSchema', () => {
-    it('accepts valid email', () => {
-      const result = resetPasswordRequestSchema.safeParse({
-        email: 'test@example.com',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejects invalid email', () => {
-      const result = resetPasswordRequestSchema.safeParse({
-        email: 'bad',
-      });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('resetPasswordConfirmSchema', () => {
-    it('accepts valid input', () => {
-      const result = resetPasswordConfirmSchema.safeParse({
-        token: 'some-token',
-        password: 'newpassword123',
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejects empty token', () => {
-      const result = resetPasswordConfirmSchema.safeParse({
-        token: '',
-        password: 'newpassword123',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejects short password', () => {
-      const result = resetPasswordConfirmSchema.safeParse({
-        token: 'some-token',
-        password: 'short',
-      });
-      expect(result.success).toBe(false);
-    });
-  });
 });

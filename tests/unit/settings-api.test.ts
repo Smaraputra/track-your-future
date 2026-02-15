@@ -158,8 +158,9 @@ describe('DELETE /api/settings/account', () => {
     expect(route).toContain('deleteObjects');
   });
 
-  it('cancels Stripe subscription', () => {
-    expect(route).toContain('subscriptions.cancel');
+  it('cancels subscription via billing provider', () => {
+    expect(route).toContain('getBillingProvider');
+    expect(route).toContain('provider.cancelSubscription');
   });
 
   it('deletes user record', () => {
