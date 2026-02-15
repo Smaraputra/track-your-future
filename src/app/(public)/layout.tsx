@@ -39,15 +39,9 @@ export default async function PublicLayout({
                 </Link>
                 <Link
                   href="/login"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  ./login
-                </Link>
-                <Link
-                  href="/register"
                   className="border-primary text-primary hover:bg-primary/10 hover:shadow-[0_0_12px_var(--primary)] border px-3 py-1.5 transition-all"
                 >
-                  ./register
+                  ./login
                 </Link>
               </>
             )}

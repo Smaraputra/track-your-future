@@ -80,11 +80,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const publicPaths = [
         '/',
         '/login',
-        '/register',
         '/privacy',
         '/terms',
-        '/verify-email',
-        '/reset-password',
         '/pricing',
       ];
       const isPublic =

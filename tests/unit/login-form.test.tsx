@@ -52,18 +52,6 @@ describe('LoginForm', () => {
     expect(screen.getByRole('button', { name: 'Login' })).toBeDefined();
   });
 
-  it('renders forgot password link', () => {
-    render(<LoginForm />);
-    const link = screen.getByText('Forgot password?');
-    expect(link.closest('a')?.getAttribute('href')).toBe('/reset-password');
-  });
-
-  it('renders register link', () => {
-    render(<LoginForm />);
-    const link = screen.getByText('Register');
-    expect(link.closest('a')?.getAttribute('href')).toBe('/register');
-  });
-
   it('renders OAuth buttons', () => {
     render(<LoginForm />);
     expect(screen.getByText('Google')).toBeDefined();

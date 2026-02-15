@@ -3,8 +3,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
-import Link from 'next/link';
-
 import { loginSchema, type LoginInput } from '@/lib/auth/schemas';
 import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
@@ -64,28 +62,12 @@ export function LoginForm({ initialError, callbackUrl }: LoginFormProps) {
           />
         </RetroFormField>
 
-        <div className="flex justify-end">
-          <Link
-            href="/reset-password"
-            className="font-body text-muted-foreground hover:text-primary text-xs transition-colors"
-          >
-            Forgot password?
-          </Link>
-        </div>
-
         <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? 'Authenticating...' : 'Login'}
         </RetroButton>
       </form>
 
       <OAuthButtons />
-
-      <p className="font-body text-muted-foreground text-center text-sm">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-primary hover:underline">
-          Register
-        </Link>
-      </p>
     </div>
   );
 }

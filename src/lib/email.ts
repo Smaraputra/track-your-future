@@ -30,22 +30,10 @@ async function sendEmail(opts: SendEmailOptions): Promise<void> {
   });
 
   await transport.sendMail({
-    from: process.env.EMAIL_FROM ?? 'artanodestudios@gmail.com',
+    from: process.env.EMAIL_FROM ?? 'smara.putra2001@gmail.com',
     to: opts.to,
     subject: opts.subject,
     html: opts.html,
-  });
-}
-
-export async function sendVerificationEmail(
-  email: string,
-  token: string,
-): Promise<void> {
-  const url = `${getBaseUrl()}/api/auth/verify-email?token=${token}`;
-  await sendEmail({
-    to: email,
-    subject: 'Verify your email - Track Your Future',
-    html: `<p>Click the link below to verify your email address:</p><p><a href="${url}">${url}</a></p><p>This link expires in 24 hours.</p>`,
   });
 }
 
@@ -63,19 +51,8 @@ export async function sendTrialEndingEmail(
   const url = `${getBaseUrl()}/settings`;
   await sendEmail({
     to: email,
-    subject: 'Your trial is ending soon - Track Your Future',
+    subject: 'Your trial is ending soon - Tracked Your Future',
     html: `<p>Your Pro trial ends on ${endDate}.</p><p>To keep your Pro features, add a payment method in your <a href="${url}">account settings</a>.</p><p>If you don't add a payment method, your account will be downgraded to the Free plan.</p>`,
   });
 }
 
-export async function sendPasswordResetEmail(
-  email: string,
-  token: string,
-): Promise<void> {
-  const url = `${getBaseUrl()}/reset-password/confirm?token=${token}`;
-  await sendEmail({
-    to: email,
-    subject: 'Reset your password - Track Your Future',
-    html: `<p>Click the link below to reset your password:</p><p><a href="${url}">${url}</a></p><p>This link expires in 1 hour.</p>`,
-  });
-}

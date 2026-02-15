@@ -36,19 +36,6 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
-  test('register page renders with form fields', async ({ page }) => {
-    await page.goto('/register');
-    await expect(
-      page.getByRole('heading', { name: 'Register' }),
-    ).toBeVisible();
-    await expect(page.getByPlaceholder('Your name')).toBeVisible();
-    await expect(page.getByPlaceholder('user@example.com')).toBeVisible();
-    await expect(page.getByPlaceholder('Min. 8 characters')).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'Register' }),
-    ).toBeVisible();
-  });
-
   test('login page renders with form fields', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
@@ -57,24 +44,4 @@ test.describe('Authentication', () => {
     await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
   });
 
-  test('reset password page renders form with email input', async ({ page }) => {
-    await page.goto('/reset-password');
-    await expect(
-      page.getByRole('heading', { name: 'Reset Password' }),
-    ).toBeVisible();
-    await expect(page.getByPlaceholder('user@example.com')).toBeVisible();
-    await expect(
-      page.getByRole('button', { name: 'Send Reset Link' }),
-    ).toBeVisible();
-  });
-
-  test('reset password confirm page without token shows Invalid Link', async ({ page }) => {
-    await page.goto('/reset-password/confirm');
-    await expect(
-      page.getByRole('heading', { name: 'Invalid Link' }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: 'Request reset link' }),
-    ).toBeVisible();
-  });
 });
