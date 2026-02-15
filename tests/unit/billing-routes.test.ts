@@ -14,8 +14,12 @@ describe('Checkout route', () => {
     expect(source).toContain('export async function POST');
   });
 
-  it('returns 503 when Stripe is not configured', () => {
-    expect(source).toContain('!stripe');
+  it('uses getBillingProvider for provider abstraction', () => {
+    expect(source).toContain('getBillingProvider');
+    expect(source).toContain('provider.createCheckout');
+  });
+
+  it('returns 503 when provider is not configured', () => {
     expect(source).toContain('Billing not configured');
     expect(source).toContain('status: 503');
   });
@@ -34,22 +38,13 @@ describe('Checkout route', () => {
     expect(source).toContain('status: 409');
   });
 
-  it('creates or reuses Stripe customer', () => {
-    expect(source).toContain('stripe.customers.create');
+  it('passes user info and existing customer ID to provider', () => {
     expect(source).toContain('providerCustomerId');
+    expect(source).toContain('existingCustomerId');
   });
 
-  it('creates Checkout Session with client_reference_id', () => {
-    expect(source).toContain('stripe.checkout.sessions.create');
-    expect(source).toContain('client_reference_id');
-  });
-
-  it('includes trial period in checkout', () => {
-    expect(source).toContain('trial_period_days');
-  });
-
-  it('returns checkout URL', () => {
-    expect(source).toContain('checkoutSession.url');
+  it('returns checkout URL from provider', () => {
+    expect(source).toContain('result.url');
   });
 });
 
@@ -61,6 +56,12 @@ describe('Trial route', () => {
 
   it('exports a POST handler', () => {
     expect(source).toContain('export async function POST');
+  });
+
+  it('guards against non-Stripe providers', () => {
+    expect(source).toContain('getBillingProviderName');
+    expect(source).toContain("!== 'stripe'");
+    expect(source).toContain('status: 404');
   });
 
   it('returns 503 when Stripe is not configured', () => {
@@ -110,8 +111,12 @@ describe('Portal route', () => {
     expect(source).toContain('export async function POST');
   });
 
-  it('returns 503 when Stripe is not configured', () => {
-    expect(source).toContain('!stripe');
+  it('uses getBillingProvider for provider abstraction', () => {
+    expect(source).toContain('getBillingProvider');
+    expect(source).toContain('provider.createPortalSession');
+  });
+
+  it('returns 503 when provider is not configured', () => {
     expect(source).toContain('Billing not configured');
     expect(source).toContain('status: 503');
   });
@@ -130,8 +135,7 @@ describe('Portal route', () => {
     expect(source).toContain('status: 404');
   });
 
-  it('creates portal session and returns URL', () => {
-    expect(source).toContain('stripe.billingPortal.sessions.create');
-    expect(source).toContain('portalSession.url');
+  it('returns portal URL from provider', () => {
+    expect(source).toContain('result.url');
   });
 });

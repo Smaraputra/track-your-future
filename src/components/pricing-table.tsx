@@ -6,10 +6,12 @@ import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
 import { PLAN_LIMITS, PRICES } from '@/lib/billing/plans';
 import type { Tier } from '@/lib/billing/plans';
+import type { BillingProviderName } from '@/lib/billing/provider';
 
 interface PricingTableProps {
   currentTier: Tier;
   isAuthenticated: boolean;
+  billingProvider: BillingProviderName;
 }
 
 function formatLimit(value: number | null): string {
@@ -26,6 +28,7 @@ function formatStorage(bytes: number | null): string {
 export function PricingTable({
   currentTier,
   isAuthenticated,
+  billingProvider,
 }: PricingTableProps) {
   const [interval, setInterval] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
@@ -40,7 +43,7 @@ export function PricingTable({
 
   async function handleSubscribe() {
     if (!isAuthenticated) {
-      router.push('/register');
+      router.push('/login');
       return;
     }
     setLoading(true);
@@ -61,7 +64,7 @@ export function PricingTable({
 
   async function handleStartTrial() {
     if (!isAuthenticated) {
-      router.push('/register');
+      router.push('/login');
       return;
     }
     setLoading(true);
@@ -146,6 +149,8 @@ export function PricingTable({
       pro: formatLimit(pro.ai.resume_suggestions),
     },
   ];
+
+  const showTrialButton = billingProvider === 'stripe';
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -241,7 +246,7 @@ export function PricingTable({
               <RetroButton variant="secondary" disabled className="w-full">
                 Current Plan
               </RetroButton>
-            ) : (
+            ) : showTrialButton ? (
               <div className="flex gap-2">
                 <RetroButton
                   variant="primary"
@@ -260,9 +265,20 @@ export function PricingTable({
                   Subscribe
                 </RetroButton>
               </div>
+            ) : (
+              <RetroButton
+                variant="primary"
+                className="w-full"
+                onClick={handleSubscribe}
+                disabled={loading}
+              >
+                Subscribe
+              </RetroButton>
             )}
             <p className="font-body text-muted-foreground text-center text-xs">
-              {PRICES.trialDays}-day free trial, no credit card required
+              {showTrialButton
+                ? `${PRICES.trialDays}-day free trial, no credit card required`
+                : `${PRICES.trialDays}-day free trial included`}
             </p>
           </div>
         </RetroWindow>

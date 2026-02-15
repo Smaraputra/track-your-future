@@ -4,11 +4,19 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { stripe } from '@/lib/billing/stripe';
 import { PRICES } from '@/lib/billing/plans';
+import { getBillingProviderName } from '@/lib/billing/provider';
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
 import { users } from '@/db/schema/auth';
 
 export async function POST() {
+  if (getBillingProviderName() !== 'stripe') {
+    return NextResponse.json(
+      { error: 'Not found' },
+      { status: 404 },
+    );
+  }
+
   if (!stripe) {
     return NextResponse.json(
       { error: 'Billing not configured' },

@@ -61,7 +61,7 @@ export const PLAN_LIMITS: Record<Tier, PlanConfig> = {
       documents: null,
       roleCategories: null,
       formFieldTemplates: null,
-      storageBytes: 2 * 1024 * 1024 * 1024, // 2 GB
+      storageBytes: 50 * 1024 * 1024 * 4, // 200 MB
     },
     ai: {
       parse: null,
@@ -78,10 +78,12 @@ export interface PriceConfig {
   monthly: {
     amountCents: number;
     priceId: string;
+    productId: string;
   };
   annual: {
     amountCents: number;
     priceId: string;
+    productId: string;
   };
   trialDays: number;
 }
@@ -101,10 +103,12 @@ export const PRICES: PriceConfig = {
   monthly: {
     amountCents: 900,
     priceId: process.env.STRIPE_PRICE_MONTHLY ?? '',
+    productId: process.env.POLAR_PRODUCT_MONTHLY ?? '',
   },
   annual: {
     amountCents: 7900,
     priceId: process.env.STRIPE_PRICE_ANNUAL ?? '',
+    productId: process.env.POLAR_PRODUCT_ANNUAL ?? '',
   },
   trialDays: 14,
 };

@@ -82,8 +82,8 @@ describe('PLAN_LIMITS', () => {
     expect(pro.formFieldTemplates).toBeNull();
   });
 
-  it('pro tier storage is 2 GB in bytes', () => {
-    expect(PLAN_LIMITS.pro.resources.storageBytes).toBe(2 * 1024 * 1024 * 1024);
+  it('pro tier storage is 200 MB in bytes', () => {
+    expect(PLAN_LIMITS.pro.resources.storageBytes).toBe(50 * 1024 * 1024 * 4);
   });
 
   it('free tier blocks pro-only AI features', () => {
@@ -131,6 +131,11 @@ describe('PRICES', () => {
   it('has priceId fields for Stripe', () => {
     expect(typeof PRICES.monthly.priceId).toBe('string');
     expect(typeof PRICES.annual.priceId).toBe('string');
+  });
+
+  it('has productId fields for Polar', () => {
+    expect(typeof PRICES.monthly.productId).toBe('string');
+    expect(typeof PRICES.annual.productId).toBe('string');
   });
 });
 

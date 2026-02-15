@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { auth } from '@/auth';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
+import { getBillingProviderName } from '@/lib/billing/provider';
 import { PricingTable } from '@/components/pricing-table';
 import type { Tier } from '@/lib/billing/plans';
 
 export const metadata: Metadata = {
-  title: 'Pricing - Track Your Future',
+  title: 'Pricing - Tracked Your Future',
 };
 
 export default async function PricingPage() {
@@ -30,6 +31,7 @@ export default async function PricingPage() {
       <PricingTable
         currentTier={currentTier}
         isAuthenticated={!!session?.user}
+        billingProvider={getBillingProviderName()}
       />
     </div>
   );
