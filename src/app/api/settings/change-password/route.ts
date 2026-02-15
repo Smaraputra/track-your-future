@@ -6,6 +6,8 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { PASSWORD_CHANGE_LIMIT } from '@/lib/rate-limit-configs';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1),
@@ -16,6 +18,14 @@ export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rl = await checkRateLimit(`password-change:${session.user.id}`, PASSWORD_CHANGE_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many attempts. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
   }
 
   const body = await request.json().catch(() => null);

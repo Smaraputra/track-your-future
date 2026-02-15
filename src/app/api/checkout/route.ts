@@ -7,6 +7,8 @@ import { getBillingProvider } from '@/lib/billing/provider';
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
 import { users } from '@/db/schema/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { CHECKOUT_LIMIT } from '@/lib/rate-limit-configs';
 
 const checkoutSchema = z.object({
   interval: z.enum(['monthly', 'annual']),
@@ -24,6 +26,14 @@ export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rl = await checkRateLimit(`checkout:${session.user.id}`, CHECKOUT_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many attempts. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
   }
 
   const body = await request.json().catch(() => null);

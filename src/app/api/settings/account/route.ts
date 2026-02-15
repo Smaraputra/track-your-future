@@ -8,6 +8,8 @@ import { users } from '@/db/schema/auth';
 import { documents } from '@/db/schema/core';
 import { subscriptions } from '@/db/schema/billing';
 import { deleteObjects } from '@/lib/minio/presign';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { ACCOUNT_DELETE_LIMIT } from '@/lib/rate-limit-configs';
 
 const deleteAccountSchema = z.object({
   confirmation: z.literal('DELETE MY ACCOUNT'),
@@ -20,6 +22,14 @@ export async function DELETE(request: Request) {
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(`account-delete:${userId}`, ACCOUNT_DELETE_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many attempts. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
+  }
 
   const body = await request.json().catch(() => null);
   if (!body) {

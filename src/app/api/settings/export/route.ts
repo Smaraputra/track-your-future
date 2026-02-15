@@ -4,6 +4,8 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { EXPORT_LIMIT } from '@/lib/rate-limit-configs';
 import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core';
 import {
   applications,
@@ -21,6 +23,14 @@ export async function GET() {
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(`export:${userId}`, EXPORT_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many export requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
+  }
 
   const [
     userData,

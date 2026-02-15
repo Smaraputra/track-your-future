@@ -5,6 +5,8 @@ export interface RateLimitConfig {
   maxRequests: number;
   /** Window size in seconds */
   windowSeconds: number;
+  /** When true, block requests if Redis is unavailable (default: false = fail open) */
+  failClosed?: boolean;
 }
 
 export interface RateLimitResult {
@@ -22,6 +24,9 @@ export async function checkRateLimit(
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
   if (!redis) {
+    if (config.failClosed) {
+      return { allowed: false, remaining: 0, retryAfterSeconds: 60 };
+    }
     return { allowed: true, remaining: config.maxRequests, retryAfterSeconds: 0 };
   }
 
@@ -69,7 +74,9 @@ export async function checkRateLimit(
       retryAfterSeconds: 0,
     };
   } catch {
-    // Redis error -- fail open
+    if (config.failClosed) {
+      return { allowed: false, remaining: 0, retryAfterSeconds: 60 };
+    }
     return { allowed: true, remaining: config.maxRequests, retryAfterSeconds: 0 };
   }
 }

@@ -9,6 +9,8 @@ import { getUserSubscription, checkResourceLimit } from '@/lib/billing/feature-g
 import { presignRequestSchema } from '@/lib/documents/schemas';
 import { buildFileKey } from '@/lib/documents/file-key';
 import { createPresignedPutUrl } from '@/lib/minio/presign';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { PRESIGN_LIMIT } from '@/lib/rate-limit-configs';
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -17,6 +19,14 @@ export async function POST(request: Request) {
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(`presign:${userId}`, PRESIGN_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many upload requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
+  }
 
   const body = await request.json().catch(() => null);
   if (!body) {

@@ -15,6 +15,8 @@ import { parseCvText, calculateConfidence } from '@/lib/ai/cv-parser';
 import { logAiUsage } from '@/lib/ai/usage';
 import { MODEL_NAMES } from '@/lib/ai/models';
 import { isAIAvailable } from '@/lib/ai/providers';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { AI_BURST_LIMIT } from '@/lib/rate-limit-configs';
 
 const bodySchema = z.object({
   documentId: z.string().uuid(),
@@ -27,6 +29,14 @@ export async function POST(request: Request) {
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(`ai:${userId}`, AI_BURST_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many AI requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
+  }
 
   const body = await request.json().catch(() => null);
   if (!body) {

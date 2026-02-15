@@ -62,7 +62,7 @@ export async function PATCH(
     const [app] = await tx
       .update(applications)
       .set(updateData)
-      .where(eq(applications.id, applicationId))
+      .where(and(eq(applications.id, applicationId), eq(applications.userId, session.user.id)))
       .returning();
 
     await tx.insert(applicationStatusHistory).values({

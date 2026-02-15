@@ -8,6 +8,8 @@ import { getBillingProviderName } from '@/lib/billing/provider';
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
 import { users } from '@/db/schema/auth';
+import { checkRateLimit } from '@/lib/rate-limit';
+import { TRIAL_LIMIT } from '@/lib/rate-limit-configs';
 
 export async function POST() {
   if (getBillingProviderName() !== 'stripe') {
@@ -30,6 +32,14 @@ export async function POST() {
   }
 
   const userId = session.user.id;
+
+  const rl = await checkRateLimit(`trial:${userId}`, TRIAL_LIMIT);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many attempts. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } },
+    );
+  }
 
   // Check for existing subscription
   const existing = await db.query.subscriptions.findFirst({

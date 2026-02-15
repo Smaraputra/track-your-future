@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { documents, roleCategories } from '@/db/schema/core';
 import { parsedProfiles } from '@/db/schema/ai';
+import { documentTypeEnum } from '@/db/schema/enums';
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -22,7 +23,10 @@ export async function GET(request: Request) {
   ];
 
   if (typeFilter) {
-    conditions.push(eq(documents.documentType, typeFilter as never));
+    if (!documentTypeEnum.enumValues.includes(typeFilter as typeof documentTypeEnum.enumValues[number])) {
+      return NextResponse.json({ error: 'Invalid type filter' }, { status: 400 });
+    }
+    conditions.push(eq(documents.documentType, typeFilter as typeof documentTypeEnum.enumValues[number]));
   }
 
   if (roleFilter) {
