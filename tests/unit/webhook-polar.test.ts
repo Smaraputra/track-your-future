@@ -12,11 +12,17 @@ describe('Polar webhook handler (source analysis)', () => {
 
   it('uses @polar-sh/nextjs Webhooks handler', () => {
     expect(source).toContain("import { Webhooks } from '@polar-sh/nextjs'");
-    expect(source).toContain('export const POST = Webhooks');
+    expect(source).toContain('Webhooks({');
   });
 
   it('reads POLAR_WEBHOOK_SECRET from env', () => {
     expect(source).toContain('process.env.POLAR_WEBHOOK_SECRET');
+  });
+
+  it('returns 503 when webhook secret is not configured', () => {
+    expect(source).toContain('!POLAR_WEBHOOK_SECRET');
+    expect(source).toContain('status: 503');
+    expect(source).toContain('Polar webhooks not configured');
   });
 
   it('handles subscription.created event', () => {

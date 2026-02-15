@@ -19,27 +19,8 @@ describe('Health route', () => {
     expect(routeSource).toContain('SELECT 1');
   });
 
-  it('records postgres status as up or down', () => {
-    expect(routeSource).toContain("checks.postgres = { status: 'up'");
-    expect(routeSource).toContain("checks.postgres = { status: 'down'");
-  });
-
   it('checks Redis via ping', () => {
     expect(routeSource).toContain('redis.ping()');
-  });
-
-  it('handles missing Redis as not_configured', () => {
-    expect(routeSource).toContain("status: 'not_configured'");
-  });
-
-  it('records redis status as up or down', () => {
-    expect(routeSource).toContain("checks.redis = { status: 'up'");
-    expect(routeSource).toContain("checks.redis = { status: 'down'");
-  });
-
-  it('measures latency per service', () => {
-    expect(routeSource).toContain('Date.now() - pgStart');
-    expect(routeSource).toContain('Date.now() - redisStart');
   });
 
   it('returns healthy (200) or degraded (503)', () => {
@@ -48,9 +29,10 @@ describe('Health route', () => {
     expect(routeSource).toContain('healthy ? 200 : 503');
   });
 
-  it('includes a timestamp in the response', () => {
-    expect(routeSource).toContain('timestamp');
-    expect(routeSource).toContain('new Date().toISOString()');
+  it('does not leak infrastructure latency details', () => {
+    expect(routeSource).not.toContain('latencyMs');
+    expect(routeSource).not.toContain('checks');
+    expect(routeSource).not.toContain('timestamp');
   });
 
   it('sets force-dynamic', () => {

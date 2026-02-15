@@ -23,9 +23,10 @@ describe('Cron detect-stale route', () => {
     expect(routeSource).toContain('status: 500');
   });
 
-  it('validates Bearer token from authorization header', () => {
+  it('validates Bearer token from authorization header using timing-safe comparison', () => {
     expect(routeSource).toContain("request.headers.get('authorization')");
     expect(routeSource).toContain('`Bearer ${cronSecret}`');
+    expect(routeSource).toContain('timingSafeEqual');
   });
 
   it('returns 401 for invalid token', () => {

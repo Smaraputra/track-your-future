@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { applications } from '@/db/schema/applications';
 import { roleCategories } from '@/db/schema/core';
+import { applicationStatusEnum } from '@/db/schema/enums';
 import { createApplicationSchema } from '@/lib/applications/schemas';
 import { getUserSubscription, checkResourceLimit } from '@/lib/billing/feature-gate';
 import { detectMilestones } from '@/lib/notifications/milestones';
@@ -22,7 +23,10 @@ export async function GET(request: Request) {
   const conditions = [eq(applications.userId, session.user.id)];
 
   if (statusFilter) {
-    conditions.push(eq(applications.currentStatus, statusFilter as never));
+    if (!applicationStatusEnum.enumValues.includes(statusFilter as typeof applicationStatusEnum.enumValues[number])) {
+      return NextResponse.json({ error: 'Invalid status filter' }, { status: 400 });
+    }
+    conditions.push(eq(applications.currentStatus, statusFilter as typeof applicationStatusEnum.enumValues[number]));
   }
 
   if (roleFilter) {

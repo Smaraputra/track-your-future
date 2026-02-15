@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { Webhooks } from '@polar-sh/nextjs';
 import { eq } from 'drizzle-orm';
 
@@ -7,6 +8,8 @@ import {
   webhookEvents,
   payments,
 } from '@/db/schema/billing';
+
+const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET;
 
 type SubscriptionStatus =
   | 'active'
@@ -48,8 +51,10 @@ async function recordEvent(
   }
 }
 
-export const POST = Webhooks({
-  webhookSecret: process.env.POLAR_WEBHOOK_SECRET ?? '',
+export const POST = !POLAR_WEBHOOK_SECRET
+  ? async () => NextResponse.json({ error: 'Polar webhooks not configured' }, { status: 503 })
+  : Webhooks({
+  webhookSecret: POLAR_WEBHOOK_SECRET,
 
   onSubscriptionCreated: async (payload) => {
     const sub = payload.data;
