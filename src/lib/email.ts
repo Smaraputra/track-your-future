@@ -30,7 +30,7 @@ async function sendEmail(opts: SendEmailOptions): Promise<void> {
   });
 
   await transport.sendMail({
-    from: process.env.EMAIL_FROM ?? 'smara.putra2001@gmail.com',
+    from: process.env.EMAIL_FROM ?? (() => { throw new Error('EMAIL_FROM environment variable is required in production'); })(),
     to: opts.to,
     subject: opts.subject,
     html: opts.html,

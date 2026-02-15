@@ -74,7 +74,7 @@ export default function TermsPage() {
             </h3>
             <p className="text-muted-foreground">
               The Pro tier ($9/month) includes: unlimited applications, documents,
-              and role categories, 2GB file storage, and the full AI suite.
+              and role categories, 200MB file storage, and the full AI suite.
               Billing is handled through Stripe. Subscriptions renew
               automatically unless cancelled.
             </p>
@@ -235,8 +235,8 @@ export default function TermsPage() {
               15. Contact
             </h2>
             <p className="text-muted-foreground">
-              For questions about these Terms, contact us at
-              smara.putra2001@gmail.com.
+              For questions about these Terms, contact us at{' '}
+              {process.env.CONTACT_EMAIL ?? 'support@trackedyourfuture.com'}.
             </p>
           </section>
         </article>

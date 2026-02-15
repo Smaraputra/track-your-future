@@ -226,8 +226,8 @@ export default function PrivacyPage() {
               10. Contact
             </h2>
             <p className="text-muted-foreground">
-              For privacy-related inquiries, contact us at
-              smara.putra2001@gmail.com.
+              For privacy-related inquiries, contact us at{' '}
+              {process.env.CONTACT_EMAIL ?? 'support@trackedyourfuture.com'}.
             </p>
           </section>
         </article>
