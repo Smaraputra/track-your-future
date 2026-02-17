@@ -1,4 +1,6 @@
-export const BILLING_DISABLED = process.env.BILLING_DISABLED === 'true';
+export function isBillingDisabled(): boolean {
+  return process.env.BILLING_DISABLED === 'true';
+}
 
 export type Tier = 'free' | 'pro';
 
@@ -97,7 +99,7 @@ const PRO_ONLY_FEATURES: AiFeatureKey[] = [
 ];
 
 export function canAccess(tier: Tier, feature: AiFeatureKey): boolean {
-  if (BILLING_DISABLED) return true;
+  if (isBillingDisabled()) return true;
   if (tier === 'pro') return true;
   return !PRO_ONLY_FEATURES.includes(feature);
 }
