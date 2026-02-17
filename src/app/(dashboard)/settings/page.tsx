@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users, accounts } from '@/db/schema/auth';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
+import { BILLING_DISABLED } from '@/lib/billing/plans';
 import { RetroWindow } from '@/components/retro-window';
 import { SettingsContent } from '@/components/settings/settings-content';
 
@@ -53,6 +54,7 @@ export default async function SettingsPage() {
           cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
           currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
         }}
+        billingDisabled={BILLING_DISABLED}
       />
     </RetroWindow>
   );

@@ -1,6 +1,6 @@
 export { stripe } from './stripe';
 export { polar } from './polar';
-export { PLAN_LIMITS, PRICES, canAccess } from './plans';
+export { BILLING_DISABLED, PLAN_LIMITS, PRICES, canAccess } from './plans';
 export type { Tier, ResourceKey, AiFeatureKey, PriceConfig } from './plans';
 export {
   getUserSubscription,

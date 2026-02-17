@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
@@ -12,6 +13,7 @@ interface PricingTableProps {
   currentTier: Tier;
   isAuthenticated: boolean;
   billingProvider: BillingProviderName;
+  billingDisabled?: boolean;
 }
 
 function formatLimit(value: number | null): string {
@@ -29,6 +31,7 @@ export function PricingTable({
   currentTier,
   isAuthenticated,
   billingProvider,
+  billingDisabled = false,
 }: PricingTableProps) {
   const [interval, setInterval] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
@@ -154,135 +157,156 @@ export function PricingTable({
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      {/* Interval toggle */}
-      <div className="flex items-center justify-center gap-3">
-        <button
-          onClick={() => setInterval('monthly')}
-          className={`font-body cursor-pointer text-sm transition-colors ${
-            interval === 'monthly'
-              ? 'text-primary'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Monthly
-        </button>
-        <span className="text-muted-foreground font-body text-sm">/</span>
-        <button
-          onClick={() => setInterval('annual')}
-          className={`font-body cursor-pointer text-sm transition-colors ${
-            interval === 'annual'
-              ? 'text-primary'
-              : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Annual
-        </button>
-        {interval === 'annual' && (
-          <span className="border-primary text-primary rounded-sm border px-1.5 py-0.5 text-xs">
-            Save 27%
-          </span>
-        )}
-      </div>
-
-      {/* Plan cards */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Free Plan */}
-        <RetroWindow title="plan://free">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-heading text-foreground text-2xl">Free</h3>
-              <p className="font-body text-muted-foreground text-sm">
-                Get started with job tracking
-              </p>
-            </div>
-            <div className="font-heading text-foreground text-3xl">
-              $0
-              <span className="font-body text-muted-foreground text-sm">
-                {' '}
-                / forever
-              </span>
-            </div>
-            {currentTier === 'free' ? (
-              <RetroButton variant="secondary" disabled className="w-full">
-                Current Plan
-              </RetroButton>
-            ) : (
-              <RetroButton
-                variant="secondary"
-                className="w-full"
-                disabled
-              >
-                Included
-              </RetroButton>
-            )}
-          </div>
-        </RetroWindow>
-
-        {/* Pro Plan */}
-        <RetroWindow
-          title="plan://pro"
-          className="border-primary/50"
-        >
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-heading text-primary text-2xl">Pro</h3>
-              <p className="font-body text-muted-foreground text-sm">
-                Full power for serious job seekers
-              </p>
-            </div>
-            <div className="font-heading text-foreground text-3xl">
-              ${perMonth}
-              <span className="font-body text-muted-foreground text-sm">
-                {' '}
-                / month
-              </span>
-              {interval === 'annual' && (
-                <span className="font-body text-muted-foreground block text-xs">
-                  ${price} billed annually
-                </span>
-              )}
-            </div>
-            {currentTier === 'pro' ? (
-              <RetroButton variant="secondary" disabled className="w-full">
-                Current Plan
-              </RetroButton>
-            ) : showTrialButton ? (
-              <div className="flex gap-2">
-                <RetroButton
-                  variant="primary"
-                  className="flex-1"
-                  onClick={handleStartTrial}
-                  disabled={loading}
-                >
-                  Start Free Trial
-                </RetroButton>
-                <RetroButton
-                  variant="secondary"
-                  className="flex-1"
-                  onClick={handleSubscribe}
-                  disabled={loading}
-                >
-                  Subscribe
-                </RetroButton>
-              </div>
-            ) : (
-              <RetroButton
-                variant="primary"
-                className="w-full"
-                onClick={handleSubscribe}
-                disabled={loading}
-              >
-                Subscribe
-              </RetroButton>
-            )}
-            <p className="font-body text-muted-foreground text-center text-xs">
-              {showTrialButton
-                ? `${PRICES.trialDays}-day free trial, no credit card required`
-                : `${PRICES.trialDays}-day free trial included`}
+      {billingDisabled ? (
+        /* Promotional banner when billing is disabled */
+        <RetroWindow title="plan://pro" className="border-primary/50">
+          <div className="space-y-4 text-center">
+            <h3 className="font-heading text-primary text-2xl">
+              All Pro Features -- Free Access
+            </h3>
+            <p className="font-body text-muted-foreground text-sm">
+              Every feature is currently unlocked at no cost. Get started today.
             </p>
+            <RetroButton asChild className="w-full sm:w-auto">
+              <Link href={isAuthenticated ? '/dashboard' : '/login'}>
+                {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
+              </Link>
+            </RetroButton>
           </div>
         </RetroWindow>
-      </div>
+      ) : (
+        <>
+          {/* Interval toggle */}
+          <div className="flex items-center justify-center gap-3">
+            <button
+              onClick={() => setInterval('monthly')}
+              className={`font-body cursor-pointer text-sm transition-colors ${
+                interval === 'monthly'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Monthly
+            </button>
+            <span className="text-muted-foreground font-body text-sm">/</span>
+            <button
+              onClick={() => setInterval('annual')}
+              className={`font-body cursor-pointer text-sm transition-colors ${
+                interval === 'annual'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Annual
+            </button>
+            {interval === 'annual' && (
+              <span className="border-primary text-primary rounded-sm border px-1.5 py-0.5 text-xs">
+                Save 27%
+              </span>
+            )}
+          </div>
+
+          {/* Plan cards */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Free Plan */}
+            <RetroWindow title="plan://free">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-heading text-foreground text-2xl">Free</h3>
+                  <p className="font-body text-muted-foreground text-sm">
+                    Get started with job tracking
+                  </p>
+                </div>
+                <div className="font-heading text-foreground text-3xl">
+                  $0
+                  <span className="font-body text-muted-foreground text-sm">
+                    {' '}
+                    / forever
+                  </span>
+                </div>
+                {currentTier === 'free' ? (
+                  <RetroButton variant="secondary" disabled className="w-full">
+                    Current Plan
+                  </RetroButton>
+                ) : (
+                  <RetroButton
+                    variant="secondary"
+                    className="w-full"
+                    disabled
+                  >
+                    Included
+                  </RetroButton>
+                )}
+              </div>
+            </RetroWindow>
+
+            {/* Pro Plan */}
+            <RetroWindow
+              title="plan://pro"
+              className="border-primary/50"
+            >
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-heading text-primary text-2xl">Pro</h3>
+                  <p className="font-body text-muted-foreground text-sm">
+                    Full power for serious job seekers
+                  </p>
+                </div>
+                <div className="font-heading text-foreground text-3xl">
+                  ${perMonth}
+                  <span className="font-body text-muted-foreground text-sm">
+                    {' '}
+                    / month
+                  </span>
+                  {interval === 'annual' && (
+                    <span className="font-body text-muted-foreground block text-xs">
+                      ${price} billed annually
+                    </span>
+                  )}
+                </div>
+                {currentTier === 'pro' ? (
+                  <RetroButton variant="secondary" disabled className="w-full">
+                    Current Plan
+                  </RetroButton>
+                ) : showTrialButton ? (
+                  <div className="flex gap-2">
+                    <RetroButton
+                      variant="primary"
+                      className="flex-1"
+                      onClick={handleStartTrial}
+                      disabled={loading}
+                    >
+                      Start Free Trial
+                    </RetroButton>
+                    <RetroButton
+                      variant="secondary"
+                      className="flex-1"
+                      onClick={handleSubscribe}
+                      disabled={loading}
+                    >
+                      Subscribe
+                    </RetroButton>
+                  </div>
+                ) : (
+                  <RetroButton
+                    variant="primary"
+                    className="w-full"
+                    onClick={handleSubscribe}
+                    disabled={loading}
+                  >
+                    Subscribe
+                  </RetroButton>
+                )}
+                <p className="font-body text-muted-foreground text-center text-xs">
+                  {showTrialButton
+                    ? `${PRICES.trialDays}-day free trial, no credit card required`
+                    : `${PRICES.trialDays}-day free trial included`}
+                </p>
+              </div>
+            </RetroWindow>
+          </div>
+        </>
+      )}
 
       {/* Comparison table */}
       <RetroWindow title="comparison://features">
