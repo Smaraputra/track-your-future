@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
 
 import {
-  BILLING_DISABLED,
+  isBillingDisabled,
   PLAN_LIMITS,
   PRICES,
   type Tier,
@@ -13,27 +13,26 @@ import {
 
 const ROOT = resolve(__dirname, '../..');
 
-describe('BILLING_DISABLED', () => {
-  it('exports BILLING_DISABLED constant', () => {
-    expect(typeof BILLING_DISABLED).toBe('boolean');
+describe('isBillingDisabled', () => {
+  it('exports isBillingDisabled function', () => {
+    expect(typeof isBillingDisabled).toBe('function');
   });
 
-  it('reads from process.env.BILLING_DISABLED', () => {
+  it('reads from process.env.BILLING_DISABLED at call time', () => {
     const source = readFileSync(
       resolve(ROOT, 'src/lib/billing/plans.ts'),
       'utf-8',
     );
-    expect(source).toContain(
-      "export const BILLING_DISABLED = process.env.BILLING_DISABLED === 'true'",
-    );
+    expect(source).toContain("process.env.BILLING_DISABLED === 'true'");
+    expect(source).toContain('function isBillingDisabled()');
   });
 
-  it('canAccess checks BILLING_DISABLED before tier', () => {
+  it('canAccess checks isBillingDisabled before tier', () => {
     const source = readFileSync(
       resolve(ROOT, 'src/lib/billing/plans.ts'),
       'utf-8',
     );
-    expect(source).toContain('if (BILLING_DISABLED) return true');
+    expect(source).toContain('if (isBillingDisabled()) return true');
   });
 });
 
