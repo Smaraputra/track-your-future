@@ -18,6 +18,9 @@ CMD ["pnpm", "dev"]
 FROM dependencies AS builder
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# Dummy DATABASE_URL so Next.js page data collection doesn't throw
+# (the db module validates the env var exists at import time; no actual connection is made during build)
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
 RUN pnpm build
 
 # Production stage: minimal image for deployment
