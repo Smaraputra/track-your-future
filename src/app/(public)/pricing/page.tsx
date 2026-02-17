@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { getBillingProviderName } from '@/lib/billing/provider';
 import { PricingTable } from '@/components/pricing-table';
+import { BILLING_DISABLED } from '@/lib/billing/plans';
 import type { Tier } from '@/lib/billing/plans';
 
 export const metadata: Metadata = {
@@ -25,13 +26,16 @@ export default async function PricingPage() {
           Pricing
         </h1>
         <p className="font-body text-muted-foreground">
-          Choose the plan that fits your job search
+          {BILLING_DISABLED
+            ? 'All features are currently free'
+            : 'Choose the plan that fits your job search'}
         </p>
       </div>
       <PricingTable
         currentTier={currentTier}
         isAuthenticated={!!session?.user}
         billingProvider={getBillingProviderName()}
+        billingDisabled={BILLING_DISABLED}
       />
     </div>
   );

@@ -34,6 +34,42 @@ describe('canAccess', () => {
   });
 });
 
+describe('BILLING_DISABLED bypass (source analysis)', () => {
+  const source = readFileSync(
+    resolve(ROOT, 'src/lib/billing/feature-gate.ts'),
+    'utf-8',
+  );
+
+  it('imports BILLING_DISABLED from plans', () => {
+    expect(source).toContain('BILLING_DISABLED');
+    expect(source).toContain("from './plans'");
+  });
+
+  it('getUserSubscription returns pro tier when billing disabled', () => {
+    expect(source).toContain('if (BILLING_DISABLED) return BILLING_DISABLED_SUBSCRIPTION');
+  });
+
+  it('BILLING_DISABLED_SUBSCRIPTION has tier pro and status active', () => {
+    expect(source).toContain("tier: 'pro'");
+    expect(source).toContain("status: 'active'");
+  });
+
+  it('checkResourceLimit bypasses when billing disabled', () => {
+    expect(source).toContain(
+      'if (BILLING_DISABLED) return { allowed: true, current: 0, limit: null }',
+    );
+  });
+
+  it('checkAiLimit bypasses when billing disabled', () => {
+    // Both checkResourceLimit and checkAiLimit use the same pattern
+    const matches = source.match(
+      /if \(BILLING_DISABLED\) return \{ allowed: true, current: 0, limit: null \}/g,
+    );
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
 describe('getUserSubscription (source analysis)', () => {
   const source = readFileSync(
     resolve(ROOT, 'src/lib/billing/feature-gate.ts'),
@@ -122,8 +158,8 @@ describe('barrel export', () => {
     expect(source).toContain("export { stripe } from './stripe'");
   });
 
-  it('re-exports plan limits and canAccess', () => {
-    expect(source).toContain("export { PLAN_LIMITS, PRICES, canAccess } from './plans'");
+  it('re-exports plan limits, canAccess, and BILLING_DISABLED', () => {
+    expect(source).toContain("export { BILLING_DISABLED, PLAN_LIMITS, PRICES, canAccess } from './plans'");
   });
 
   it('re-exports feature gate functions', () => {

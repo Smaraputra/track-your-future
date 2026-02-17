@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
 
 import {
+  BILLING_DISABLED,
   PLAN_LIMITS,
   PRICES,
   type Tier,
@@ -11,6 +12,30 @@ import {
 } from '@/lib/billing/plans';
 
 const ROOT = resolve(__dirname, '../..');
+
+describe('BILLING_DISABLED', () => {
+  it('exports BILLING_DISABLED constant', () => {
+    expect(typeof BILLING_DISABLED).toBe('boolean');
+  });
+
+  it('reads from process.env.BILLING_DISABLED', () => {
+    const source = readFileSync(
+      resolve(ROOT, 'src/lib/billing/plans.ts'),
+      'utf-8',
+    );
+    expect(source).toContain(
+      "export const BILLING_DISABLED = process.env.BILLING_DISABLED === 'true'",
+    );
+  });
+
+  it('canAccess checks BILLING_DISABLED before tier', () => {
+    const source = readFileSync(
+      resolve(ROOT, 'src/lib/billing/plans.ts'),
+      'utf-8',
+    );
+    expect(source).toContain('if (BILLING_DISABLED) return true');
+  });
+});
 
 describe('PLAN_LIMITS', () => {
   const tiers: Tier[] = ['free', 'pro'];

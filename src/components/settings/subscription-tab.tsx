@@ -12,9 +12,10 @@ interface SubscriptionTabProps {
     cancelAtPeriodEnd: boolean;
     currentPeriodEnd: string | null;
   };
+  billingDisabled?: boolean;
 }
 
-export function SubscriptionTab({ subscription }: SubscriptionTabProps) {
+export function SubscriptionTab({ subscription, billingDisabled = false }: SubscriptionTabProps) {
   const [loading, setLoading] = useState(false);
 
   const handlePortal = useCallback(async () => {
@@ -48,58 +49,68 @@ export function SubscriptionTab({ subscription }: SubscriptionTabProps) {
           <div className="flex items-center justify-between">
             <span className="font-body text-muted-foreground text-sm">Plan</span>
             <span className="font-body text-foreground text-sm font-medium uppercase">
-              {subscription.tier}
+              {billingDisabled ? 'Pro (Free Access)' : subscription.tier}
             </span>
           </div>
 
-          {subscription.status && (
-            <div className="flex items-center justify-between">
-              <span className="font-body text-muted-foreground text-sm">Status</span>
-              <span className="font-body text-foreground text-sm capitalize">
-                {subscription.status}
-              </span>
-            </div>
-          )}
-
-          {subscription.trialEnd && (
-            <div className="flex items-center justify-between">
-              <span className="font-body text-muted-foreground text-sm">Trial ends</span>
-              <span className="font-body text-foreground text-sm">
-                {formatDate(subscription.trialEnd)}
-              </span>
-            </div>
-          )}
-
-          {subscription.currentPeriodEnd && (
-            <div className="flex items-center justify-between">
-              <span className="font-body text-muted-foreground text-sm">
-                {subscription.cancelAtPeriodEnd ? 'Access until' : 'Renews on'}
-              </span>
-              <span className="font-body text-foreground text-sm">
-                {formatDate(subscription.currentPeriodEnd)}
-              </span>
-            </div>
-          )}
-
-          {subscription.cancelAtPeriodEnd && (
-            <p className="font-body text-destructive text-xs">
-              Subscription will cancel at end of period
+          {billingDisabled ? (
+            <p className="font-body text-muted-foreground text-xs">
+              All features are currently unlocked at no cost.
             </p>
+          ) : (
+            <>
+              {subscription.status && (
+                <div className="flex items-center justify-between">
+                  <span className="font-body text-muted-foreground text-sm">Status</span>
+                  <span className="font-body text-foreground text-sm capitalize">
+                    {subscription.status}
+                  </span>
+                </div>
+              )}
+
+              {subscription.trialEnd && (
+                <div className="flex items-center justify-between">
+                  <span className="font-body text-muted-foreground text-sm">Trial ends</span>
+                  <span className="font-body text-foreground text-sm">
+                    {formatDate(subscription.trialEnd)}
+                  </span>
+                </div>
+              )}
+
+              {subscription.currentPeriodEnd && (
+                <div className="flex items-center justify-between">
+                  <span className="font-body text-muted-foreground text-sm">
+                    {subscription.cancelAtPeriodEnd ? 'Access until' : 'Renews on'}
+                  </span>
+                  <span className="font-body text-foreground text-sm">
+                    {formatDate(subscription.currentPeriodEnd)}
+                  </span>
+                </div>
+              )}
+
+              {subscription.cancelAtPeriodEnd && (
+                <p className="font-body text-destructive text-xs">
+                  Subscription will cancel at end of period
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {subscription.tier === 'free' ? (
-          <RetroButton asChild>
-            <Link href="/pricing">Upgrade to Pro</Link>
-          </RetroButton>
-        ) : (
-          <RetroButton onClick={handlePortal} disabled={loading}>
-            {loading ? 'Loading...' : 'Manage Subscription'}
-          </RetroButton>
-        )}
-      </div>
+      {!billingDisabled && (
+        <div className="flex gap-2">
+          {subscription.tier === 'free' ? (
+            <RetroButton asChild>
+              <Link href="/pricing">Upgrade to Pro</Link>
+            </RetroButton>
+          ) : (
+            <RetroButton onClick={handlePortal} disabled={loading}>
+              {loading ? 'Loading...' : 'Manage Subscription'}
+            </RetroButton>
+          )}
+        </div>
+      )}
 
       <div>
         <h3 className="font-heading text-primary text-sm">AI Usage (This Month)</h3>

@@ -27,12 +27,14 @@ interface SettingsContentProps {
   user: UserInfo;
   linkedProviders: string[];
   subscription: SubscriptionInfo;
+  billingDisabled?: boolean;
 }
 
 export function SettingsContent({
   user,
   linkedProviders,
   subscription,
+  billingDisabled = false,
 }: SettingsContentProps) {
   return (
     <Tabs defaultValue="appearance" className="w-full">
@@ -67,7 +69,7 @@ export function SettingsContent({
         />
       </TabsContent>
       <TabsContent value="subscription" className="mt-4">
-        <SubscriptionTab subscription={subscription} />
+        <SubscriptionTab subscription={subscription} billingDisabled={billingDisabled} />
       </TabsContent>
       <TabsContent value="data" className="mt-4">
         <DataTab createdAt={user.createdAt} />

@@ -10,7 +10,7 @@ import {
   roleCategories,
 } from '@/db/schema/core';
 import { aiUsage } from '@/db/schema/ai';
-import { PLAN_LIMITS, type Tier, type ResourceKey, type AiFeatureKey } from './plans';
+import { BILLING_DISABLED, PLAN_LIMITS, type Tier, type ResourceKey, type AiFeatureKey } from './plans';
 
 export interface UserSubscription {
   tier: Tier;
@@ -24,8 +24,20 @@ export interface UserSubscription {
 
 const ACTIVE_STATUSES = ['active', 'trialing', 'past_due'] as const;
 
+const BILLING_DISABLED_SUBSCRIPTION: UserSubscription = {
+  tier: 'pro',
+  status: 'active',
+  trialEnd: null,
+  cancelAtPeriodEnd: false,
+  currentPeriodEnd: null,
+  providerCustomerId: null,
+  providerSubscriptionId: null,
+};
+
 export const getUserSubscription = cache(
   async (userId: string): Promise<UserSubscription> => {
+    if (BILLING_DISABLED) return BILLING_DISABLED_SUBSCRIPTION;
+
     const sub = await db.query.subscriptions.findFirst({
       where: and(
         eq(subscriptions.userId, userId),
@@ -119,6 +131,8 @@ export async function checkResourceLimit(
   resource: ResourceKey,
   tier: Tier,
 ): Promise<LimitCheckResult> {
+  if (BILLING_DISABLED) return { allowed: true, current: 0, limit: null };
+
   const limit = PLAN_LIMITS[tier].resources[resource];
   const current = await resourceCounters[resource](userId);
 
@@ -134,6 +148,8 @@ export async function checkAiLimit(
   feature: AiFeatureKey,
   tier: Tier,
 ): Promise<LimitCheckResult> {
+  if (BILLING_DISABLED) return { allowed: true, current: 0, limit: null };
+
   const limit = PLAN_LIMITS[tier].ai[feature];
 
   if (limit === null) {
