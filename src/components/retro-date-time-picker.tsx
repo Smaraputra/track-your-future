@@ -39,9 +39,7 @@ function buildIsoString(date: Date, hour: string, minute: string): string {
   d.setMinutes(parseInt(minute, 10) || 0);
   d.setSeconds(0);
   d.setMilliseconds(0);
-  // Return datetime-local format for form compatibility
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return d.toISOString();
 }
 
 function formatDisplay(value: string): string {
