@@ -29,8 +29,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: '/login',
   },
   providers: [
-    Google,
-    GitHub,
+    Google({ allowDangerousEmailAccountLinking: true }),
+    GitHub({ allowDangerousEmailAccountLinking: true }),
     Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
