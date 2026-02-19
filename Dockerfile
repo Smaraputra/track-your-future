@@ -8,6 +8,11 @@ FROM base AS dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
+# Script dependencies: hoisted layout so COPY gets real dirs (not pnpm symlinks)
+FROM base AS script-deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN echo "node-linker=hoisted" > .npmrc && pnpm install --frozen-lockfile --prod
+
 # Development stage: for local dev with hot reload
 FROM dependencies AS development
 COPY . .
@@ -41,10 +46,16 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/scripts ./scripts
 
-# Copy packages needed by scripts (standalone tracer won't include these)
-COPY --from=dependencies /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
-COPY --from=dependencies /app/node_modules/postgres ./node_modules/postgres
-COPY --from=dependencies /app/node_modules/bcryptjs ./node_modules/bcryptjs
+# Copy packages needed by scripts (from hoisted layout to avoid pnpm symlink issues)
+COPY --from=script-deps /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
+COPY --from=script-deps /app/node_modules/postgres ./node_modules/postgres
+COPY --from=script-deps /app/node_modules/bcryptjs ./node_modules/bcryptjs
+COPY --from=script-deps /app/node_modules/@aws-sdk ./node_modules/@aws-sdk
+COPY --from=script-deps /app/node_modules/@aws-crypto ./node_modules/@aws-crypto
+COPY --from=script-deps /app/node_modules/@smithy ./node_modules/@smithy
+COPY --from=script-deps /app/node_modules/tslib ./node_modules/tslib
+COPY --from=script-deps /app/node_modules/fast-xml-parser ./node_modules/fast-xml-parser
+COPY --from=script-deps /app/node_modules/strnum ./node_modules/strnum
 
 # Copy entrypoint
 COPY docker-entrypoint.sh ./
