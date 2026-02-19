@@ -26,7 +26,6 @@ describe('Route structure', () => {
     'src/app/(dashboard)/roles/[roleId]/page.tsx',
     'src/app/(dashboard)/roles/[roleId]/edit/page.tsx',
     'src/app/(dashboard)/documents/page.tsx',
-    'src/app/(dashboard)/templates/page.tsx',
     'src/app/(dashboard)/analytics/page.tsx',
     'src/app/(dashboard)/settings/page.tsx',
   ];

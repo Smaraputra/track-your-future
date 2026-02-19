@@ -3,7 +3,6 @@ import {
   Briefcase,
   Tags,
   FileText,
-  FileStack,
   BarChart3,
   Settings,
   type LucideIcon,
@@ -20,7 +19,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Applications', href: '/applications', icon: Briefcase },
   { label: 'Roles', href: '/roles', icon: Tags },
   { label: 'Documents', href: '/documents', icon: FileText },
-  { label: 'Templates', href: '/templates', icon: FileStack },
   { label: 'Analytics', href: '/analytics', icon: BarChart3 },
   { label: 'Settings', href: '/settings', icon: Settings },
 ];
