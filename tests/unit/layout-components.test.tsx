@@ -60,8 +60,8 @@ const themeWrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe('NAV_ITEMS', () => {
-  it('has 7 navigation items', () => {
-    expect(NAV_ITEMS).toHaveLength(7);
+  it('has 6 navigation items', () => {
+    expect(NAV_ITEMS).toHaveLength(6);
   });
 
   it('each item has label, href, and icon', () => {
@@ -85,7 +85,7 @@ describe('NAV_ITEMS', () => {
 describe('BottomDock', async () => {
   const { BottomDock } = await import('@/components/dock');
 
-  it('renders all 7 nav items as links', () => {
+  it('renders all 6 nav items as links', () => {
     render(<BottomDock />, { wrapper: themeWrapper });
     for (const item of NAV_ITEMS) {
       const links = screen.getAllByRole('link');
