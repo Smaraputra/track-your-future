@@ -812,7 +812,7 @@ try {
   // 4. Form field templates
   // -------------------------------------------------------------------------
   for (const [i, f] of U1_FIELDS.entries()) {
-    const fid = sid(`00000000001${(20 + i).toString(16).padStart(2, '0')}`);
+    const fid = sid(`0000000001${(20 + i).toString().padStart(2, '0')}`);
     await db.execute(sql`
       INSERT INTO form_field_templates (id, user_id, role_category_id, field_key, field_value, position)
       VALUES (${fid}, ${U1}, ${U1_ROLES[f.roleIdx].id}, ${f.key}, ${f.value}, ${i % 3})
@@ -820,7 +820,7 @@ try {
     `);
   }
   for (const [i, f] of U2_FIELDS.entries()) {
-    const fid = sid(`000000000220${i.toString(16).padStart(2, '0')}`);
+    const fid = sid(`0000000022${i.toString(16).padStart(2, '0')}`);
     await db.execute(sql`
       INSERT INTO form_field_templates (id, user_id, role_category_id, field_key, field_value, position)
       VALUES (${fid}, ${U2}, ${U2_ROLES[f.roleIdx].id}, ${f.key}, ${f.value}, ${i % 3})
@@ -894,13 +894,12 @@ try {
   // -------------------------------------------------------------------------
   let histIdx = 0;
   for (const apps of [U1_APPS, U2_APPS]) {
-    const userPrefix = apps === U1_APPS ? '0000000001' : '0000000002';
     for (const app of apps) {
       if (app.status === 'draft') continue;
       const progression = STATUS_PROGRESSION[app.status] || [];
       for (let i = 1; i < progression.length; i++) {
         const changedAt = daysAgo(Math.max(1, (progression.length - i) * 3 + Math.floor(Math.random() * 5)));
-        const hid = sid(`${userPrefix}e0${histIdx.toString(16).padStart(2, '0')}`);
+        const hid = sid(`0000000e${histIdx.toString(16).padStart(4, '0')}`);
         await db.execute(sql`
           INSERT INTO application_status_history (id, application_id, from_status, to_status, changed_at)
           VALUES (${hid}, ${app.id}, ${progression[i - 1]}, ${progression[i]}, ${changedAt})
@@ -1027,9 +1026,9 @@ try {
   // -------------------------------------------------------------------------
   let aiIdx = 0;
   for (const [userId, entries] of [[U1, U1_AI_USAGE], [U2, U2_AI_USAGE]]) {
-    const prefix = userId === U1 ? '000000000180' : '0000000002b0';
     for (const [i, entry] of entries.entries()) {
-      const aid = sid(`${prefix}${i.toString(16).padStart(2, '0')}`);
+      const aid = sid(`000000a${aiIdx.toString(16).padStart(5, '0')}`);
+      aiIdx++;
       const createdAt = daysAgo(entry.daysAgo);
       await db.execute(sql`
         INSERT INTO ai_usage (id, user_id, feature, model, input_tokens, output_tokens, cost_cents, created_at)
@@ -1037,7 +1036,6 @@ try {
         ON CONFLICT (id) DO NOTHING
       `);
     }
-    aiIdx++;
   }
   console.log('  AI usage records created');
 
