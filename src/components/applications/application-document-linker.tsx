@@ -6,6 +6,7 @@ import { Eye, FileText, Upload, X } from 'lucide-react';
 import { RetroButton } from '@/components/retro-button';
 import { RetroSelect } from '@/components/retro-select';
 import { UploadDialog } from '@/components/documents/upload-dialog';
+import { ParseCvButton } from '@/components/documents/parse-cv-button';
 import { DocumentPreviewPanel } from './document-preview-panel';
 
 interface LinkedDocument {
@@ -13,6 +14,7 @@ interface LinkedDocument {
   fileName: string;
   documentType: string;
   customTypeName: string | null;
+  parsedProfileId: string | null;
 }
 
 interface AvailableDocument {
@@ -32,6 +34,7 @@ interface ApplicationDocumentLinkerProps {
   linkedDocuments: LinkedDocument[];
   availableDocuments: AvailableDocument[];
   onChanged: () => void;
+  onParsed?: () => void;
   roles?: Role[];
 }
 
@@ -40,6 +43,7 @@ export function ApplicationDocumentLinker({
   linkedDocuments,
   availableDocuments,
   onChanged,
+  onParsed,
   roles,
 }: ApplicationDocumentLinkerProps) {
   const [linking, setLinking] = useState(false);
@@ -108,6 +112,16 @@ export function ApplicationDocumentLinker({
                 </span>
               </div>
               <div className="flex items-center gap-1">
+                {doc.documentType === 'cv' && (
+                  <ParseCvButton
+                    documentId={doc.id}
+                    hasParsedProfile={!!doc.parsedProfileId}
+                    onParsed={() => {
+                      onChanged();
+                      onParsed?.();
+                    }}
+                  />
+                )}
                 <DocumentPreviewPanel
                   documentId={doc.id}
                   fileName={doc.fileName}

@@ -9,6 +9,7 @@ import {
   applicationDocuments,
 } from '@/db/schema/applications';
 import { roleCategories, documents } from '@/db/schema/core';
+import { parsedProfiles } from '@/db/schema/ai';
 import { updateApplicationSchema } from '@/lib/applications/schemas';
 
 export async function GET(
@@ -69,9 +70,11 @@ export async function GET(
       mimeType: documents.mimeType,
       fileSizeBytes: documents.fileSizeBytes,
       createdAt: documents.createdAt,
+      parsedProfileId: parsedProfiles.id,
     })
     .from(applicationDocuments)
     .innerJoin(documents, eq(applicationDocuments.documentId, documents.id))
+    .leftJoin(parsedProfiles, eq(parsedProfiles.documentId, documents.id))
     .where(eq(applicationDocuments.applicationId, applicationId));
 
   return NextResponse.json({

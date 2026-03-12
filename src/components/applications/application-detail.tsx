@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Pencil, Trash2, ExternalLink, Sparkles } from 'lucide-react';
 
@@ -20,6 +20,8 @@ import { InterviewPrepViewer } from './interview-prep-viewer';
 import { ResumeSuggestionsButton } from './resume-suggestions-button';
 import { ResumeSuggestionsViewer } from './resume-suggestions-viewer';
 import { MatchScoreActions } from './match-score-actions';
+import { AiPrerequisiteHint } from './ai-prerequisite-hint';
+import { RunAllAiButton } from './run-all-ai-button';
 import { type ApplicationItem } from './applications-page-content';
 import type { JdExtractedData, MatchScoreResult, InterviewPrepResult, ResumeSuggestionResult } from '@/lib/ai/schemas';
 
@@ -35,6 +37,7 @@ interface LinkedDocument {
   fileName: string;
   documentType: string;
   customTypeName: string | null;
+  parsedProfileId: string | null;
 }
 
 interface AvailableDocument {
@@ -130,8 +133,14 @@ export function ApplicationDetail({
   const [coverLetter, setCoverLetter] = useState(initialCoverLetter);
   const [interviewPrep, setInterviewPrep] = useState(initialInterviewPrep);
   const [resumeSuggestions, setResumeSuggestions] = useState(initialResumeSuggestions);
-  const [hasParsedCv] = useState(initialHasParsedCv);
+  const [hasParsedCv, setHasParsedCv] = useState(initialHasParsedCv);
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const firstCvDoc = useMemo(
+    () => linkedDocuments.find((d) => d.documentType === 'cv') ?? null,
+    [linkedDocuments],
+  );
+  const cvDocumentId = firstCvDoc?.id ?? null;
 
   const refreshDetail = useCallback(async () => {
     const res = await fetch(`/api/applications/${application.id}`);
@@ -252,6 +261,15 @@ export function ApplicationDetail({
     }
   }, [application.id]);
 
+  const handleCvParsed = useCallback(async () => {
+    setHasParsedCv(true);
+    await refreshDocuments();
+  }, [refreshDocuments]);
+
+  const handleJdExtracted = useCallback(async () => {
+    await refreshJobAnalysis();
+  }, [refreshJobAnalysis]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -264,7 +282,25 @@ export function ApplicationDetail({
             {application.jobTitle}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <RunAllAiButton
+            applicationId={application.id}
+            jobUrl={application.jobUrl}
+            hasParsedCv={hasParsedCv}
+            hasJobAnalysis={!!jobAnalysis}
+            hasMatchScore={!!matchScore}
+            hasCoverLetter={!!coverLetter}
+            hasInterviewPrep={!!interviewPrep}
+            hasResumeSuggestions={!!resumeSuggestions}
+            isPro={isPro}
+            cvDocumentId={cvDocumentId}
+            onCvParsed={handleCvParsed}
+            onJdExtracted={handleJdExtracted}
+            onMatchScored={refreshMatchScore}
+            onCoverLetterGenerated={refreshCoverLetter}
+            onInterviewPrepGenerated={refreshInterviewPrep}
+            onResumeSuggestionsGenerated={refreshResumeSuggestions}
+          />
           {application.jobUrl && (
             <RetroButton variant="secondary" size="sm" asChild>
               <a
@@ -361,6 +397,7 @@ export function ApplicationDetail({
           linkedDocuments={linkedDocuments}
           availableDocuments={availableDocuments}
           onChanged={refreshDocuments}
+          onParsed={handleCvParsed}
           roles={roles}
         />
       </div>
@@ -420,16 +457,17 @@ export function ApplicationDetail({
             />
           </>
         ) : (
-          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
-            <Sparkles className="size-4" />
-            {!hasParsedCv && !jobAnalysis
-              ? 'Parse a CV and extract the JD to enable match scoring'
-              : !hasParsedCv
-                ? 'Parse a CV to enable match scoring'
-                : !jobAnalysis
-                  ? 'Extract the JD to enable match scoring'
-                  : 'Click "Score Match" to analyze fit'}
-          </p>
+          <AiPrerequisiteHint
+            section="match-score"
+            hasParsedCv={hasParsedCv}
+            hasJobAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            jobUrl={application.jobUrl}
+            cvDocumentId={cvDocumentId}
+            applicationId={application.id}
+            onCvParsed={handleCvParsed}
+            onJdExtracted={handleJdExtracted}
+          />
         )}
       </div>
 
@@ -453,14 +491,17 @@ export function ApplicationDetail({
             tone={coverLetter.tone}
           />
         ) : (
-          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
-            <Sparkles className="size-4" />
-            {!isPro
-              ? 'Pro plan required for cover letter generation'
-              : !hasParsedCv || !jobAnalysis
-                ? 'Parse a CV and extract the JD to generate a cover letter'
-                : 'Select a tone and click "Generate" to create a cover letter'}
-          </p>
+          <AiPrerequisiteHint
+            section="cover-letter"
+            hasParsedCv={hasParsedCv}
+            hasJobAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            jobUrl={application.jobUrl}
+            cvDocumentId={cvDocumentId}
+            applicationId={application.id}
+            onCvParsed={handleCvParsed}
+            onJdExtracted={handleJdExtracted}
+          />
         )}
       </div>
 
@@ -483,14 +524,17 @@ export function ApplicationDetail({
             data={interviewPrep.result as InterviewPrepResult}
           />
         ) : (
-          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
-            <Sparkles className="size-4" />
-            {!isPro
-              ? 'Pro plan required for interview prep'
-              : !jobAnalysis
-                ? 'Extract the JD to generate interview prep'
-                : 'Click "Generate" to create interview preparation materials'}
-          </p>
+          <AiPrerequisiteHint
+            section="interview-prep"
+            hasParsedCv={hasParsedCv}
+            hasJobAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            jobUrl={application.jobUrl}
+            cvDocumentId={cvDocumentId}
+            applicationId={application.id}
+            onCvParsed={handleCvParsed}
+            onJdExtracted={handleJdExtracted}
+          />
         )}
       </div>
 
@@ -513,14 +557,17 @@ export function ApplicationDetail({
             data={resumeSuggestions.result as ResumeSuggestionResult}
           />
         ) : (
-          <p className="font-body text-muted-foreground flex items-center gap-2 text-sm">
-            <Sparkles className="size-4" />
-            {!isPro
-              ? 'Pro plan required for resume suggestions'
-              : !hasParsedCv
-                ? 'Parse a CV to enable resume suggestions'
-                : 'Click "Generate" to get resume improvement suggestions'}
-          </p>
+          <AiPrerequisiteHint
+            section="resume-suggestions"
+            hasParsedCv={hasParsedCv}
+            hasJobAnalysis={!!jobAnalysis}
+            isPro={isPro}
+            jobUrl={application.jobUrl}
+            cvDocumentId={cvDocumentId}
+            applicationId={application.id}
+            onCvParsed={handleCvParsed}
+            onJdExtracted={handleJdExtracted}
+          />
         )}
       </div>
 
