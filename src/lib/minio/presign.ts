@@ -6,7 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { s3, BUCKET } from './client';
+import { s3, s3Presign, BUCKET } from './client';
 
 const PUT_EXPIRY_SECONDS = 600; // 10 minutes
 const GET_EXPIRY_SECONDS = 3600; // 1 hour
@@ -23,7 +23,7 @@ export async function createPresignedPutUrl(
     ContentLength: fileSizeBytes,
   });
 
-  return getSignedUrl(s3, command, { expiresIn: PUT_EXPIRY_SECONDS });
+  return getSignedUrl(s3Presign, command, { expiresIn: PUT_EXPIRY_SECONDS });
 }
 
 export async function createPresignedGetUrl(
@@ -36,7 +36,7 @@ export async function createPresignedGetUrl(
     ResponseContentDisposition: `attachment; filename="${fileName}"`,
   });
 
-  return getSignedUrl(s3, command, { expiresIn: GET_EXPIRY_SECONDS });
+  return getSignedUrl(s3Presign, command, { expiresIn: GET_EXPIRY_SECONDS });
 }
 
 export async function createPresignedInlineUrl(
@@ -49,7 +49,7 @@ export async function createPresignedInlineUrl(
     ResponseContentDisposition: `inline; filename="${fileName}"`,
   });
 
-  return getSignedUrl(s3, command, { expiresIn: GET_EXPIRY_SECONDS });
+  return getSignedUrl(s3Presign, command, { expiresIn: GET_EXPIRY_SECONDS });
 }
 
 export async function headObject(

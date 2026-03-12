@@ -172,10 +172,10 @@ describe('createApplicationSchema', () => {
     }
   });
 
-  it('rejects notes over 5000 characters', () => {
+  it('rejects notes over 20000 characters', () => {
     const result = createApplicationSchema.safeParse({
       ...validInput,
-      notes: 'x'.repeat(5001),
+      notes: 'x'.repeat(20001),
     });
     expect(result.success).toBe(false);
   });

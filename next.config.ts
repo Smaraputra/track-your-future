@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 
+const minioPublicEndpoint = process.env.MINIO_PUBLIC_ENDPOINT;
+const minioPublicSsl = process.env.MINIO_PUBLIC_USE_SSL === 'true';
+const minioConnectSrc = minioPublicEndpoint
+  ? ` ${minioPublicSsl ? 'https' : 'http'}://${minioPublicEndpoint}`
+  : '';
+
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -17,7 +23,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
-      "connect-src 'self' https://checkout.stripe.com https://api.stripe.com https://*.polar.sh",
+      `connect-src 'self' https://checkout.stripe.com https://api.stripe.com https://*.polar.sh${minioConnectSrc}`,
       "frame-src https://checkout.stripe.com https://*.polar.sh",
       "object-src 'none'",
       "base-uri 'self'",
