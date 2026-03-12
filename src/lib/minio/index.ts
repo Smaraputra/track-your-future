@@ -1,4 +1,4 @@
-export { s3, BUCKET } from './client';
+export { s3, s3Presign, BUCKET } from './client';
 export {
   createPresignedPutUrl,
   createPresignedGetUrl,
