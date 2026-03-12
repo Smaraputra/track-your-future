@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import type { MatchScoreResult } from '@/lib/ai/schemas';
 
 interface MatchScoreViewerProps {
@@ -90,13 +89,14 @@ export function MatchScoreViewer({ data }: MatchScoreViewerProps) {
       {/* Suggestions */}
       {data.suggestions.length > 0 && (
         <Section title="Suggestions">
-          <div className="flex flex-wrap gap-1">
+          <ul className="font-body text-sm space-y-1">
             {data.suggestions.map((s, i) => (
-              <Badge key={i} variant="secondary" className="text-xs">
-                {s}
-              </Badge>
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-blue-400 mt-0.5 shrink-0">*</span>
+                <span className="text-muted-foreground">{s}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </Section>
       )}
     </div>
