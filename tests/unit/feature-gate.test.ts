@@ -56,16 +56,14 @@ describe('isBillingDisabled bypass (source analysis)', () => {
 
   it('checkResourceLimit bypasses when billing disabled', () => {
     expect(source).toContain(
-      'if (isBillingDisabled()) return { allowed: true, current: 0, limit: null }',
+      'if (isBillingDisabled()) return { allowed: true, current, limit: null }',
     );
   });
 
   it('checkAiLimit bypasses when billing disabled', () => {
-    const matches = source.match(
-      /if \(isBillingDisabled\(\)\) return \{ allowed: true, current: 0, limit: null \}/g,
+    expect(source).toContain(
+      'if (isBillingDisabled()) return { allowed: true, current: 0, limit: null }',
     );
-    expect(matches).not.toBeNull();
-    expect(matches!.length).toBeGreaterThanOrEqual(2);
   });
 });
 

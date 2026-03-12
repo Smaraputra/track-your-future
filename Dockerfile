@@ -27,6 +27,8 @@ ARG MINIO_PUBLIC_USE_SSL
 ENV MINIO_PUBLIC_ENDPOINT=${MINIO_PUBLIC_ENDPOINT}
 ENV MINIO_PUBLIC_USE_SSL=${MINIO_PUBLIC_USE_SSL}
 RUN pnpm build
+# Save pdfjs-dist worker file (dynamically imported, not traced by standalone output)
+RUN cp $(find /app/node_modules -name "pdf.worker.mjs" -path "*/pdfjs-dist/legacy/*" | head -1) /tmp/pdf.worker.mjs
 
 # Production stage: minimal image for deployment
 FROM node:20-alpine AS production
@@ -51,6 +53,13 @@ COPY --from=builder /app/scripts ./scripts
 COPY --from=dependencies /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 COPY --from=dependencies /app/node_modules/postgres ./node_modules/postgres
 COPY --from=dependencies /app/node_modules/bcryptjs ./node_modules/bcryptjs
+
+# pdfjs-dist worker file is dynamically imported and not traced by standalone output.
+# Find where pdf.mjs landed in standalone node_modules and place the worker beside it.
+COPY --from=builder /tmp/pdf.worker.mjs /tmp/pdf.worker.mjs
+RUN DEST=$(find /app/node_modules -name "pdf.mjs" -path "*/pdfjs-dist/legacy/*" -exec dirname {} \; | head -1) \
+    && cp /tmp/pdf.worker.mjs "$DEST/pdf.worker.mjs" \
+    && rm /tmp/pdf.worker.mjs
 
 # Copy entrypoint
 COPY docker-entrypoint.sh ./
