@@ -131,10 +131,10 @@ export async function checkResourceLimit(
   resource: ResourceKey,
   tier: Tier,
 ): Promise<LimitCheckResult> {
-  if (isBillingDisabled()) return { allowed: true, current: 0, limit: null };
+  const current = await resourceCounters[resource](userId);
+  if (isBillingDisabled()) return { allowed: true, current, limit: null };
 
   const limit = PLAN_LIMITS[tier].resources[resource];
-  const current = await resourceCounters[resource](userId);
 
   return {
     allowed: limit === null || current < limit,
