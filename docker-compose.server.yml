@@ -4,6 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
+      args:
+        MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT}
+        MINIO_PUBLIC_USE_SSL: ${MINIO_PUBLIC_USE_SSL}
     container_name: tyf-app
     restart: unless-stopped
     env_file: .env
