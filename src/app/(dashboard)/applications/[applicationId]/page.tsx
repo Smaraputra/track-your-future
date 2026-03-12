@@ -72,9 +72,11 @@ export default async function ApplicationDetailPage({
           fileName: documents.fileName,
           documentType: documents.documentType,
           customTypeName: documents.customTypeName,
+          parsedProfileId: parsedProfiles.id,
         })
         .from(applicationDocuments)
         .innerJoin(documents, eq(applicationDocuments.documentId, documents.id))
+        .leftJoin(parsedProfiles, eq(parsedProfiles.documentId, documents.id))
         .where(eq(applicationDocuments.applicationId, applicationId)),
       db
         .select({

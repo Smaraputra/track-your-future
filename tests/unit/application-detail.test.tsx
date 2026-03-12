@@ -128,6 +128,7 @@ const mockLinkedDocuments = [
     fileName: 'resume.pdf',
     documentType: 'cv',
     customTypeName: null,
+    parsedProfileId: null,
   },
 ];
 
@@ -362,7 +363,7 @@ describe('ApplicationDetail', () => {
       />,
     );
     expect(
-      screen.getByText('Parse a CV and extract the JD to enable match scoring'),
+      screen.getByText('To enable match scoring:'),
     ).toBeDefined();
   });
 });
