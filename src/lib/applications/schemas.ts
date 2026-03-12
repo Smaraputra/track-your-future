@@ -27,7 +27,7 @@ export const createApplicationSchema = z.object({
   notes: z
     .string()
     .trim()
-    .max(5000, 'Notes must be at most 5000 characters')
+    .max(20000, 'Notes must be at most 20000 characters')
     .optional()
     .or(z.literal('')),
   currentStatus: z.enum(APPLICATION_STATUSES).optional(),
