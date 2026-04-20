@@ -11,6 +11,7 @@ import {
 } from '@/lib/auth/password-reset';
 import { passwordResetConfirmSchema } from '@/lib/auth/schemas';
 import { invalidateUserSessions } from '@/lib/auth/session-invalidation';
+import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_RESET_CONFIRM_LIMIT } from '@/lib/rate-limit-configs';
 
@@ -77,6 +78,12 @@ export async function POST(request: NextRequest) {
   });
 
   await invalidateUserSessions(record.userId);
+
+  await logAuditEvent({
+    action: 'password_reset_completed',
+    userId: record.userId,
+    request,
+  });
 
   return NextResponse.json({ success: true });
 }

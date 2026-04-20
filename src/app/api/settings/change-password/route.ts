@@ -7,6 +7,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema/auth';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
 import { invalidateUserSessions } from '@/lib/auth/session-invalidation';
+import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_CHANGE_LIMIT } from '@/lib/rate-limit-configs';
 
@@ -69,6 +70,12 @@ export async function POST(request: Request) {
     .where(eq(users.id, session.user.id));
 
   await invalidateUserSessions(session.user.id);
+
+  await logAuditEvent({
+    action: 'password_changed',
+    userId: session.user.id,
+    request,
+  });
 
   return NextResponse.json({ success: true });
 }

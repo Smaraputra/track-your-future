@@ -24,6 +24,7 @@ import {
   shouldSendLockoutNotification,
 } from '@/lib/auth/login-lockout';
 import { isSessionStillValid } from '@/lib/auth/session-invalidation';
+import { logAuditEvent } from '@/lib/audit/log';
 import { sendLoginLockoutEmail } from '@/lib/email';
 import type {} from '@/lib/auth/types';
 
@@ -55,6 +56,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const emailHash = hashEmailForKey(email);
 
         if (await isEmailLockedOut(emailHash)) {
+          await logAuditEvent({
+            action: 'login_locked',
+            metadata: { emailHash },
+          });
           return null;
         }
 
@@ -69,6 +74,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!passwordOk) {
           const failureCount = await recordLoginFailure(emailHash);
+          await logAuditEvent({
+            action: 'login_failure',
+            userId: user?.id ?? null,
+            metadata: {
+              emailHash,
+              failureCount,
+              reason: !user
+                ? 'unknown_email'
+                : !user.hashedPassword
+                  ? 'no_password_set'
+                  : !user.emailVerified
+                    ? 'email_unverified'
+                    : 'wrong_password',
+            },
+          });
           if (
             failureCount >= LOGIN_FAILURE_THRESHOLD &&
             user?.email &&
@@ -84,6 +104,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         await clearLoginFailures(emailHash);
+        await logAuditEvent({
+          action: 'login_success',
+          userId: user.id,
+          metadata: { emailHash },
+        });
 
         return {
           id: user.id,
@@ -104,8 +129,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       const decision = await isOauthLinkingAllowed(account.provider, user.email);
       if (decision.allowed) {
+        await logAuditEvent({
+          action: 'oauth_linked',
+          userId: user.id ?? null,
+          metadata: { provider: account.provider },
+        });
         return true;
       }
+      await logAuditEvent({
+        action: 'oauth_rejected',
+        userId: user.id ?? null,
+        metadata: { provider: account.provider, reason: decision.reason },
+      });
       if (decision.reason === 'unverified_credentials') {
         return '/login?error=UnverifiedEmail';
       }

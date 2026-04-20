@@ -5,4 +5,5 @@ export * from './applications';
 export * from './billing';
 export * from './ai';
 export * from './notifications';
+export * from './audit';
 export * from './relations';
