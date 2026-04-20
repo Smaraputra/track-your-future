@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { formFieldTemplates, roleCategories } from '@/db/schema/core';
 import { updateTemplateSchema } from '@/lib/templates/schemas';
+import { encryptField, safeDecryptField } from '@/lib/crypto/field-encryption';
 
 type Params = { params: Promise<{ roleId: string; templateId: string }> };
 
@@ -43,7 +44,10 @@ export async function GET(_request: Request, { params }: Params) {
     );
   }
 
-  return NextResponse.json(template);
+  return NextResponse.json({
+    ...template,
+    fieldValue: safeDecryptField(template.fieldValue, session.user.id),
+  });
 }
 
 export async function PATCH(request: Request, { params }: Params) {
@@ -122,10 +126,13 @@ export async function PATCH(request: Request, { params }: Params) {
   if (parsed.data.fieldKey !== undefined)
     updateData.fieldKey = parsed.data.fieldKey;
   if (parsed.data.fieldValue !== undefined)
-    updateData.fieldValue = parsed.data.fieldValue;
+    updateData.fieldValue = encryptField(parsed.data.fieldValue, session.user.id);
 
   if (Object.keys(updateData).length === 0) {
-    return NextResponse.json(existing);
+    return NextResponse.json({
+      ...existing,
+      fieldValue: safeDecryptField(existing.fieldValue, session.user.id),
+    });
   }
 
   const [updated] = await db
@@ -140,7 +147,10 @@ export async function PATCH(request: Request, { params }: Params) {
     )
     .returning();
 
-  return NextResponse.json(updated);
+  return NextResponse.json({
+    ...updated,
+    fieldValue: safeDecryptField(updated.fieldValue, session.user.id),
+  });
 }
 
 export async function DELETE(_request: Request, { params }: Params) {
