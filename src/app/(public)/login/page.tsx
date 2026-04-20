@@ -25,12 +25,20 @@ export default async function LoginPage({
   const initialError = errorCode
     ? ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.Default
     : undefined;
+  const initialSuccess =
+    params.reset === 'success'
+      ? 'Password updated. Sign in with your new password.'
+      : undefined;
 
   return (
     <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">
       <MatrixRain />
       <RetroWindow title="sys://auth/login" className="relative z-10 w-full max-w-sm">
-        <LoginForm initialError={initialError} callbackUrl={callbackUrl} />
+        <LoginForm
+          initialError={initialError}
+          initialSuccess={initialSuccess}
+          callbackUrl={callbackUrl}
+        />
       </RetroWindow>
     </div>
   );

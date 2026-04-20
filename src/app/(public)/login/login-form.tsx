@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn } from 'next-auth/react';
@@ -12,10 +13,11 @@ import { AuthMessage } from '@/components/auth/auth-message';
 
 interface LoginFormProps {
   initialError?: string;
+  initialSuccess?: string;
   callbackUrl?: string;
 }
 
-export function LoginForm({ initialError, callbackUrl }: LoginFormProps) {
+export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFormProps) {
   const {
     register,
     handleSubmit,
@@ -42,6 +44,7 @@ export function LoginForm({ initialError, callbackUrl }: LoginFormProps) {
       </div>
 
       {initialError && <AuthMessage variant="error" message={initialError} />}
+      {initialSuccess && <AuthMessage variant="success" message={initialSuccess} />}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <RetroFormField label="Email" error={errors.email?.message}>
@@ -65,6 +68,12 @@ export function LoginForm({ initialError, callbackUrl }: LoginFormProps) {
         <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? 'Authenticating...' : 'Login'}
         </RetroButton>
+
+        <p className="font-body text-muted-foreground text-right text-xs">
+          <Link href="/forgot-password" className="text-primary underline">
+            Forgot password?
+          </Link>
+        </p>
       </form>
 
       <OAuthButtons />

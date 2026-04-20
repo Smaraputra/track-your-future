@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
 import { hashPassword, verifyPassword } from '@/lib/auth/password';
+import { invalidateUserSessions } from '@/lib/auth/session-invalidation';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_CHANGE_LIMIT } from '@/lib/rate-limit-configs';
 
@@ -64,8 +65,10 @@ export async function POST(request: Request) {
   const hashed = await hashPassword(parsed.data.newPassword);
   await db
     .update(users)
-    .set({ hashedPassword: hashed })
+    .set({ hashedPassword: hashed, passwordChangedAt: new Date() })
     .where(eq(users.id, session.user.id));
+
+  await invalidateUserSessions(session.user.id);
 
   return NextResponse.json({ success: true });
 }
