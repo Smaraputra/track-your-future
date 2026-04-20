@@ -60,8 +60,9 @@ describe('proxy.ts structure', () => {
     'utf-8',
   );
 
-  it('exports auth as proxy', () => {
-    expect(proxySource).toContain('auth as proxy');
+  it('uses the NextAuth middleware wrapper form', () => {
+    expect(proxySource).toContain("import { auth } from '@/auth'");
+    expect(proxySource).toContain('auth((request)');
   });
 
   it('has a matcher config', () => {

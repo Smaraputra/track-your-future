@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { VT323, JetBrains_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { CookieConsent } from "@/components/cookie-consent";
 import { CRTOverlay } from "@/components/crt-overlay";
@@ -26,15 +27,19 @@ export const metadata: Metadata = {
 
 const themeScript = `(function(){try{var t=localStorage.getItem("${THEME_STORAGE_KEY}");if(t==="green"||t==="amber"){document.documentElement.setAttribute("data-theme",t)}else{document.documentElement.setAttribute("data-theme","${DEFAULT_THEME}")}}catch(e){document.documentElement.setAttribute("data-theme","${DEFAULT_THEME}")}})()`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html lang="en" data-theme="amber" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body
         className={`${vt323.variable} ${jetbrainsMono.variable} antialiased`}

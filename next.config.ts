@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
 
-const minioPublicEndpoint = process.env.MINIO_PUBLIC_ENDPOINT;
-const minioPublicSsl = process.env.MINIO_PUBLIC_USE_SSL === 'true';
-const minioConnectSrc = minioPublicEndpoint
-  ? ` ${minioPublicSsl ? 'https' : 'http'}://${minioPublicEndpoint}`
-  : '';
-
+// Content-Security-Policy is set per-request by the proxy/middleware in
+// src/proxy.ts so each rendered page can carry a fresh nonce. The
+// headers() block below only covers directives that are safe to serve
+// statically on every response (including non-middleware routes).
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -14,21 +12,6 @@ const securityHeaders = [
   {
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
-  },
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https:",
-      `connect-src 'self' https://checkout.stripe.com https://api.stripe.com https://*.polar.sh${minioConnectSrc}`,
-      "frame-src https://checkout.stripe.com https://*.polar.sh",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join('; '),
   },
 ];
 

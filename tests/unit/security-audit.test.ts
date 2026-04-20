@@ -67,21 +67,53 @@ describe('P0-3: Security headers in next.config.ts', () => {
     expect(source).toContain('includeSubDomains');
   });
 
-  it('sets Content-Security-Policy', () => {
-    expect(source).toContain('Content-Security-Policy');
-    expect(source).toContain("default-src 'self'");
-    expect(source).toContain("object-src 'none'");
-    expect(source).toContain("base-uri 'self'");
-  });
-
-  it('allows Stripe and Polar in CSP', () => {
-    expect(source).toContain('checkout.stripe.com');
-    expect(source).toContain('api.stripe.com');
-    expect(source).toContain('*.polar.sh');
+  it('delegates Content-Security-Policy to the per-request middleware', () => {
+    // CSP is now emitted by src/proxy.ts with a nonce. The static config
+    // must not set a conflicting CSP header entry.
+    expect(source).not.toMatch(/key:\s*['"]Content-Security-Policy['"]/);
   });
 
   it('applies headers to all routes', () => {
     expect(source).toContain("source: '/(.*)'");
+  });
+});
+
+describe('P0-3b: Nonce-based CSP in proxy middleware', () => {
+  const cspSource = readRoute('src/lib/security/csp.ts');
+  const proxySource = readRoute('src/proxy.ts');
+
+  it('generates a fresh nonce per request', () => {
+    expect(cspSource).toContain('randomBytes(16)');
+    expect(cspSource).toContain("toString('base64')");
+  });
+
+  it('drops unsafe-inline and unsafe-eval from script-src', () => {
+    expect(cspSource).not.toMatch(/script-src[^']*'unsafe-inline'/);
+    expect(cspSource).not.toMatch(/script-src[^']*'unsafe-eval'/);
+    expect(cspSource).toContain("'nonce-${nonce}'");
+    expect(cspSource).toContain("'strict-dynamic'");
+  });
+
+  it('retains the baseline hardening directives', () => {
+    expect(cspSource).toContain("default-src 'self'");
+    expect(cspSource).toContain("object-src 'none'");
+    expect(cspSource).toContain("base-uri 'self'");
+    expect(cspSource).toContain("form-action 'self'");
+    expect(cspSource).toContain("frame-ancestors 'none'");
+  });
+
+  it('allows Stripe and Polar in connect-src / frame-src', () => {
+    expect(cspSource).toContain('checkout.stripe.com');
+    expect(cspSource).toContain('api.stripe.com');
+    expect(cspSource).toContain('*.polar.sh');
+  });
+
+  it('proxy wraps auth and emits the nonce + CSP header', () => {
+    expect(proxySource).toContain('auth((request)');
+    expect(proxySource).toContain('generateCspNonce');
+    expect(proxySource).toContain('buildContentSecurityPolicy');
+    expect(proxySource).toContain("requestHeaders.set('x-nonce', nonce)");
+    expect(proxySource).toContain("response.headers.set('Content-Security-Policy', csp)");
   });
 });
 
