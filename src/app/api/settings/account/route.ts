@@ -8,6 +8,7 @@ import { users } from '@/db/schema/auth';
 import { documents } from '@/db/schema/core';
 import { subscriptions } from '@/db/schema/billing';
 import { deleteObjects } from '@/lib/minio/presign';
+import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { ACCOUNT_DELETE_LIMIT } from '@/lib/rate-limit-configs';
 
@@ -74,6 +75,17 @@ export async function DELETE(request: Request) {
       });
     }
   }
+
+  await logAuditEvent({
+    action: 'account_deleted',
+    userId,
+    request,
+    metadata: {
+      deletedUserId: userId,
+      documentCount: userDocs.length,
+      cancelledSubscription: !!userSubscription?.providerSubscriptionId,
+    },
+  });
 
   // Delete user -- cascades all related data
   await db.delete(users).where(eq(users.id, userId));

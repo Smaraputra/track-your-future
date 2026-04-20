@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
+import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { EXPORT_LIMIT } from '@/lib/rate-limit-configs';
 import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core';
@@ -16,7 +17,7 @@ import { subscriptions, payments } from '@/db/schema/billing';
 import { parsedProfiles, jobAnalyses, aiUsage } from '@/db/schema/ai';
 import { notifications } from '@/db/schema/notifications';
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -127,6 +128,16 @@ export async function GET() {
     aiUsage: aiUsageData,
     notifications: notificationsData,
   };
+
+  await logAuditEvent({
+    action: 'data_exported',
+    userId,
+    request,
+    metadata: {
+      applicationCount: applicationsData.length,
+      documentCount: documentsData.length,
+    },
+  });
 
   return new NextResponse(JSON.stringify(exportData, null, 2), {
     status: 200,

@@ -12,6 +12,7 @@ import {
 } from '@/lib/auth/password-reset';
 import { passwordResetRequestSchema } from '@/lib/auth/schemas';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_RESET_REQUEST_LIMIT } from '@/lib/rate-limit-configs';
 
@@ -70,6 +71,13 @@ export async function POST(request: NextRequest) {
         console.error('Failed to send password reset email', err);
       }
     }
+
+    await logAuditEvent({
+      action: 'password_reset_requested',
+      userId: user?.id ?? null,
+      request,
+      metadata: { emailHash, accountFound: !!user?.hashedPassword },
+    });
   } catch (err) {
     console.error('Password reset request failed', err);
   }
