@@ -44,6 +44,22 @@ async function sendEmail(opts: SendEmailOptions): Promise<void> {
   });
 }
 
+export async function sendPasswordResetEmail(
+  email: string,
+  token: string,
+): Promise<void> {
+  const url = `${getBaseUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+  await sendEmail({
+    to: email,
+    subject: 'Reset your Tracked Your Future password',
+    html: `
+      <p>Someone (hopefully you) asked to reset the password on your account.</p>
+      <p><a href="${url}">Click here to set a new password.</a></p>
+      <p>This link expires in one hour and can only be used once. If you did not request a reset, you can ignore this email — your current password will keep working.</p>
+    `,
+  });
+}
+
 export async function sendLoginLockoutEmail(email: string): Promise<void> {
   const resetUrl = `${getBaseUrl()}/reset-password`;
   await sendEmail({

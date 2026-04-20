@@ -43,3 +43,17 @@ export const AI_BURST_LIMIT: RateLimitConfig = {
   maxRequests: 10,
   windowSeconds: 60,
 };
+
+/** Password reset request: 5 per hour (per IP and per email), fail closed */
+export const PASSWORD_RESET_REQUEST_LIMIT: RateLimitConfig = {
+  maxRequests: 5,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};
+
+/** Password reset confirm: 10 per hour per IP, fail closed */
+export const PASSWORD_RESET_CONFIRM_LIMIT: RateLimitConfig = {
+  maxRequests: 10,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};

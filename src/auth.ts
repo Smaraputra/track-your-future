@@ -23,6 +23,7 @@ import {
   recordLoginFailure,
   shouldSendLockoutNotification,
 } from '@/lib/auth/login-lockout';
+import { isSessionStillValid } from '@/lib/auth/session-invalidation';
 import { sendLoginLockoutEmail } from '@/lib/email';
 import type {} from '@/lib/auth/types';
 
@@ -110,9 +111,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return '/login?error=OAuthAccountNotLinked';
     },
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user?.id) {
         token.id = user.id;
+        token.signedInAt = Math.floor(Date.now() / 1000);
+        return token;
+      }
+      if (token.id && !(await isSessionStillValid(token.id, token.signedInAt))) {
+        return null;
       }
       return token;
     },
@@ -125,6 +131,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const publicPaths = [
         '/',
         '/login',
+        '/forgot-password',
+        '/reset-password',
         '/privacy',
         '/terms',
         '/pricing',
