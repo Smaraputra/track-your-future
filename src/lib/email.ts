@@ -1,3 +1,5 @@
+import { createHash } from 'crypto';
+
 import nodemailer from 'nodemailer';
 
 interface SendEmailOptions {
@@ -10,10 +12,15 @@ function getBaseUrl(): string {
   return process.env.AUTH_URL ?? 'http://localhost:3000';
 }
 
+function redactRecipient(email: string): string {
+  const hash = createHash('sha256').update(email.toLowerCase().trim()).digest('hex');
+  return `sha256:${hash.slice(0, 12)}`;
+}
+
 async function sendEmail(opts: SendEmailOptions): Promise<void> {
   if (process.env.NODE_ENV !== 'production') {
     console.log('--- DEV EMAIL ---');
-    console.log(`To: ${opts.to}`);
+    console.log(`To: <redacted ${redactRecipient(opts.to)}>`);
     console.log(`Subject: ${opts.subject}`);
     console.log(opts.html);
     console.log('--- END EMAIL ---');
@@ -34,6 +41,20 @@ async function sendEmail(opts: SendEmailOptions): Promise<void> {
     to: opts.to,
     subject: opts.subject,
     html: opts.html,
+  });
+}
+
+export async function sendLoginLockoutEmail(email: string): Promise<void> {
+  const resetUrl = `${getBaseUrl()}/reset-password`;
+  await sendEmail({
+    to: email,
+    subject: 'Unusual sign-in activity on your Tracked Your Future account',
+    html: `
+      <p>We detected several failed sign-in attempts on your account.</p>
+      <p>Your account is temporarily locked for about an hour as a precaution. You can still sign in with Google or GitHub if you have those connected.</p>
+      <p>If this was not you, we recommend <a href="${resetUrl}">resetting your password</a> as soon as the lock clears.</p>
+      <p>If it was you, you can safely ignore this email.</p>
+    `,
   });
 }
 

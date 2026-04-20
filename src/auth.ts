@@ -15,6 +15,15 @@ import {
 import { loginSchema } from '@/lib/auth/schemas';
 import { verifyPassword } from '@/lib/auth/password';
 import { isOauthLinkingAllowed } from '@/lib/auth/account-linking';
+import {
+  LOGIN_FAILURE_THRESHOLD,
+  clearLoginFailures,
+  hashEmailForKey,
+  isEmailLockedOut,
+  recordLoginFailure,
+  shouldSendLockoutNotification,
+} from '@/lib/auth/login-lockout';
+import { sendLoginLockoutEmail } from '@/lib/email';
 import type {} from '@/lib/auth/types';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -42,19 +51,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
 
         const email = parsed.data.email.toLowerCase().trim();
+        const emailHash = hashEmailForKey(email);
+
+        if (await isEmailLockedOut(emailHash)) {
+          return null;
+        }
 
         const user = await db.query.users.findFirst({
           where: eq(users.email, email),
         });
 
-        if (!user?.hashedPassword) return null;
-        if (!user.emailVerified) return null;
+        const passwordOk =
+          !!user?.hashedPassword &&
+          !!user.emailVerified &&
+          (await verifyPassword(parsed.data.password, user.hashedPassword));
 
-        const valid = await verifyPassword(
-          parsed.data.password,
-          user.hashedPassword,
-        );
-        if (!valid) return null;
+        if (!passwordOk) {
+          const failureCount = await recordLoginFailure(emailHash);
+          if (
+            failureCount >= LOGIN_FAILURE_THRESHOLD &&
+            user?.email &&
+            (await shouldSendLockoutNotification(emailHash))
+          ) {
+            try {
+              await sendLoginLockoutEmail(user.email);
+            } catch (err) {
+              console.error('Failed to send lockout notification email', err);
+            }
+          }
+          return null;
+        }
+
+        await clearLoginFailures(emailHash);
 
         return {
           id: user.id,

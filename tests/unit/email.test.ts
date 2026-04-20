@@ -13,12 +13,13 @@ describe('email sending (dev mode)', () => {
     consoleSpy.mockRestore();
   });
 
-  it('sendTrialEndingEmail logs to console in dev', async () => {
+  it('sendTrialEndingEmail logs to console in dev with redacted recipient', async () => {
     const trialEnd = new Date('2026-03-01');
     await sendTrialEndingEmail('user@example.com', trialEnd);
 
     const output = consoleSpy.mock.calls.map((c: unknown[]) => c[0]).join('\n');
-    expect(output).toContain('user@example.com');
+    expect(output).not.toContain('user@example.com');
+    expect(output).toMatch(/To: <redacted sha256:[0-9a-f]{12}>/);
     expect(output).toContain('Your trial is ending soon');
     expect(output).toContain('/settings');
   });
