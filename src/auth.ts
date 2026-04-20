@@ -14,6 +14,7 @@ import {
 } from '@/db/schema/auth';
 import { loginSchema } from '@/lib/auth/schemas';
 import { verifyPassword } from '@/lib/auth/password';
+import { isOauthLinkingAllowed } from '@/lib/auth/account-linking';
 import type {} from '@/lib/auth/types';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -29,8 +30,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: '/login',
   },
   providers: [
-    Google({ allowDangerousEmailAccountLinking: true }),
-    GitHub({ allowDangerousEmailAccountLinking: true }),
+    Google,
+    GitHub,
     Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
@@ -65,6 +66,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (!account || account.provider === 'credentials') {
+        return true;
+      }
+      if (!user.email) {
+        return false;
+      }
+      const decision = await isOauthLinkingAllowed(account.provider, user.email);
+      if (decision.allowed) {
+        return true;
+      }
+      if (decision.reason === 'unverified_credentials') {
+        return '/login?error=UnverifiedEmail';
+      }
+      return '/login?error=OAuthAccountNotLinked';
+    },
     jwt({ token, user }) {
       if (user?.id) {
         token.id = user.id;
