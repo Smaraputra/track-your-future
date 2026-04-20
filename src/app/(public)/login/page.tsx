@@ -7,6 +7,7 @@ import { LoginForm } from './login-form';
 const ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: 'Invalid email or password. If you recently registered, check your email for a verification link.',
   OAuthAccountNotLinked: 'An account already exists with this email using a different sign-in method.',
+  UnverifiedEmail: 'An account with this email exists but has not been verified. Check your inbox for the verification link before signing in with a social provider.',
   Default: 'An authentication error occurred. Please try again.',
 };
 
