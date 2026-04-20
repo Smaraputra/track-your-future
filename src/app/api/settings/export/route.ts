@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { db } from '@/db';
 import { users } from '@/db/schema/auth';
 import { logAuditEvent } from '@/lib/audit/log';
+import { safeDecryptField } from '@/lib/crypto/field-encryption';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { EXPORT_LIMIT } from '@/lib/rate-limit-configs';
 import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core';
@@ -108,12 +109,17 @@ export async function GET(request: Request) {
     }),
   ]);
 
+  const decryptedFormFieldTemplates = formFieldTemplatesData.map((t) => ({
+    ...t,
+    fieldValue: safeDecryptField(t.fieldValue, userId),
+  }));
+
   const exportData = {
     exportedAt: new Date().toISOString(),
     user: userData,
     roleCategories: roleCategoriesData,
     documents: documentsData,
-    formFieldTemplates: formFieldTemplatesData,
+    formFieldTemplates: decryptedFormFieldTemplates,
     applications: applicationsData,
     applicationStatusHistory: statusHistoryData.map(
       (r) => r.application_status_history,

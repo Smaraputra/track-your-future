@@ -9,6 +9,7 @@ import { roleCategories, documents, formFieldTemplates } from '@/db/schema/core'
 import { applications } from '@/db/schema/applications';
 import { parsedProfiles } from '@/db/schema/ai';
 import { checkResourceLimit, getUserSubscription } from '@/lib/billing/feature-gate';
+import { safeDecryptField } from '@/lib/crypto/field-encryption';
 import { RetroWindow } from '@/components/retro-window';
 import { RetroButton } from '@/components/retro-button';
 import { RoleColorBadge } from '@/components/roles/role-color-badge';
@@ -127,6 +128,11 @@ export default async function RoleDetailPage({
     createdAt: d.createdAt.toISOString(),
   }));
 
+  const decryptedTemplates = templates.map((t) => ({
+    ...t,
+    fieldValue: safeDecryptField(t.fieldValue, userId),
+  }));
+
   return (
     <RetroWindow title={`sys://roles/${role.name}`}>
       <div className="space-y-6">
@@ -183,7 +189,7 @@ export default async function RoleDetailPage({
 
         <TemplateList
           roleId={roleId}
-          initialTemplates={templates}
+          initialTemplates={decryptedTemplates}
           globalTemplateCount={globalTemplateCount.count}
         />
 

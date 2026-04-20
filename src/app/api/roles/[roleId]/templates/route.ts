@@ -6,6 +6,7 @@ import { db } from '@/db';
 import { formFieldTemplates, roleCategories } from '@/db/schema/core';
 import { createTemplateSchema } from '@/lib/templates/schemas';
 import { getUserSubscription, checkResourceLimit } from '@/lib/billing/feature-gate';
+import { encryptField, safeDecryptField } from '@/lib/crypto/field-encryption';
 
 export async function GET(
   _request: Request,
@@ -44,7 +45,12 @@ export async function GET(
       asc(formFieldTemplates.createdAt),
     );
 
-  return NextResponse.json(templates);
+  const decrypted = templates.map((t) => ({
+    ...t,
+    fieldValue: safeDecryptField(t.fieldValue, session.user.id),
+  }));
+
+  return NextResponse.json(decrypted);
 }
 
 export async function POST(
@@ -130,16 +136,21 @@ export async function POST(
       ),
     );
 
+  const encryptedValue = encryptField(parsed.data.fieldValue, session.user.id);
+
   const [template] = await db
     .insert(formFieldTemplates)
     .values({
       userId: session.user.id,
       roleCategoryId: roleId,
       fieldKey: parsed.data.fieldKey,
-      fieldValue: parsed.data.fieldValue,
+      fieldValue: encryptedValue,
       position: maxResult.count,
     })
     .returning();
 
-  return NextResponse.json(template, { status: 201 });
+  return NextResponse.json(
+    { ...template, fieldValue: parsed.data.fieldValue },
+    { status: 201 },
+  );
 }
