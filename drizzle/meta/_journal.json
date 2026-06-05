@@ -50,6 +50,13 @@
       "when": 1780660980456,
       "tag": "0006_youthful_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780675384304,
+      "tag": "0007_futuristic_naoko",
+      "breakpoints": true
     }
   ]
 }

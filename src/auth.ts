@@ -166,6 +166,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const publicPaths = [
         '/',
         '/login',
+        '/register',
+        '/verify-email',
         '/forgot-password',
         '/reset-password',
         '/privacy',

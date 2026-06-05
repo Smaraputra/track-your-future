@@ -28,7 +28,9 @@ export default async function LoginPage({
   const initialSuccess =
     params.reset === 'success'
       ? 'Password updated. Sign in with your new password.'
-      : undefined;
+      : params.verified === '1'
+        ? 'Email verified. Sign in to access your account.'
+        : undefined;
 
   return (
     <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">

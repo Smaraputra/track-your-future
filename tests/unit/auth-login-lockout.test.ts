@@ -82,11 +82,10 @@ describe('auth.ts login-lockout wiring', () => {
   });
 });
 
-describe('email.ts recipient redaction', () => {
-  const emailSource = readFileSync(
-    resolve(__dirname, '../../src/lib/email.ts'),
-    'utf-8',
-  );
+describe('email module recipient redaction', () => {
+  const emailSource =
+    readFileSync(resolve(__dirname, '../../src/lib/email/send.ts'), 'utf-8') +
+    readFileSync(resolve(__dirname, '../../src/lib/email/index.ts'), 'utf-8');
 
   it('does not log raw recipient email in dev', () => {
     expect(emailSource).not.toContain('`To: ${opts.to}`');
