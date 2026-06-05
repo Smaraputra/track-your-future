@@ -9,7 +9,8 @@ export type ResourceKey =
   | 'documents'
   | 'roleCategories'
   | 'formFieldTemplates'
-  | 'storageBytes';
+  | 'storageBytes'
+  | 'apiTokens';
 
 export type AiFeatureKey =
   | 'parse'
@@ -25,6 +26,7 @@ interface ResourceLimits {
   roleCategories: number | null;
   formFieldTemplates: number | null;
   storageBytes: number | null;
+  apiTokens: number | null;
 }
 
 interface AiLimits {
@@ -49,6 +51,7 @@ export const PLAN_LIMITS: Record<Tier, PlanConfig> = {
       roleCategories: 3,
       formFieldTemplates: 20,
       storageBytes: 50 * 1024 * 1024, // 50 MB
+      apiTokens: 2,
     },
     ai: {
       parse: 3,
@@ -66,6 +69,7 @@ export const PLAN_LIMITS: Record<Tier, PlanConfig> = {
       roleCategories: null,
       formFieldTemplates: null,
       storageBytes: 50 * 1024 * 1024 * 4, // 200 MB
+      apiTokens: null,
     },
     ai: {
       parse: null,

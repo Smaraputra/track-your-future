@@ -12,7 +12,9 @@ export type AuditAction =
   | 'oauth_linked'
   | 'oauth_rejected'
   | 'account_deleted'
-  | 'data_exported';
+  | 'data_exported'
+  | 'api_token_created'
+  | 'api_token_revoked';
 
 export const auditLog = pgTable(
   'audit_log',

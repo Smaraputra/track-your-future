@@ -6,6 +6,7 @@ import { ProfileTab } from './profile-tab';
 import { SecurityTab } from './security-tab';
 import { SubscriptionTab } from './subscription-tab';
 import { DataTab } from './data-tab';
+import { ApiTokensTab, type ApiTokenSummary } from './api-tokens-tab';
 
 interface UserInfo {
   id: string;
@@ -27,6 +28,7 @@ interface SettingsContentProps {
   user: UserInfo;
   linkedProviders: string[];
   subscription: SubscriptionInfo;
+  apiTokens: ApiTokenSummary[];
   billingDisabled?: boolean;
 }
 
@@ -34,6 +36,7 @@ export function SettingsContent({
   user,
   linkedProviders,
   subscription,
+  apiTokens,
   billingDisabled = false,
 }: SettingsContentProps) {
   return (
@@ -47,6 +50,9 @@ export function SettingsContent({
         </TabsTrigger>
         <TabsTrigger value="security" className="font-body text-xs">
           Security
+        </TabsTrigger>
+        <TabsTrigger value="developers" className="font-body text-xs">
+          Developers
         </TabsTrigger>
         <TabsTrigger value="subscription" className="font-body text-xs">
           Subscription
@@ -67,6 +73,9 @@ export function SettingsContent({
           hasPassword={user.hasPassword}
           linkedProviders={linkedProviders}
         />
+      </TabsContent>
+      <TabsContent value="developers" className="mt-4">
+        <ApiTokensTab initialTokens={apiTokens} />
       </TabsContent>
       <TabsContent value="subscription" className="mt-4">
         <SubscriptionTab subscription={subscription} billingDisabled={billingDisabled} />

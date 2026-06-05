@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { and, count, eq, gte, inArray, sql, sum } from 'drizzle-orm';
+import { and, count, eq, gte, inArray, isNull, sql, sum } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { subscriptions } from '@/db/schema/billing';
@@ -10,6 +10,7 @@ import {
   roleCategories,
 } from '@/db/schema/core';
 import { aiUsage } from '@/db/schema/ai';
+import { apiTokens } from '@/db/schema/api-tokens';
 import { isBillingDisabled, PLAN_LIMITS, type Tier, type ResourceKey, type AiFeatureKey } from './plans';
 
 export interface UserSubscription {
@@ -115,6 +116,14 @@ async function sumStorageBytes(userId: string): Promise<number> {
   return Number(result.total ?? 0);
 }
 
+async function countApiTokens(userId: string): Promise<number> {
+  const [result] = await db
+    .select({ count: count() })
+    .from(apiTokens)
+    .where(and(eq(apiTokens.userId, userId), isNull(apiTokens.revokedAt)));
+  return result.count;
+}
+
 const resourceCounters: Record<
   ResourceKey,
   (userId: string) => Promise<number>
@@ -124,6 +133,7 @@ const resourceCounters: Record<
   roleCategories: countRoleCategories,
   formFieldTemplates: countFormFieldTemplates,
   storageBytes: sumStorageBytes,
+  apiTokens: countApiTokens,
 };
 
 export async function checkResourceLimit(

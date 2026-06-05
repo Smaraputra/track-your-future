@@ -1,8 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 
 import { auth } from '@/auth';
 import { db } from '@/db';
 import { users, accounts } from '@/db/schema/auth';
+import { apiTokens } from '@/db/schema/api-tokens';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { isBillingDisabled } from '@/lib/billing/plans';
 import { RetroWindow } from '@/components/retro-window';
@@ -16,7 +17,7 @@ export default async function SettingsPage() {
 
   const userId = session.user.id;
 
-  const [user, linkedAccounts, subscription] = await Promise.all([
+  const [user, linkedAccounts, subscription, tokens] = await Promise.all([
     db.query.users.findFirst({
       where: eq(users.id, userId),
       columns: {
@@ -32,6 +33,19 @@ export default async function SettingsPage() {
       columns: { provider: true },
     }),
     getUserSubscription(userId),
+    db
+      .select({
+        id: apiTokens.id,
+        name: apiTokens.name,
+        tokenPrefix: apiTokens.tokenPrefix,
+        scope: apiTokens.scope,
+        lastUsedAt: apiTokens.lastUsedAt,
+        expiresAt: apiTokens.expiresAt,
+        createdAt: apiTokens.createdAt,
+      })
+      .from(apiTokens)
+      .where(and(eq(apiTokens.userId, userId), isNull(apiTokens.revokedAt)))
+      .orderBy(desc(apiTokens.createdAt)),
   ]);
 
   if (!user) return null;
@@ -54,6 +68,15 @@ export default async function SettingsPage() {
           cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
           currentPeriodEnd: subscription.currentPeriodEnd?.toISOString() ?? null,
         }}
+        apiTokens={tokens.map((t) => ({
+          id: t.id,
+          name: t.name,
+          tokenPrefix: t.tokenPrefix,
+          scope: t.scope,
+          lastUsedAt: t.lastUsedAt?.toISOString() ?? null,
+          expiresAt: t.expiresAt?.toISOString() ?? null,
+          createdAt: t.createdAt.toISOString(),
+        }))}
         billingDisabled={isBillingDisabled()}
       />
     </RetroWindow>

@@ -57,3 +57,16 @@ export const PASSWORD_RESET_CONFIRM_LIMIT: RateLimitConfig = {
   windowSeconds: 60 * 60,
   failClosed: true,
 };
+
+/** Public API (/api/v1): 120 requests per minute, per token owner */
+export const API_TOKEN_LIMIT: RateLimitConfig = {
+  maxRequests: 120,
+  windowSeconds: 60,
+};
+
+/** API token management (create/revoke): 20 per hour, fail closed */
+export const API_TOKEN_MANAGEMENT_LIMIT: RateLimitConfig = {
+  maxRequests: 20,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};
