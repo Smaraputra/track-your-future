@@ -74,6 +74,13 @@ export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFo
             Forgot password?
           </Link>
         </p>
+
+        <p className="font-body text-muted-foreground text-center text-xs">
+          Need an account?{' '}
+          <Link href="/register" className="text-primary underline">
+            Register
+          </Link>
+        </p>
       </form>
 
       <OAuthButtons />

@@ -4,9 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AppearanceTab } from './appearance-tab';
 import { ProfileTab } from './profile-tab';
 import { SecurityTab } from './security-tab';
+import { NotificationsTab } from './notifications-tab';
 import { SubscriptionTab } from './subscription-tab';
 import { DataTab } from './data-tab';
 import { ApiTokensTab, type ApiTokenSummary } from './api-tokens-tab';
+
+interface EmailPreferences {
+  product: boolean;
+  reminders: boolean;
+}
 
 interface UserInfo {
   id: string;
@@ -29,6 +35,7 @@ interface SettingsContentProps {
   linkedProviders: string[];
   subscription: SubscriptionInfo;
   apiTokens: ApiTokenSummary[];
+  emailPreferences: EmailPreferences;
   billingDisabled?: boolean;
 }
 
@@ -37,6 +44,7 @@ export function SettingsContent({
   linkedProviders,
   subscription,
   apiTokens,
+  emailPreferences,
   billingDisabled = false,
 }: SettingsContentProps) {
   return (
@@ -50,6 +58,9 @@ export function SettingsContent({
         </TabsTrigger>
         <TabsTrigger value="security" className="font-body text-xs">
           Security
+        </TabsTrigger>
+        <TabsTrigger value="notifications" className="font-body text-xs">
+          Notifications
         </TabsTrigger>
         <TabsTrigger value="developers" className="font-body text-xs">
           Developers
@@ -73,6 +84,9 @@ export function SettingsContent({
           hasPassword={user.hasPassword}
           linkedProviders={linkedProviders}
         />
+      </TabsContent>
+      <TabsContent value="notifications" className="mt-4">
+        <NotificationsTab preferences={emailPreferences} />
       </TabsContent>
       <TabsContent value="developers" className="mt-4">
         <ApiTokensTab initialTokens={apiTokens} />
