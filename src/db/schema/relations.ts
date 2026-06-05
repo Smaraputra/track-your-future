@@ -23,6 +23,7 @@ import {
   aiUsage,
 } from './ai';
 import { notifications } from './notifications';
+import { apiTokens } from './api-tokens';
 
 // --- Auth relations ---
 
@@ -30,6 +31,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   passwordResetTokens: many(passwordResetTokens),
+  apiTokens: many(apiTokens),
   roleCategories: many(roleCategories),
   documents: many(documents),
   applications: many(applications),
@@ -282,5 +284,14 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   application: one(applications, {
     fields: [notifications.applicationId],
     references: [applications.id],
+  }),
+}));
+
+// --- API token relations ---
+
+export const apiTokensRelations = relations(apiTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [apiTokens.userId],
+    references: [users.id],
   }),
 }));

@@ -62,6 +62,7 @@ const defaultProps = {
     cancelAtPeriodEnd: false,
     currentPeriodEnd: null,
   },
+  apiTokens: [],
 };
 
 describe('SettingsContent tabs', () => {
@@ -71,6 +72,7 @@ describe('SettingsContent tabs', () => {
     expect(screen.getByText('Appearance')).toBeDefined();
     expect(screen.getByText('Profile')).toBeDefined();
     expect(screen.getByText('Security')).toBeDefined();
+    expect(screen.getByText('Developers')).toBeDefined();
     expect(screen.getByText('Subscription')).toBeDefined();
     expect(screen.getByText('Data')).toBeDefined();
   });
@@ -86,7 +88,7 @@ describe('SettingsContent tabs', () => {
     render(<SettingsContent {...defaultProps} />);
 
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.length).toBe(5);
+    expect(tabs.length).toBe(6);
   });
 });
 
