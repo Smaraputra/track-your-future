@@ -1,3 +1,5 @@
+import { randomBytes } from 'crypto';
+
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { sql } from 'drizzle-orm';
 import postgres from 'postgres';
@@ -757,8 +759,14 @@ try {
   // -------------------------------------------------------------------------
   // 1. Users
   // -------------------------------------------------------------------------
-  const u1Hash = await bcrypt.hash('demo-password-2026!', 10);
-  const u2Hash = await bcrypt.hash('pro-password-2026!', 10);
+  // Demo account passwords come from env; otherwise a random one is generated
+  // and printed below, so no working credential is hardcoded in the repo.
+  const demoPassword =
+    process.env.SEED_DEMO_PASSWORD || randomBytes(12).toString('base64url');
+  const proPassword =
+    process.env.SEED_PRO_PASSWORD || randomBytes(12).toString('base64url');
+  const u1Hash = await bcrypt.hash(demoPassword, 10);
+  const u2Hash = await bcrypt.hash(proPassword, 10);
 
   await db.execute(sql`
     INSERT INTO users (id, name, email, hashed_password, email_verified, onboarding_completed)
@@ -1067,8 +1075,8 @@ try {
   console.log('  Payments created');
 
   console.log('Seed complete!');
-  console.log('  Demo user: demo@trackedyourfuture.com / demo-password-2026!');
-  console.log('  Pro user:  pro@trackedyourfuture.com / pro-password-2026!');
+  console.log(`  Demo user: demo@trackedyourfuture.com / ${demoPassword}`);
+  console.log(`  Pro user:  pro@trackedyourfuture.com / ${proPassword}`);
 } catch (err) {
   console.error('Seed failed:', err);
   process.exit(1);
