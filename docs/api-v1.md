@@ -12,7 +12,7 @@ The API is versioned. The current version is `v1`, served under the `/api/v1` pa
 |---|
 | `https://trackedyourfuture.com/api/v1` |
 
-All paths in this document are relative to that base URL.
+All paths in this document are relative to that base URL. If you self-host, replace the host with your own domain.
 
 ## Authentication
 
