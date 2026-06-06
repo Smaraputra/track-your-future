@@ -5,6 +5,7 @@ import {
   accounts,
   sessions,
   passwordResetTokens,
+  emailVerificationTokens,
 } from './auth';
 import { roleCategories, documents, formFieldTemplates } from './core';
 import {
@@ -31,6 +32,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   passwordResetTokens: many(passwordResetTokens),
+  emailVerificationTokens: many(emailVerificationTokens),
   apiTokens: many(apiTokens),
   roleCategories: many(roleCategories),
   documents: many(documents),
@@ -66,6 +68,16 @@ export const passwordResetTokensRelations = relations(
   ({ one }) => ({
     user: one(users, {
       fields: [passwordResetTokens.userId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const emailVerificationTokensRelations = relations(
+  emailVerificationTokens,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [emailVerificationTokens.userId],
       references: [users.id],
     }),
   }),

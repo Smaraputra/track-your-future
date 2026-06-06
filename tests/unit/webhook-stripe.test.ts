@@ -134,7 +134,7 @@ describe('Auth config allows webhook access', () => {
 
 describe('Email module exports sendTrialEndingEmail', () => {
   const source = readFileSync(
-    resolve(ROOT, 'src/lib/email.ts'),
+    resolve(ROOT, 'src/lib/email/index.ts'),
     'utf-8',
   );
 

@@ -10,6 +10,7 @@ import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { AuthMessage } from '@/components/auth/auth-message';
+import { TurnstileWidget } from '@/components/auth/turnstile-widget';
 
 const formSchema = z
   .object({
@@ -28,11 +29,24 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface ResetPasswordFormProps {
   token: string;
+  turnstileSiteKey?: string;
+  nonce?: string;
 }
 
-export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export function ResetPasswordForm({
+  token,
+  turnstileSiteKey,
+  nonce,
+}: ResetPasswordFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  function resetTurnstile() {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  }
 
   const {
     register,
@@ -42,18 +56,24 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   async function onSubmit(data: FormValues) {
     setError(null);
+    if (turnstileSiteKey && !turnstileToken) {
+      setError('Please complete the verification challenge.');
+      return;
+    }
     const response = await fetch('/api/auth/password-reset/confirm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, newPassword: data.newPassword }),
+      body: JSON.stringify({ token, newPassword: data.newPassword, turnstileToken }),
     });
 
     if (response.status === 429) {
       setError('Too many attempts. Please try again later.');
+      resetTurnstile();
       return;
     }
     if (!response.ok) {
       setError('This reset link is no longer valid. Request a new one.');
+      resetTurnstile();
       return;
     }
     router.replace('/login?reset=success');
@@ -78,6 +98,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           {...register('confirmPassword')}
         />
       </RetroFormField>
+      <TurnstileWidget
+        key={turnstileKey}
+        siteKey={turnstileSiteKey}
+        nonce={nonce}
+        onToken={setTurnstileToken}
+      />
       <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? 'Updating...' : 'Set new password'}
       </RetroButton>

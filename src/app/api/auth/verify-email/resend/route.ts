@@ -2,19 +2,19 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { users, passwordResetTokens } from '@/db/schema/auth';
+import { emailVerificationTokens, users } from '@/db/schema/auth';
+import {
+  generateVerificationToken,
+  hashVerificationToken,
+  verificationTokenExpiry,
+} from '@/lib/auth/email-verification';
 import { getClientIp } from '@/lib/auth/get-ip';
 import { hashEmailForKey } from '@/lib/auth/login-lockout';
-import {
-  generateResetToken,
-  hashResetToken,
-  resetTokenExpiry,
-} from '@/lib/auth/password-reset';
-import { passwordResetRequestSchema } from '@/lib/auth/schemas';
-import { sendPasswordResetEmail } from '@/lib/email';
+import { resendVerificationSchema } from '@/lib/auth/schemas';
 import { logAuditEvent } from '@/lib/audit/log';
+import { sendVerificationEmail } from '@/lib/email';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { PASSWORD_RESET_REQUEST_LIMIT } from '@/lib/rate-limit-configs';
+import { EMAIL_VERIFY_RESEND_LIMIT } from '@/lib/rate-limit-configs';
 import { verifyTurnstile } from '@/lib/turnstile';
 
 const GENERIC_OK = { success: true } as const;
@@ -22,12 +22,12 @@ const GENERIC_OK = { success: true } as const;
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const ipRl = await checkRateLimit(
-    `pw-reset-request:ip:${ip}`,
-    PASSWORD_RESET_REQUEST_LIMIT,
+    `email-verify-resend:ip:${ip}`,
+    EMAIL_VERIFY_RESEND_LIMIT,
   );
   if (!ipRl.allowed) {
     return NextResponse.json(
-      { error: 'Too many reset requests. Try again later.' },
+      { error: 'Too many requests. Try again later.' },
       { status: 429, headers: { 'Retry-After': String(ipRl.retryAfterSeconds) } },
     );
   }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const parsed = passwordResetRequestSchema.safeParse(body);
+  const parsed = resendVerificationSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(GENERIC_OK);
   }
@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
   const emailHash = hashEmailForKey(email);
 
   const emailRl = await checkRateLimit(
-    `pw-reset-request:email:${emailHash}`,
-    PASSWORD_RESET_REQUEST_LIMIT,
+    `email-verify-resend:email:${emailHash}`,
+    EMAIL_VERIFY_RESEND_LIMIT,
   );
   if (!emailRl.allowed) {
     return NextResponse.json(GENERIC_OK);
@@ -61,35 +61,33 @@ export async function POST(request: NextRequest) {
   try {
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
-      columns: { id: true, email: true, hashedPassword: true },
+      columns: { id: true, email: true, emailVerified: true, hashedPassword: true },
     });
 
-    if (user?.hashedPassword) {
-      const rawToken = generateResetToken();
-      const tokenHash = hashResetToken(rawToken);
-      const expiresAt = resetTokenExpiry();
-
-      await db.insert(passwordResetTokens).values({
+    // Only reissue for unverified credentials accounts.
+    if (user && !user.emailVerified && user.hashedPassword) {
+      const rawToken = generateVerificationToken();
+      await db.insert(emailVerificationTokens).values({
         userId: user.id,
-        token: tokenHash,
-        expiresAt,
+        token: hashVerificationToken(rawToken),
+        expiresAt: verificationTokenExpiry(),
       });
 
       try {
-        await sendPasswordResetEmail(user.email, rawToken);
+        await sendVerificationEmail(user.email, rawToken);
       } catch (err) {
-        console.error('Failed to send password reset email', err);
+        console.error('Failed to resend verification email', err);
       }
-    }
 
-    await logAuditEvent({
-      action: 'password_reset_requested',
-      userId: user?.id ?? null,
-      request,
-      metadata: { emailHash, accountFound: !!user?.hashedPassword },
-    });
+      await logAuditEvent({
+        action: 'email_verification_sent',
+        userId: user.id,
+        request,
+        metadata: { emailHash },
+      });
+    }
   } catch (err) {
-    console.error('Password reset request failed', err);
+    console.error('Resend verification failed', err);
   }
 
   return NextResponse.json(GENERIC_OK);

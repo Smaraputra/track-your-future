@@ -2,12 +2,28 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
+
+/**
+ * Per-user opt-in/out for non-essential email categories. Transactional and
+ * security email (verification, password reset, login lockout) ignore this and
+ * are always sent.
+ */
+export type EmailPreferences = {
+  product: boolean;
+  reminders: boolean;
+};
+
+export const DEFAULT_EMAIL_PREFERENCES: EmailPreferences = {
+  product: true,
+  reminders: true,
+};
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -18,6 +34,10 @@ export const users = pgTable('users', {
   hashedPassword: text('hashed_password'),
   passwordChangedAt: timestamp('password_changed_at', { mode: 'date' }),
   onboardingCompleted: boolean('onboarding_completed').default(false).notNull(),
+  emailPreferences: jsonb('email_preferences')
+    .$type<EmailPreferences>()
+    .default(DEFAULT_EMAIL_PREFERENCES)
+    .notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
@@ -76,4 +96,19 @@ export const passwordResetTokens = pgTable(
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   },
   (t) => [index('password_reset_tokens_user_id_idx').on(t.userId)],
+);
+
+export const emailVerificationTokens = pgTable(
+  'email_verification_tokens',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    token: text('token').notNull(),
+    expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+    usedAt: timestamp('used_at', { mode: 'date' }),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  },
+  (t) => [index('email_verification_tokens_user_id_idx').on(t.userId)],
 );

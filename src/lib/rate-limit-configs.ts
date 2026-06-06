@@ -44,6 +44,27 @@ export const AI_BURST_LIMIT: RateLimitConfig = {
   windowSeconds: 60,
 };
 
+/** Registration: 5 per hour (per IP and per email), fail closed */
+export const REGISTER_LIMIT: RateLimitConfig = {
+  maxRequests: 5,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};
+
+/** Verification email resend: 5 per hour (per IP and per email), fail closed */
+export const EMAIL_VERIFY_RESEND_LIMIT: RateLimitConfig = {
+  maxRequests: 5,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};
+
+/** Verification token confirm: 10 per hour per IP, fail closed */
+export const EMAIL_VERIFY_CONFIRM_LIMIT: RateLimitConfig = {
+  maxRequests: 10,
+  windowSeconds: 60 * 60,
+  failClosed: true,
+};
+
 /** Password reset request: 5 per hour (per IP and per email), fail closed */
 export const PASSWORD_RESET_REQUEST_LIMIT: RateLimitConfig = {
   maxRequests: 5,

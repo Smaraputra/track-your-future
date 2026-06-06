@@ -1,9 +1,11 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 import { auth } from '@/auth';
 import { RetroWindow } from '@/components/retro-window';
 import { MatrixRain } from '@/components/matrix-rain';
+import { getTurnstileSiteKey } from '@/lib/turnstile';
 import { ResetPasswordForm } from './reset-password-form';
 
 export default async function ResetPasswordPage({
@@ -16,6 +18,8 @@ export default async function ResetPasswordPage({
 
   const params = await searchParams;
   const token = typeof params.token === 'string' ? params.token : undefined;
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+  const turnstileSiteKey = getTurnstileSiteKey();
 
   return (
     <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">
@@ -32,7 +36,11 @@ export default async function ResetPasswordPage({
             </p>
           </div>
           {token ? (
-            <ResetPasswordForm token={token} />
+            <ResetPasswordForm
+              token={token}
+              turnstileSiteKey={turnstileSiteKey}
+              nonce={nonce}
+            />
           ) : (
             <p className="font-body text-destructive text-sm">
               This reset link is missing or invalid. Request a new one from the{' '}

@@ -12,10 +12,26 @@ import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { AuthMessage } from '@/components/auth/auth-message';
+import { TurnstileWidget } from '@/components/auth/turnstile-widget';
 
-export function ForgotPasswordForm() {
+interface ForgotPasswordFormProps {
+  turnstileSiteKey?: string;
+  nonce?: string;
+}
+
+export function ForgotPasswordForm({
+  turnstileSiteKey,
+  nonce,
+}: ForgotPasswordFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  function resetTurnstile() {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  }
 
   const {
     register,
@@ -27,19 +43,25 @@ export function ForgotPasswordForm() {
 
   async function onSubmit(data: PasswordResetRequestInput) {
     setError(null);
+    if (turnstileSiteKey && !turnstileToken) {
+      setError('Please complete the verification challenge.');
+      return;
+    }
     try {
       const response = await fetch('/api/auth/password-reset/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, turnstileToken }),
       });
       if (response.status === 429) {
         setError('Too many requests. Please try again in a little while.');
+        resetTurnstile();
         return;
       }
       setSubmitted(true);
     } catch {
       setError('Something went wrong. Please try again.');
+      resetTurnstile();
     }
   }
 
@@ -63,6 +85,12 @@ export function ForgotPasswordForm() {
           {...register('email')}
         />
       </RetroFormField>
+      <TurnstileWidget
+        key={turnstileKey}
+        siteKey={turnstileSiteKey}
+        nonce={nonce}
+        onToken={setTurnstileToken}
+      />
       <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? 'Sending...' : 'Send reset link'}
       </RetroButton>

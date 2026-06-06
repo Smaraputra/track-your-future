@@ -1,14 +1,19 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 import { auth } from '@/auth';
 import { RetroWindow } from '@/components/retro-window';
 import { MatrixRain } from '@/components/matrix-rain';
+import { getTurnstileSiteKey } from '@/lib/turnstile';
 import { ForgotPasswordForm } from './forgot-password-form';
 
 export default async function ForgotPasswordPage() {
   const session = await auth();
   if (session?.user) redirect('/dashboard');
+
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+  const turnstileSiteKey = getTurnstileSiteKey();
 
   return (
     <div className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center overflow-hidden p-4">
@@ -24,7 +29,10 @@ export default async function ForgotPasswordPage() {
               Enter your account email to receive a reset link.
             </p>
           </div>
-          <ForgotPasswordForm />
+          <ForgotPasswordForm
+            turnstileSiteKey={turnstileSiteKey}
+            nonce={nonce}
+          />
           <p className="font-body text-muted-foreground text-xs">
             Remembered it?{' '}
             <Link href="/login" className="text-primary underline">
