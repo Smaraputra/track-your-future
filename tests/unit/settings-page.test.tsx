@@ -63,6 +63,7 @@ const defaultProps = {
     currentPeriodEnd: null,
   },
   apiTokens: [],
+  emailPreferences: { product: true, reminders: true },
 };
 
 describe('SettingsContent tabs', () => {
@@ -72,6 +73,7 @@ describe('SettingsContent tabs', () => {
     expect(screen.getByText('Appearance')).toBeDefined();
     expect(screen.getByText('Profile')).toBeDefined();
     expect(screen.getByText('Security')).toBeDefined();
+    expect(screen.getByText('Notifications')).toBeDefined();
     expect(screen.getByText('Developers')).toBeDefined();
     expect(screen.getByText('Subscription')).toBeDefined();
     expect(screen.getByText('Data')).toBeDefined();
@@ -88,7 +90,7 @@ describe('SettingsContent tabs', () => {
     render(<SettingsContent {...defaultProps} />);
 
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.length).toBe(6);
+    expect(tabs.length).toBe(7);
   });
 });
 

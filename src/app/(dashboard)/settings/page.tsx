@@ -2,7 +2,7 @@ import { and, desc, eq, isNull } from 'drizzle-orm';
 
 import { auth } from '@/auth';
 import { db } from '@/db';
-import { users, accounts } from '@/db/schema/auth';
+import { users, accounts, DEFAULT_EMAIL_PREFERENCES } from '@/db/schema/auth';
 import { apiTokens } from '@/db/schema/api-tokens';
 import { getUserSubscription } from '@/lib/billing/feature-gate';
 import { isBillingDisabled } from '@/lib/billing/plans';
@@ -25,6 +25,7 @@ export default async function SettingsPage() {
         name: true,
         email: true,
         hashedPassword: true,
+        emailPreferences: true,
         createdAt: true,
       },
     }),
@@ -77,6 +78,7 @@ export default async function SettingsPage() {
           expiresAt: t.expiresAt?.toISOString() ?? null,
           createdAt: t.createdAt.toISOString(),
         }))}
+        emailPreferences={user.emailPreferences ?? DEFAULT_EMAIL_PREFERENCES}
         billingDisabled={isBillingDisabled()}
       />
     </RetroWindow>
