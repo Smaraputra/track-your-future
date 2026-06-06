@@ -13,7 +13,7 @@ Track Your Future is a multi-tenant SaaS job-application tracking platform, a "j
 - Dashboard, analytics, and in-app notifications.
 - Billing with Stripe or Polar, including checkout, trials, and a customer portal. Billing can be disabled to grant all users Pro access.
 - A personal API token system exposing a versioned REST API under `/api/v1`. See [API documentation](docs/api-v1.md).
-- Security features: per-request CSP nonces, an audit log, rate limiting, and application-level encryption for sensitive columns.
+- Security features: Cloudflare Turnstile on all auth forms, per-request CSP nonces, an audit log, rate limiting, and application-level encryption for sensitive columns.
 
 ## Tech stack
 
@@ -36,7 +36,7 @@ Track Your Future is a multi-tenant SaaS job-application tracking platform, a "j
 
 | |
 |---|
-| `src/`<br>`  app/                 Next.js App Router pages and API routes`<br>`    (public)/          Landing, auth pages, legal, pricing`<br>`    (dashboard)/       Authenticated app (sidebar + header layout)`<br>`    api/               API routes (auth, checkout, webhooks, documents, ai, settings, v1)`<br>`  components/           React components (retro UI system)`<br>`  db/                   Drizzle ORM (connection, schema, migrations)`<br>`  lib/                  Server utilities (auth, billing, ai, minio, email, crypto)`<br>`  hooks/                Custom React hooks`<br>`  types/                TypeScript type definitions`<br>`drizzle/                Generated SQL migrations (committed)`<br>`docs/                   Documentation`<br>`plans/                  Phase implementation plans`<br>`sessions/               Session handover documents`<br>`tests/                  unit, integration, and e2e tests` |
+| `src/`<br>`  app/                 Next.js App Router pages and API routes`<br>`    (public)/          Landing, auth pages, legal, pricing`<br>`    (dashboard)/       Authenticated app (sidebar + header layout)`<br>`    api/               API routes (auth, checkout, webhooks, documents, ai, settings, v1)`<br>`  components/           React components (retro UI system)`<br>`  db/                   Drizzle ORM (connection, schema, migrations)`<br>`  lib/                  Server utilities (auth, billing, ai, minio, email, crypto)`<br>`  hooks/                Custom React hooks`<br>`  types/                TypeScript type definitions`<br>`drizzle/                Generated SQL migrations (committed)`<br>`docs/                   Documentation`<br>`tests/                  unit, integration, and e2e tests` |
 
 Multi-tenancy is enforced by scoping every database query to `session.user.id` (or, for the API, the token owner's user id).
 
@@ -194,7 +194,7 @@ AI features additionally enforce per-feature monthly usage limits by plan.
 
 ## Deployment
 
-The application is deployed to a Contabo VPS running Ubuntu, behind a Caddy reverse proxy that terminates TLS. Services run under Docker Compose: the Next.js application (standalone build), PostgreSQL, MinIO, and Redis.
+The application is deployed to a self-hosted Linux VPS (Ubuntu), behind a Caddy reverse proxy that terminates TLS. Services run under Docker Compose: the Next.js application (standalone build), PostgreSQL, MinIO, and Redis.
 
 Continuous deployment is handled by a GitHub Actions workflow that runs on pushes to `main`. The workflow connects to the server over SSH, pulls the latest code, rebuilds and restarts the containers, and prunes unused images. On startup the application container waits for PostgreSQL, applies pending migrations, and starts the server.
 
@@ -205,3 +205,7 @@ Continuous deployment is handled by a GitHub Actions workflow that runs on pushe
 - Every database query is scoped to the authenticated user.
 - File uploads always use presigned URLs; binary data is never proxied through the application server.
 - AI calls are tracked in the `ai_usage` table and enforce plan limits.
+
+## License
+
+This project is source-available, not open-source. The code is published for viewing, reference, and evaluation only; all rights are reserved and reuse, redistribution, or hosting is not permitted without written permission. See [LICENSE](LICENSE) for the full terms. External contributions are not currently accepted.
