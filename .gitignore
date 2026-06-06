@@ -49,6 +49,10 @@ yarn-error.log*
 # AI assistant instructions
 CLAUDE.md
 
+# internal dev docs (not for public repo)
+sessions/
+plans/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
