@@ -8,14 +8,23 @@ import { RetroButton } from '@/components/retro-button';
 import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { AuthMessage } from '@/components/auth/auth-message';
+import { TurnstileWidget } from '@/components/auth/turnstile-widget';
 
 interface VerifyEmailClientProps {
   token?: string;
   email?: string;
   status?: string;
+  turnstileSiteKey?: string;
+  nonce?: string;
 }
 
-export function VerifyEmailClient({ token, email, status }: VerifyEmailClientProps) {
+export function VerifyEmailClient({
+  token,
+  email,
+  status,
+  turnstileSiteKey,
+  nonce,
+}: VerifyEmailClientProps) {
   const router = useRouter();
   const [verifying, setVerifying] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -26,15 +35,27 @@ export function VerifyEmailClient({ token, email, status }: VerifyEmailClientPro
   const [resent, setResent] = useState(false);
   const [resendError, setResendError] = useState<string | null>(null);
 
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  function resetTurnstile() {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  }
+
   async function onVerify() {
     if (!token) return;
+    if (turnstileSiteKey && !turnstileToken) {
+      setError('Please complete the verification challenge.');
+      return;
+    }
     setVerifying(true);
     setError(null);
     try {
       const response = await fetch('/api/auth/verify-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, turnstileToken }),
       });
       if (response.ok) {
         router.replace('/login?verified=1');
@@ -46,9 +67,11 @@ export function VerifyEmailClient({ token, email, status }: VerifyEmailClientPro
           ? 'Too many attempts. Please try again later.'
           : 'This verification link is invalid or has expired.',
       );
+      resetTurnstile();
     } catch {
       setFailed(true);
       setError('Something went wrong. Please try again.');
+      resetTurnstile();
     } finally {
       setVerifying(false);
     }
@@ -56,21 +79,27 @@ export function VerifyEmailClient({ token, email, status }: VerifyEmailClientPro
 
   async function onResend(e: React.FormEvent) {
     e.preventDefault();
+    if (turnstileSiteKey && !turnstileToken) {
+      setResendError('Please complete the verification challenge.');
+      return;
+    }
     setResending(true);
     setResendError(null);
     try {
       const response = await fetch('/api/auth/verify-email/resend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resendEmail }),
+        body: JSON.stringify({ email: resendEmail, turnstileToken }),
       });
       if (response.status === 429) {
         setResendError('Too many requests. Please try again in a little while.');
+        resetTurnstile();
         return;
       }
       setResent(true);
     } catch {
       setResendError('Something went wrong. Please try again.');
+      resetTurnstile();
     } finally {
       setResending(false);
     }
@@ -92,6 +121,12 @@ export function VerifyEmailClient({ token, email, status }: VerifyEmailClientPro
       {showTokenAction ? (
         <div className="space-y-4">
           {error && <AuthMessage variant="error" message={error} />}
+          <TurnstileWidget
+            key={turnstileKey}
+            siteKey={turnstileSiteKey}
+            nonce={nonce}
+            onToken={setTurnstileToken}
+          />
           <RetroButton
             type="button"
             onClick={onVerify}
@@ -131,6 +166,12 @@ export function VerifyEmailClient({ token, email, status }: VerifyEmailClientPro
                 />
               </RetroFormField>
               {resendError && <AuthMessage variant="error" message={resendError} />}
+              <TurnstileWidget
+                key={turnstileKey}
+                siteKey={turnstileSiteKey}
+                nonce={nonce}
+                onToken={setTurnstileToken}
+              />
               <RetroButton type="submit" className="w-full" disabled={resending}>
                 {resending ? 'Sending...' : 'Resend verification link'}
               </RetroButton>

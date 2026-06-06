@@ -15,6 +15,7 @@ import { sendPasswordResetEmail } from '@/lib/email';
 import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_RESET_REQUEST_LIMIT } from '@/lib/rate-limit-configs';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 const GENERIC_OK = { success: true } as const;
 
@@ -32,6 +33,15 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null);
+
+  const turnstile = await verifyTurnstile(body?.turnstileToken, ip);
+  if (!turnstile.success) {
+    return NextResponse.json(
+      { error: 'Verification failed. Please try again.' },
+      { status: 400 },
+    );
+  }
+
   const parsed = passwordResetRequestSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(GENERIC_OK);
