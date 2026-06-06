@@ -14,6 +14,7 @@ import { invalidateUserSessions } from '@/lib/auth/session-invalidation';
 import { logAuditEvent } from '@/lib/audit/log';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { PASSWORD_RESET_CONFIRM_LIMIT } from '@/lib/rate-limit-configs';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
@@ -29,6 +30,15 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null);
+
+  const turnstile = await verifyTurnstile(body?.turnstileToken, ip);
+  if (!turnstile.success) {
+    return NextResponse.json(
+      { error: 'Verification failed. Please try again.' },
+      { status: 400 },
+    );
+  }
+
   const parsed = passwordResetConfirmSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(

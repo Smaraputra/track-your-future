@@ -13,6 +13,7 @@ import { logAuditEvent } from '@/lib/audit/log';
 import { sendWelcomeEmail } from '@/lib/email';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { EMAIL_VERIFY_CONFIRM_LIMIT } from '@/lib/rate-limit-configs';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 const INVALID = { error: 'Invalid or expired verification link.' } as const;
 
@@ -27,6 +28,15 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null);
+
+  const turnstile = await verifyTurnstile(body?.turnstileToken, ip);
+  if (!turnstile.success) {
+    return NextResponse.json(
+      { error: 'Verification failed. Please try again.' },
+      { status: 400 },
+    );
+  }
+
   const parsed = verifyEmailSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(INVALID, { status: 400 });

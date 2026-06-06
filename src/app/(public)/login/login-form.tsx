@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,14 +11,26 @@ import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
 import { AuthMessage } from '@/components/auth/auth-message';
+import { TurnstileWidget } from '@/components/auth/turnstile-widget';
 
 interface LoginFormProps {
   initialError?: string;
   initialSuccess?: string;
   callbackUrl?: string;
+  turnstileSiteKey?: string;
+  nonce?: string;
 }
 
-export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFormProps) {
+export function LoginForm({
+  initialError,
+  initialSuccess,
+  callbackUrl,
+  turnstileSiteKey,
+  nonce,
+}: LoginFormProps) {
+  const [formError, setFormError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -27,9 +40,15 @@ export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFo
   });
 
   async function onSubmit(data: LoginInput) {
+    if (turnstileSiteKey && !turnstileToken) {
+      setFormError('Please complete the verification challenge.');
+      return;
+    }
+    setFormError(null);
     await signIn('credentials', {
       email: data.email,
       password: data.password,
+      turnstileToken: turnstileToken ?? '',
       redirectTo: callbackUrl || '/dashboard',
     });
   }
@@ -45,6 +64,7 @@ export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFo
 
       {initialError && <AuthMessage variant="error" message={initialError} />}
       {initialSuccess && <AuthMessage variant="success" message={initialSuccess} />}
+      {formError && <AuthMessage variant="error" message={formError} />}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <RetroFormField label="Email" error={errors.email?.message}>
@@ -64,6 +84,12 @@ export function LoginForm({ initialError, initialSuccess, callbackUrl }: LoginFo
             {...register('password')}
           />
         </RetroFormField>
+
+        <TurnstileWidget
+          siteKey={turnstileSiteKey}
+          nonce={nonce}
+          onToken={setTurnstileToken}
+        />
 
         <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? 'Authenticating...' : 'Login'}

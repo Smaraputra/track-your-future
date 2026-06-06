@@ -97,6 +97,7 @@ describe('LoginForm', () => {
       expect(mockSignIn).toHaveBeenCalledWith('credentials', {
         email: 'test@example.com',
         password: 'password123',
+        turnstileToken: '',
         redirectTo: '/dashboard',
       });
     });
@@ -116,6 +117,7 @@ describe('LoginForm', () => {
       expect(mockSignIn).toHaveBeenCalledWith('credentials', {
         email: 'test@example.com',
         password: 'password123',
+        turnstileToken: '',
         redirectTo: '/settings',
       });
     });

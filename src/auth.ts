@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { CredentialsSignin } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 import GitHub from 'next-auth/providers/github';
@@ -26,7 +26,12 @@ import {
 import { isSessionStillValid } from '@/lib/auth/session-invalidation';
 import { logAuditEvent } from '@/lib/audit/log';
 import { sendLoginLockoutEmail } from '@/lib/email';
+import { verifyTurnstile } from '@/lib/turnstile';
 import type {} from '@/lib/auth/types';
+
+class TurnstileError extends CredentialsSignin {
+  code = 'turnstile_failed';
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -47,8 +52,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        turnstileToken: { label: 'Turnstile token', type: 'text' },
       },
       async authorize(credentials) {
+        const turnstileToken =
+          typeof credentials?.turnstileToken === 'string'
+            ? credentials.turnstileToken
+            : undefined;
+        const turnstile = await verifyTurnstile(turnstileToken);
+        if (!turnstile.success) {
+          throw new TurnstileError();
+        }
+
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 

@@ -12,6 +12,7 @@ import { RetroInput } from '@/components/retro-input';
 import { RetroFormField } from '@/components/retro-form-field';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
+import { TurnstileWidget } from '@/components/auth/turnstile-widget';
 
 const formSchema = z
   .object({
@@ -33,9 +34,21 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  turnstileSiteKey?: string;
+  nonce?: string;
+}
+
+export function RegisterForm({ turnstileSiteKey, nonce }: RegisterFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  function resetTurnstile() {
+    setTurnstileToken(null);
+    setTurnstileKey((k) => k + 1);
+  }
 
   const {
     register,
@@ -48,6 +61,10 @@ export function RegisterForm() {
 
   async function onSubmit(data: FormValues) {
     setError(null);
+    if (turnstileSiteKey && !turnstileToken) {
+      setError('Please complete the verification challenge.');
+      return;
+    }
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -57,15 +74,18 @@ export function RegisterForm() {
           email: data.email,
           password: data.password,
           acceptTerms: data.acceptTerms,
+          turnstileToken,
         }),
       });
       if (response.status === 429) {
         setError('Too many attempts. Please try again in a little while.');
+        resetTurnstile();
         return;
       }
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
         setError(payload?.error ?? 'Registration failed. Please try again.');
+        resetTurnstile();
         return;
       }
       router.replace(
@@ -73,6 +93,7 @@ export function RegisterForm() {
       );
     } catch {
       setError('Something went wrong. Please try again.');
+      resetTurnstile();
     }
   }
 
@@ -152,6 +173,13 @@ export function RegisterForm() {
             </p>
           )}
         </div>
+
+        <TurnstileWidget
+          key={turnstileKey}
+          siteKey={turnstileSiteKey}
+          nonce={nonce}
+          onToken={setTurnstileToken}
+        />
 
         <RetroButton type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? 'Creating account...' : 'Create account'}
