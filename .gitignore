@@ -48,10 +48,12 @@ yarn-error.log*
 
 # AI assistant instructions
 CLAUDE.md
+.claude/
 
 # internal dev docs (not for public repo)
 sessions/
 plans/
+SHIPPING.md
 
 # typescript
 *.tsbuildinfo
