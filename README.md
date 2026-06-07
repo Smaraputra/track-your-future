@@ -1,19 +1,95 @@
+<div align="center">
+
+<img src="public/logo.png" alt="Track Your Future" width="96" height="96" />
+
 # Track Your Future
 
-Track Your Future is a multi-tenant SaaS job-application tracking platform, a "job search command center." Users store CVs and cover letters, manage reusable form-field answers, track applications through a status pipeline, and generate AI-powered insights. The interface uses a retro terminal aesthetic. The product is monetized through Free and Pro ($9/month) tiers with billing handled by Stripe or Polar.
+**Your job-search command center.** Track every application, store your CVs and reusable answers, and get AI-powered insights, all wrapped in a retro terminal UI.
+
+[Live Demo](https://trackedyourfuture.com) &nbsp;&middot;&nbsp; [Features](#features) &nbsp;&middot;&nbsp; [Screenshots](#screenshots) &nbsp;&middot;&nbsp; [Tech Stack](#tech-stack) &nbsp;&middot;&nbsp; [Getting Started](#getting-started) &nbsp;&middot;&nbsp; [API](#api) &nbsp;&middot;&nbsp; [License](#license)
+
+![Version](https://img.shields.io/badge/version-1.0.0-22c55e?style=flat-square)
+![License](https://img.shields.io/badge/license-source--available-f59e0b?style=flat-square)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-1400%2B%20passing-22c55e?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/Smaraputra/track-your-future?style=flat-square)
+
+<img src="docs/assets/dashboard.png" alt="Track Your Future dashboard" width="100%" />
+
+</div>
+
+## Live demo
+
+Try it without installing anything at **[trackedyourfuture.com](https://trackedyourfuture.com)**. A shared demo account is preloaded with sample applications, documents, and AI results, with all Pro features unlocked.
+
+| Field | Value |
+|-------|-------|
+| URL | https://trackedyourfuture.com/login |
+| Email | `demo@trackedyourfuture.com` |
+| Password | `demo-explore-2026` |
+
+The demo account is shared and periodically reset, so treat it as a sandbox.
+
+## About
+
+Job searching scatters your life across spreadsheets, note apps, and a dozen browser tabs. Track Your Future pulls it into one place: a command center where every application has a status, every CV and cover letter has a home, and an AI layer reads job descriptions to tell you how well you match and what to fix. It is a full multi-tenant SaaS, with authentication, billing, an object store, and a public API, presented through a deliberately retro terminal aesthetic with green and amber themes.
 
 ## Features
 
-- Authentication with email and password plus Google and GitHub OAuth (NextAuth v5), email verification, password reset, and per-email login lockout.
-- Role categories to organize applications, documents, and reusable answers.
-- Document storage for CVs and cover letters with versioning, served through presigned object-storage URLs.
-- Reusable form-field templates whose values are encrypted at rest (AES-256-GCM).
-- Application tracking through a status pipeline with status history and milestone notifications.
-- AI suite: CV parsing, job-description extraction, match scoring, cover-letter generation, interview preparation, and resume suggestions, with per-plan usage limits.
-- Dashboard, analytics, and in-app notifications.
-- Billing with Stripe or Polar, including checkout, trials, and a customer portal. Billing can be disabled to grant all users Pro access.
-- A personal API token system exposing a versioned REST API under `/api/v1`. See [API documentation](docs/api-v1.md).
-- Security features: Cloudflare Turnstile on all auth forms, per-request CSP nonces, an audit log, rate limiting, and application-level encryption for sensitive columns.
+- **Application pipeline.** Track every application through a status pipeline (draft, applied, phone screen, interview, offer, rejected, ghosted, withdrawn) with full status history and milestone notifications.
+- **AI suite.** CV parsing, job-description extraction, match scoring, cover-letter generation, interview preparation, and resume suggestions, each with per-plan usage limits.
+- **Documents.** Store CVs and cover letters with versioning, served through presigned object-storage URLs so binaries never proxy through the app.
+- **Roles and reusable answers.** Organize everything by role category, and keep reusable form-field answers that are encrypted at rest (AES-256-GCM).
+- **Analytics.** Status distribution, a conversion funnel, and per-role breakdowns.
+- **Auth and security.** Email and password plus Google and GitHub OAuth (NextAuth v5), email verification, password reset, per-email login lockout, Cloudflare Turnstile, per-request CSP nonces, an audit log, and rate limiting.
+- **Billing.** Free and Pro ($9/mo) tiers via Stripe or Polar, with checkout, trials, and a customer portal. Billing can be disabled to grant everyone Pro access.
+- **Public API.** A versioned REST API under `/api/v1`, authenticated with scoped personal API tokens.
+- **Retro UI.** Green and amber terminal themes with an optional CRT scanline overlay, plus full GDPR cookie consent and data export and deletion.
+
+### Application pipeline
+
+<img src="docs/assets/applications.png" alt="Application pipeline board" width="100%" />
+
+### AI insights
+
+Score how well your profile matches a job, see strengths and gaps, and generate tailored cover letters in different tones.
+
+<img src="docs/assets/ai-insights.png" alt="AI match score and cover letter generation" width="100%" />
+
+### Analytics
+
+<img src="docs/assets/analytics.png" alt="Analytics: status distribution and conversion funnel" width="100%" />
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/landing-green.jpg" alt="Landing page, green theme" /><br/><sub>Landing, green theme</sub></td>
+    <td width="50%"><img src="docs/assets/landing-amber.jpg" alt="Landing page, amber theme" /><br/><sub>Landing, amber theme</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/application-detail.png" alt="Application detail" /><br/><sub>Application detail</sub></td>
+    <td><img src="docs/assets/documents.png" alt="Documents" /><br/><sub>Documents</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/roles.png" alt="Role categories" /><br/><sub>Role categories</sub></td>
+    <td><img src="docs/assets/settings.png" alt="Settings" /><br/><sub>Settings and themes</sub></td>
+  </tr>
+</table>
+
+<details>
+<summary>Mobile views</summary>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/landing-mobile.jpg" alt="Landing on mobile" /><br/><sub>Landing</sub></td>
+    <td width="50%"><img src="docs/assets/dashboard-mobile.png" alt="Dashboard on mobile" /><br/><sub>Dashboard</sub></td>
+  </tr>
+</table>
+
+</details>
 
 ## Tech stack
 
@@ -53,6 +129,8 @@ If pnpm is not yet available:
 | `corepack enable`<br>`corepack prepare pnpm@latest --activate` |
 
 ## Getting started
+
+This project is source-available; the steps below are for running it locally to inspect and evaluate the code (see [License](#license)).
 
 Clone the repository and install dependencies:
 
@@ -96,6 +174,9 @@ The application is then available at `http://localhost:3001`.
 
 Copy `.env.example` to `.env.local` and provide values. The most important variables are listed below.
 
+<details>
+<summary>Environment variable reference</summary>
+
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string. |
@@ -112,7 +193,10 @@ Copy `.env.example` to `.env.local` and provide values. The most important varia
 | `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, `POLAR_PRODUCT_MONTHLY`, `POLAR_PRODUCT_ANNUAL` | Conditional | Required when `BILLING_PROVIDER` is `polar`. |
 | `OPENAI_API_KEY`, `MISTRAL_API_KEY` | Conditional | At least one AI provider key is required to use AI features. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `CONTACT_EMAIL` | No | Email delivery configuration. |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | No | Cloudflare Turnstile. When unset, the challenge is disabled. |
 | `CRON_SECRET` | No | Shared secret for authenticating scheduled cron requests. |
+
+</details>
 
 Generate a value for `DATA_ENCRYPTION_KEY` with:
 
@@ -198,6 +282,10 @@ The application is deployed to a self-hosted Linux VPS (Ubuntu), behind a Caddy 
 
 Continuous deployment is handled by a GitHub Actions workflow that runs on pushes to `main`. The workflow connects to the server over SSH, pulls the latest code, rebuilds and restarts the containers, and prunes unused images. On startup the application container waits for PostgreSQL, applies pending migrations, and starts the server.
 
+## Project status
+
+Version 1.0.0, feature-complete across 26 build steps, backed by 1400+ unit and integration tests plus an end-to-end Playwright suite. See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## Conventions
 
 - Commit messages follow Conventional Commits, for example `feat(api): add per-user scoped API token system`.
@@ -205,6 +293,10 @@ Continuous deployment is handled by a GitHub Actions workflow that runs on pushe
 - Every database query is scoped to the authenticated user.
 - File uploads always use presigned URLs; binary data is never proxied through the application server.
 - AI calls are tracked in the `ai_usage` table and enforce plan limits.
+
+## Contributing
+
+This project is source-available and does not currently accept external contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for details, and [SECURITY.md](SECURITY.md) for how to report security issues.
 
 ## License
 
