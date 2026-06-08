@@ -69,6 +69,13 @@ describe('Applications list/create route (GET/POST /api/applications)', () => {
     expect(source).toContain('request.json().catch(() => null)');
     expect(source).toContain('Invalid JSON');
   });
+
+  it('records an initial draft -> status history row for non-draft creations', () => {
+    expect(source).toContain('db.transaction');
+    expect(source).toContain('applicationStatusHistory');
+    expect(source).toContain("fromStatus: 'draft'");
+    expect(source).toContain('toStatus: status');
+  });
 });
 
 describe('Application detail route (GET/PATCH/DELETE /api/applications/[applicationId])', () => {
@@ -128,6 +135,23 @@ describe('Application detail route (GET/PATCH/DELETE /api/applications/[applicat
   it('PATCH returns existing if no fields changed', () => {
     expect(source).toContain('Object.keys(updateData).length === 0');
     expect(source).toContain('return NextResponse.json(existing)');
+  });
+
+  it('PATCH persists currentStatus changes', () => {
+    expect(source).toContain('updateData.currentStatus = nextStatus');
+  });
+
+  it('PATCH records a status-history transition transactionally', () => {
+    expect(source).toContain('db.transaction');
+    expect(source).toContain('tx.insert(applicationStatusHistory)');
+    expect(source).toContain('fromStatus: existing.currentStatus');
+    expect(source).toContain('toStatus: nextStatus');
+  });
+
+  it('PATCH fires milestone detection on status change', () => {
+    expect(source).toContain('detectMilestones');
+    expect(source).toContain("event: 'status_changed'");
+    expect(source).toContain('newStatus: nextStatus');
   });
 
   it('DELETE checks ownership before deleting', () => {

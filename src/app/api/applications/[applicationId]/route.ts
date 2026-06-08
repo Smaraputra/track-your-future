@@ -11,6 +11,7 @@ import {
 import { roleCategories, documents } from '@/db/schema/core';
 import { parsedProfiles } from '@/db/schema/ai';
 import { updateApplicationSchema } from '@/lib/applications/schemas';
+import { detectMilestones } from '@/lib/notifications/milestones';
 
 export async function GET(
   _request: Request,
@@ -141,6 +142,15 @@ export async function PATCH(
     }
   }
 
+  // Status change carries side effects (history + milestones), so detect it
+  // up front. `nextStatus` is null when status is unchanged, which lets
+  // TypeScript narrow it to the enum inside the change branches below.
+  const nextStatus =
+    parsed.data.currentStatus !== undefined &&
+    parsed.data.currentStatus !== existing.currentStatus
+      ? parsed.data.currentStatus
+      : null;
+
   const updateData: Record<string, unknown> = {};
   if (parsed.data.companyName !== undefined) updateData.companyName = parsed.data.companyName;
   if (parsed.data.jobTitle !== undefined) updateData.jobTitle = parsed.data.jobTitle;
@@ -152,21 +162,57 @@ export async function PATCH(
   if (parsed.data.appliedAt !== undefined) {
     updateData.appliedAt = parsed.data.appliedAt ? new Date(parsed.data.appliedAt) : null;
   }
+  if (nextStatus !== null) updateData.currentStatus = nextStatus;
 
   if (Object.keys(updateData).length === 0) {
     return NextResponse.json(existing);
   }
 
-  const [updated] = await db
-    .update(applications)
-    .set(updateData)
-    .where(
-      and(
-        eq(applications.id, applicationId),
-        eq(applications.userId, session.user.id),
-      ),
-    )
-    .returning();
+  // When the status changes, update + record the transition atomically,
+  // mirroring the dedicated PATCH .../status route. Note: appliedAt is NOT
+  // auto-set here (unlike the status route) because the edit form exposes it
+  // as an explicit field that the user controls directly.
+  const [updated] =
+    nextStatus !== null
+      ? await db.transaction(async (tx) => {
+          const rows = await tx
+            .update(applications)
+            .set(updateData)
+            .where(
+              and(
+                eq(applications.id, applicationId),
+                eq(applications.userId, session.user.id),
+              ),
+            )
+            .returning();
+
+          await tx.insert(applicationStatusHistory).values({
+            applicationId,
+            fromStatus: existing.currentStatus,
+            toStatus: nextStatus,
+          });
+
+          return rows;
+        })
+      : await db
+          .update(applications)
+          .set(updateData)
+          .where(
+            and(
+              eq(applications.id, applicationId),
+              eq(applications.userId, session.user.id),
+            ),
+          )
+          .returning();
+
+  if (nextStatus !== null) {
+    // Fire-and-forget milestone detection
+    detectMilestones(session.user.id, {
+      event: 'status_changed',
+      applicationId,
+      newStatus: nextStatus,
+    }).catch(() => {});
+  }
 
   return NextResponse.json(updated);
 }

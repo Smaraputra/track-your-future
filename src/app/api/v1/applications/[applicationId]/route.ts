@@ -8,6 +8,7 @@ import {
 } from '@/db/schema/applications';
 import { documents, roleCategories } from '@/db/schema/core';
 import { updateApplicationSchema } from '@/lib/applications/schemas';
+import { detectMilestones } from '@/lib/notifications/milestones';
 import { withApiToken, readJsonBody } from '@/lib/api/v1/with-token';
 import { apiOk, apiError, apiValidationError } from '@/lib/api/v1/response';
 
@@ -69,6 +70,14 @@ export const PATCH = withApiToken<Ctx>('write', async (request, { params }, { us
     }
   }
 
+  // null when status is unchanged; lets TypeScript narrow to the enum in the
+  // change branches below.
+  const nextStatus =
+    parsed.data.currentStatus !== undefined &&
+    parsed.data.currentStatus !== existing.currentStatus
+      ? parsed.data.currentStatus
+      : null;
+
   const updateData: Record<string, unknown> = {};
   if (parsed.data.companyName !== undefined) updateData.companyName = parsed.data.companyName;
   if (parsed.data.jobTitle !== undefined) updateData.jobTitle = parsed.data.jobTitle;
@@ -80,14 +89,42 @@ export const PATCH = withApiToken<Ctx>('write', async (request, { params }, { us
   if (parsed.data.appliedAt !== undefined) {
     updateData.appliedAt = parsed.data.appliedAt ? new Date(parsed.data.appliedAt) : null;
   }
+  if (nextStatus !== null) updateData.currentStatus = nextStatus;
 
   if (Object.keys(updateData).length === 0) return apiOk(existing);
 
-  const [updated] = await db
-    .update(applications)
-    .set(updateData)
-    .where(and(eq(applications.id, applicationId), eq(applications.userId, userId)))
-    .returning();
+  // Record the transition atomically when the status changes (mirrors the
+  // dedicated PATCH .../status route).
+  const [updated] =
+    nextStatus !== null
+      ? await db.transaction(async (tx) => {
+          const rows = await tx
+            .update(applications)
+            .set(updateData)
+            .where(and(eq(applications.id, applicationId), eq(applications.userId, userId)))
+            .returning();
+
+          await tx.insert(applicationStatusHistory).values({
+            applicationId,
+            fromStatus: existing.currentStatus,
+            toStatus: nextStatus,
+          });
+
+          return rows;
+        })
+      : await db
+          .update(applications)
+          .set(updateData)
+          .where(and(eq(applications.id, applicationId), eq(applications.userId, userId)))
+          .returning();
+
+  if (nextStatus !== null) {
+    detectMilestones(userId, {
+      event: 'status_changed',
+      applicationId,
+      newStatus: nextStatus,
+    }).catch(() => {});
+  }
 
   return apiOk(updated);
 });
