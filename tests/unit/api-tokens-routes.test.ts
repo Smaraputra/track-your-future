@@ -75,6 +75,9 @@ describe('v1 resource routes', () => {
   const confirm = read('src/app/api/v1/documents/confirm/route.ts');
   const templates = read('src/app/api/v1/roles/[roleId]/templates/route.ts');
   const ai = read('src/app/api/v1/ai/[feature]/route.ts');
+  const appDocs = read(
+    'src/app/api/v1/applications/[applicationId]/documents/route.ts',
+  );
 
   // Tolerate the optional <Ctx> generic on dynamic-route handlers.
   const usesScope = (src: string, scope: string) =>
@@ -105,5 +108,26 @@ describe('v1 resource routes', () => {
     expect(usesScope(ai, 'read')).toBe(true);
     expect(ai).toContain('isAiFeatureSlug(feature)');
     expect(usesScope(ai, 'write')).toBe(false);
+  });
+
+  it('exposes read GET and write POST/DELETE on application documents', () => {
+    expect(usesScope(appDocs, 'read')).toBe(true);
+    expect(usesScope(appDocs, 'write')).toBe(true);
+    expect(appDocs).toContain('export const GET');
+    expect(appDocs).toContain('export const POST');
+    expect(appDocs).toContain('export const DELETE');
+  });
+
+  it('scopes document linking to the owner and verifies document ownership', () => {
+    expect(appDocs).toContain('eq(applications.userId, userId)');
+    expect(appDocs).toContain('eq(documents.userId, userId)');
+    expect(appDocs).toContain("'already_linked'");
+  });
+
+  it('records status history on v1 create and update transitions', () => {
+    expect(apps).toContain('applicationStatusHistory');
+    expect(apps).toContain("fromStatus: 'draft'");
+    expect(appItem).toContain('tx.insert(applicationStatusHistory)');
+    expect(appItem).toContain('toStatus: nextStatus');
   });
 });

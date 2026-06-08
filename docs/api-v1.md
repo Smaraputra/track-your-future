@@ -188,6 +188,32 @@ Request body:
 |---|
 | `curl -X PATCH https://trackedyourfuture.com/api/v1/applications/1f2e.../status \`<br>`  -H "Authorization: Bearer tyf_YOUR_TOKEN" \`<br>`  -H "Content-Type: application/json" \`<br>`  -d '{ "status": "interview" }'` |
 
+#### GET /applications/{applicationId}/documents
+
+Lists the documents linked to an application. Scope: `read`. Returns an array of document metadata.
+
+#### POST /applications/{applicationId}/documents
+
+Links an existing document to the application. Scope: `write`. Returns `201`. A document already linked to the application returns `409`.
+
+Request body:
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `documentId` | uuid | Yes | Must be a document owned by the caller. |
+
+| |
+|---|
+| `curl -X POST https://trackedyourfuture.com/api/v1/applications/1f2e.../documents \`<br>`  -H "Authorization: Bearer tyf_YOUR_TOKEN" \`<br>`  -H "Content-Type: application/json" \`<br>`  -d '{ "documentId": "c3d4..." }'` |
+
+#### DELETE /applications/{applicationId}/documents
+
+Unlinks a document from the application. Scope: `write`. The `documentId` is supplied as a query parameter. Returns `{ "success": true }`.
+
+| |
+|---|
+| `curl -X DELETE "https://trackedyourfuture.com/api/v1/applications/1f2e.../documents?documentId=c3d4..." \`<br>`  -H "Authorization: Bearer tyf_YOUR_TOKEN"` |
+
 ### Role categories
 
 #### GET /roles

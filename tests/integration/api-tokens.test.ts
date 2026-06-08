@@ -72,6 +72,38 @@ describe.skipIf(!DATABASE_URL)('API token system integration', () => {
     return app.id;
   }
 
+  async function createDocument(userId: string): Promise<string> {
+    const database = await getDb();
+    const { documents } = await import('@/db/schema/core');
+    const [doc] = await database
+      .insert(documents)
+      .values({
+        userId,
+        documentType: 'cv',
+        fileName: 'resume.pdf',
+        fileKey: `${userId}/test/cv/${crypto.randomUUID()}/v1/resume.pdf`,
+        mimeType: 'application/pdf',
+        fileSizeBytes: 1024,
+        version: 1,
+        isLatest: true,
+      })
+      .returning({ id: documents.id });
+    return doc.id;
+  }
+
+  function appCtx(applicationId: string) {
+    return { params: Promise.resolve({ applicationId }) };
+  }
+
+  async function historyFor(applicationId: string) {
+    const database = await getDb();
+    const { applicationStatusHistory } = await import('@/db/schema/applications');
+    return database
+      .select()
+      .from(applicationStatusHistory)
+      .where(eq(applicationStatusHistory.applicationId, applicationId));
+  }
+
   it('resolves a valid token to its owner', async () => {
     const userId = await createTestUser('resolve');
     const token = await issueToken(userId);
@@ -180,5 +212,211 @@ describe.skipIf(!DATABASE_URL)('API token system integration', () => {
     await issueToken(userId, { revoked: true });
     const stillTwo = await checkResourceLimit(userId, 'apiTokens', 'free');
     expect(stillTwo.current).toBe(2);
+  });
+
+  it('PATCH persists currentStatus and records a history transition', async () => {
+    const userId = await createTestUser('patch-status');
+    const appId = await createApplication(userId, 'StatusCo'); // draft
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { PATCH } = await import('@/app/api/v1/applications/[applicationId]/route');
+    const req = new Request(`http://localhost/api/v1/applications/${appId}`, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ currentStatus: 'rejected' }),
+    });
+    const res = await PATCH(req, appCtx(appId));
+    expect(res.status).toBe(200);
+
+    const database = await getDb();
+    const { applications } = await import('@/db/schema/applications');
+    const [app] = await database
+      .select()
+      .from(applications)
+      .where(eq(applications.id, appId));
+    expect(app.currentStatus).toBe('rejected');
+
+    const history = await historyFor(appId);
+    expect(history).toHaveLength(1);
+    expect(history[0].fromStatus).toBe('draft');
+    expect(history[0].toStatus).toBe('rejected');
+  });
+
+  it('PATCH does not record history when the status is unchanged', async () => {
+    const userId = await createTestUser('patch-nostatus');
+    const appId = await createApplication(userId, 'NoChangeCo'); // draft
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { PATCH } = await import('@/app/api/v1/applications/[applicationId]/route');
+    const req = new Request(`http://localhost/api/v1/applications/${appId}`, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ jobTitle: 'New Title', currentStatus: 'draft' }),
+    });
+    const res = await PATCH(req, appCtx(appId));
+    expect(res.status).toBe(200);
+
+    const database = await getDb();
+    const { applications } = await import('@/db/schema/applications');
+    const [app] = await database
+      .select()
+      .from(applications)
+      .where(eq(applications.id, appId));
+    expect(app.jobTitle).toBe('New Title');
+    expect(await historyFor(appId)).toHaveLength(0);
+  });
+
+  it('POST records an initial draft -> status row for non-draft creations', async () => {
+    const userId = await createTestUser('create-status');
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { POST } = await import('@/app/api/v1/applications/route');
+    const req = new Request('http://localhost/api/v1/applications', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        companyName: 'CreatedApplied',
+        jobTitle: 'Engineer',
+        currentStatus: 'applied',
+      }),
+    });
+    const res = await POST(req, {} as never);
+    expect(res.status).toBe(201);
+    const created = (await res.json()) as { id: string };
+
+    const history = await historyFor(created.id);
+    expect(history).toHaveLength(1);
+    expect(history[0].fromStatus).toBe('draft');
+    expect(history[0].toStatus).toBe('applied');
+  });
+
+  it('POST does not record history for draft creations', async () => {
+    const userId = await createTestUser('create-draft');
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { POST } = await import('@/app/api/v1/applications/route');
+    const req = new Request('http://localhost/api/v1/applications', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ companyName: 'CreatedDraft', jobTitle: 'Engineer' }),
+    });
+    const res = await POST(req, {} as never);
+    expect(res.status).toBe(201);
+    const created = (await res.json()) as { id: string };
+
+    expect(await historyFor(created.id)).toHaveLength(0);
+  });
+
+  it('links, lists, and unlinks a document via the v1 endpoint', async () => {
+    const userId = await createTestUser('doclink');
+    const appId = await createApplication(userId, 'DocLinkCo');
+    const docId = await createDocument(userId);
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { GET, POST, DELETE } = await import(
+      '@/app/api/v1/applications/[applicationId]/documents/route'
+    );
+    const base = `http://localhost/api/v1/applications/${appId}/documents`;
+
+    const linkRes = await POST(
+      new Request(base, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ documentId: docId }),
+      }),
+      appCtx(appId),
+    );
+    expect(linkRes.status).toBe(201);
+
+    const listRes = await GET(
+      new Request(base, { headers: { authorization: `Bearer ${token}` } }),
+      appCtx(appId),
+    );
+    expect(listRes.status).toBe(200);
+    const docs = (await listRes.json()) as Array<{ id: string }>;
+    expect(docs).toHaveLength(1);
+    expect(docs[0].id).toBe(docId);
+
+    const delRes = await DELETE(
+      new Request(`${base}?documentId=${docId}`, {
+        method: 'DELETE',
+        headers: { authorization: `Bearer ${token}` },
+      }),
+      appCtx(appId),
+    );
+    expect(delRes.status).toBe(200);
+
+    const afterRes = await GET(
+      new Request(base, { headers: { authorization: `Bearer ${token}` } }),
+      appCtx(appId),
+    );
+    expect((await afterRes.json()) as unknown[]).toHaveLength(0);
+  });
+
+  it('rejects document linking with a read-only token', async () => {
+    const userId = await createTestUser('doclink-read');
+    const appId = await createApplication(userId, 'ReadOnlyCo');
+    const docId = await createDocument(userId);
+    const readToken = await issueToken(userId, { scope: 'read' });
+
+    const { POST } = await import(
+      '@/app/api/v1/applications/[applicationId]/documents/route'
+    );
+    const res = await POST(
+      new Request(`http://localhost/api/v1/applications/${appId}/documents`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${readToken}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ documentId: docId }),
+      }),
+      appCtx(appId),
+    );
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 404 when linking another tenant's document", async () => {
+    const userA = await createTestUser('doclink-A');
+    const userB = await createTestUser('doclink-B');
+    const appId = await createApplication(userA, 'TenantACo');
+    const otherDocId = await createDocument(userB);
+    const tokenA = await issueToken(userA, { scope: 'write' });
+
+    const { POST } = await import(
+      '@/app/api/v1/applications/[applicationId]/documents/route'
+    );
+    const res = await POST(
+      new Request(`http://localhost/api/v1/applications/${appId}/documents`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${tokenA}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ documentId: otherDocId }),
+      }),
+      appCtx(appId),
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it('returns 409 when linking an already-linked document', async () => {
+    const userId = await createTestUser('doclink-dup');
+    const appId = await createApplication(userId, 'DupLinkCo');
+    const docId = await createDocument(userId);
+    const token = await issueToken(userId, { scope: 'write' });
+
+    const { POST } = await import(
+      '@/app/api/v1/applications/[applicationId]/documents/route'
+    );
+    const link = () =>
+      POST(
+        new Request(`http://localhost/api/v1/applications/${appId}/documents`, {
+          method: 'POST',
+          headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+          body: JSON.stringify({ documentId: docId }),
+        }),
+        appCtx(appId),
+      );
+
+    expect((await link()).status).toBe(201);
+    const dup = await link();
+    expect(dup.status).toBe(409);
+    const body = (await dup.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('already_linked');
   });
 });

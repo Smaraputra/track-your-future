@@ -1,7 +1,7 @@
 import { and, desc, eq } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { applications } from '@/db/schema/applications';
+import { applications, applicationStatusHistory } from '@/db/schema/applications';
 import { roleCategories } from '@/db/schema/core';
 import { applicationStatusEnum } from '@/db/schema/enums';
 import { createApplicationSchema } from '@/lib/applications/schemas';
@@ -72,19 +72,31 @@ export const POST = withApiToken('write', async (request, _ctx, { userId }) => {
       ? new Date()
       : null;
 
-  const [application] = await db
-    .insert(applications)
-    .values({
-      userId,
-      companyName: parsed.data.companyName,
-      jobTitle: parsed.data.jobTitle,
-      jobUrl: parsed.data.jobUrl || null,
-      roleCategoryId,
-      currentStatus: status,
-      appliedAt,
-      notes: parsed.data.notes || null,
-    })
-    .returning();
+  const insertValues = {
+    userId,
+    companyName: parsed.data.companyName,
+    jobTitle: parsed.data.jobTitle,
+    jobUrl: parsed.data.jobUrl || null,
+    roleCategoryId,
+    currentStatus: status,
+    appliedAt,
+    notes: parsed.data.notes || null,
+  };
+
+  // Record the implicit draft -> status transition for non-draft creations so
+  // the analytics funnel and timeline stay accurate (mirrors PATCH .../status).
+  const [application] =
+    status !== 'draft'
+      ? await db.transaction(async (tx) => {
+          const [app] = await tx.insert(applications).values(insertValues).returning();
+          await tx.insert(applicationStatusHistory).values({
+            applicationId: app.id,
+            fromStatus: 'draft',
+            toStatus: status,
+          });
+          return [app];
+        })
+      : await db.insert(applications).values(insertValues).returning();
 
   detectMilestones(userId, {
     event: 'app_created',
