@@ -20,6 +20,29 @@
 
 </div>
 
+## Table of Contents
+
+- [Live demo](#live-demo)
+- [About](#about)
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Tech stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting started](#getting-started)
+- [Environment variables](#environment-variables)
+- [Available scripts](#available-scripts)
+- [Database and migrations](#database-and-migrations)
+- [Testing](#testing)
+- [API](#api)
+- [Plan limits](#plan-limits)
+- [Deployment](#deployment)
+- [Documentation](#documentation)
+- [Project status](#project-status)
+- [Conventions](#conventions)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
 ## Live demo
 
 Try it without installing anything at **[trackedyourfuture.com](https://trackedyourfuture.com)**. A shared demo account is preloaded with sample applications, documents, and AI results, with all Pro features unlocked.
@@ -110,13 +133,29 @@ Score how well your profile matches a job, see strengths and gaps, and generate 
 
 ## Architecture
 
-| |
-|---|
-| `src/`<br>`  app/                 Next.js App Router pages and API routes`<br>`    (public)/          Landing, auth pages, legal, pricing`<br>`    (dashboard)/       Authenticated app (sidebar + header layout)`<br>`    api/               API routes (auth, checkout, webhooks, documents, ai, settings, v1)`<br>`  components/           React components (retro UI system)`<br>`  db/                   Drizzle ORM (connection, schema, migrations)`<br>`  lib/                  Server utilities (auth, billing, ai, minio, email, crypto)`<br>`  hooks/                Custom React hooks`<br>`  types/                TypeScript type definitions`<br>`drizzle/                Generated SQL migrations (committed)`<br>`docs/                   Documentation`<br>`tests/                  unit, integration, and e2e tests` |
+```text
+src/
+  app/                 Next.js App Router pages and API routes
+    (public)/          Landing, auth pages, legal, pricing
+    (dashboard)/       Authenticated app (sidebar + header layout)
+    api/               API routes (auth, checkout, webhooks, documents, ai, settings, v1)
+  components/          React components (retro UI system)
+  db/                  Drizzle ORM (connection, schema, migrations)
+  lib/                 Server utilities (auth, billing, ai, minio, email, crypto)
+  hooks/               Custom React hooks
+  types/               TypeScript type definitions
+drizzle/               Generated SQL migrations (committed)
+docs/                  Documentation
+tests/                 Unit, integration, and e2e tests
+```
 
 Multi-tenancy is enforced by scoping every database query to `session.user.id` (or, for the API, the token owner's user id).
 
-## Prerequisites
+## Getting started
+
+This project is source-available; the steps below are for running it locally to inspect and evaluate the code (see [License](#license)).
+
+### Prerequisites
 
 - Node.js 20 or newer (the project is developed on Node 24).
 - pnpm, enabled through Corepack.
@@ -124,51 +163,36 @@ Multi-tenancy is enforced by scoping every database query to `session.user.id` (
 
 If pnpm is not yet available:
 
-| |
-|---|
-| `corepack enable`<br>`corepack prepare pnpm@latest --activate` |
+```bash
+corepack enable
+corepack prepare pnpm@latest --activate
+```
 
-## Getting started
+### Installation
 
-This project is source-available; the steps below are for running it locally to inspect and evaluate the code (see [License](#license)).
+```bash
+# Clone and install
+git clone https://github.com/Smaraputra/track-your-future.git
+cd track-your-future
+pnpm install
 
-Clone the repository and install dependencies:
+# Configure environment (fill in the required values; see Environment variables below)
+cp .env.example .env.local
 
-| |
-|---|
-| `pnpm install` |
+# Start PostgreSQL, MinIO, Redis, and the one-shot MinIO bucket initializer
+docker compose up -d
 
-Create a local environment file and fill in the required values (see [Environment variables](#environment-variables)):
+# Apply database migrations
+pnpm db:migrate
 
-| |
-|---|
-| `cp .env.example .env.local` |
+# Optionally seed development data
+pnpm db:seed
 
-Start the backing services (PostgreSQL, MinIO, Redis, and the one-shot MinIO bucket initializer):
+# Start the dev server (port 3001 matches the default AUTH_URL in .env.example)
+PORT=3001 pnpm dev
+```
 
-| |
-|---|
-| `docker compose up -d` |
-
-Apply database migrations:
-
-| |
-|---|
-| `pnpm db:migrate` |
-
-Optionally seed development data:
-
-| |
-|---|
-| `pnpm db:seed` |
-
-Start the development server. Port 3001 is recommended locally to avoid conflicts, and matches the default `AUTH_URL` in `.env.example`:
-
-| |
-|---|
-| `PORT=3001 pnpm dev` |
-
-The application is then available at `http://localhost:3001`.
+The application is then available at [http://localhost:3001](http://localhost:3001).
 
 ## Environment variables
 
@@ -200,11 +224,11 @@ Copy `.env.example` to `.env.local` and provide values. The most important varia
 
 Generate a value for `DATA_ENCRYPTION_KEY` with:
 
-| |
-|---|
-| `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
 
-Rotating `DATA_ENCRYPTION_KEY` requires re-encrypting every affected row; plan changes accordingly.
+> Note: rotating `DATA_ENCRYPTION_KEY` requires re-encrypting every affected row; plan changes accordingly.
 
 ## Available scripts
 
@@ -229,9 +253,10 @@ The schema is defined with Drizzle ORM under `src/db/schema`. Migrations are gen
 
 After changing the schema, generate and review a migration, then apply it:
 
-| |
-|---|
-| `pnpm db:generate`<br>`pnpm db:migrate` |
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
 
 In deployment, migrations are applied automatically on container start. Always generate migrations locally, commit them, and let the deployment apply them.
 
@@ -241,21 +266,24 @@ The project uses Vitest for unit and integration tests and Playwright for end-to
 
 Unit tests run without external services:
 
-| |
-|---|
-| `pnpm test` |
+```bash
+pnpm test
+```
 
 Integration tests are guarded and only run when a database is available. Provide a reachable `DATABASE_URL`:
 
-| |
-|---|
-| `DATABASE_URL=postgresql://tyf:tyf_dev_password@localhost:5432/track_your_future pnpm test` |
+```bash
+DATABASE_URL=postgresql://tyf:tyf_dev_password@localhost:5432/track_your_future pnpm test
+```
 
 Before committing, the project convention is to run the full check sequence and ensure each step is clean:
 
-| |
-|---|
-| `pnpm lint`<br>`pnpm typecheck`<br>`pnpm test`<br>`pnpm build` |
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
 
 ## API
 
@@ -282,6 +310,13 @@ The application is deployed to a self-hosted Linux VPS (Ubuntu), behind a Caddy 
 
 Continuous deployment is handled by a GitHub Actions workflow that runs on pushes to `main`. The workflow connects to the server over SSH, pulls the latest code, rebuilds and restarts the containers, and prunes unused images. On startup the application container waits for PostgreSQL, applies pending migrations, and starts the server.
 
+## Documentation
+
+- [docs/api-v1.md](docs/api-v1.md): REST API v1 reference (authentication, scopes, rate limits, endpoints).
+- [CHANGELOG.md](CHANGELOG.md): version history.
+- [CONTRIBUTING.md](CONTRIBUTING.md): contribution policy.
+- [SECURITY.md](SECURITY.md): vulnerability reporting policy.
+
 ## Project status
 
 Version 1.0.0, feature-complete across 26 build steps, backed by 1400+ unit and integration tests plus an end-to-end Playwright suite. See [CHANGELOG.md](CHANGELOG.md) for release history.
@@ -301,3 +336,12 @@ This project is source-available and does not currently accept external contribu
 ## License
 
 This project is source-available, not open-source. The code is published for viewing, reference, and evaluation only; all rights are reserved and reuse, redistribution, or hosting is not permitted without written permission. See [LICENSE](LICENSE) for the full terms. External contributions are not currently accepted.
+
+## Acknowledgments
+
+- Next.js and the React ecosystem
+- shadcn/ui for the component primitives
+- Drizzle ORM
+- Stripe and Polar for billing
+- MinIO for S3-compatible object storage
+- Recharts for charts
